@@ -1,0 +1,55 @@
+From michelle@noao.edu Tue May 25 15:29:27 2004
+Date: Tue, 25 May 2004 15:29:25 -0700 (MST)
+From: Michelle Miller <michelle@noao.edu>
+To: Frank Valdes <valdes@noao.edu>
+Subject: newfirm dhs estimates
+
+Hi Frank,
+
+As I said, it looks big...  Also, I didn't adjust the time estimates as
+we just talked about (negotiating an ICD will take calendar time, but will
+not be fulltime effort for that person for the entire duration of 
+negotiations).  In addition, I changed categories as needed.
+
+Michelle
+*************************************************************************
+================================================================================
+
+                                            DAY
+Data Handling System                    |MM|205|
+    DHS Design                          |MM| 66| 
+        Monsoon/OCS ICD                 |MM|  1|
+        Pipeline/QR ICD                 |MM|  8|
+        Archive ICD                     |MM| 15|
+        AE/QL ICD                       |MM| 12|
+        DHS User Interface Spec.        |MM| 10|
+        *DHS High-level Design	        |MM| 10|
+        *DHS Low-level Design		|MM| 10|
+    DHS Implementation                  |MM|115|
+        **DHS Simulator                 |MM| 15|
+        **DHS Infrastructure            |MM| 75|
+           Agent/master 		|MM| 15|
+           FITS format			|MM| 10|
+    	   Monsoon/OCS Interface	|MM| 10| 
+           Archive Interface		|MM| 10|
+           Pipeline/QR Interface       	|MM| 10|
+           AE/QL Interface		|MM| 10|
+        DHS UI development              |MM| 15|
+        DHS Build/Config. Tools         |MM| 10|
+    DHS Testing                         |MM| 24|
+        ***DHS Unit Test                |MM|  0|
+        DHS Test Plan                   |MM|  9|
+        ****DHS Systems Test            |MM| 15|
+    DHS Delivery                        |MM|  0|
+Hardware                                |MM| 11|
+    Plan/Order Development H/W          |MM|  3|
+    Configure Development H/W           |MM|  3|
+    Order Operations Cluster            |MM|  2|
+    Config Operations Cluster           |MM|  3|
+
+* Added new categories and eliminated DHS Static & Dynamic Model
+** Removed sub-categories as too low level
+*** Unit test will be performed as part of implementation
+**** Includes DHS performance testing
+
+

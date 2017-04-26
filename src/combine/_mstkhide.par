@@ -1,0 +1,13 @@
+# _MSTKHIDE -- Image combine parameters
+
+obstype,s,h,"",,,Observation type selection expression (optional)
+detector,s,h,"",,,Detector ID expression (optional)
+select,s,h,"",,,Selection expression
+group,s,h,"",,,Group ID expression (optional)
+seqval,s,h,"",,,Sequence value expression
+seqgap,r,h,INDEF,,,Maximum gap in sequence value
+extension,s,h,"mkid(extname,1,1)",,,Extension expression
+delete,b,h,no,,,Delete input files after combining?
+outtype,s,h,"real","short|ushort|integer|long|real|double",,Output image pixel datatype
+outlimits,s,h,"",,,Output limits (x1 x2 y1 y2 ...)
+offsets,f,h,"wcs",,,Input image offsets

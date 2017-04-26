@@ -1,0 +1,5 @@
+input,s,a,,,,List of input catalogs
+output,f,a,,,,Output catalog
+catdef,s,h,"",,,Catalog definitions
+filter,s,h,"",,,Image catalog filter
+verbose,b,h,no,,,Verbose output?

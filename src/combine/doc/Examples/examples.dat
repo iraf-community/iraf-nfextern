@@ -1,0 +1,66 @@
+demo dark   dark    120 58323.1235 10
+DARK
+demo dark   dark    120 58323.1236 10
+DARK
+demo dark   dark    120 58323.1237 10
+DARK
+demo flat   dome    121 58323.1278 10
+V #123
+demo flat   dome    121 58323.1279 10
+V #123
+demo flat   dome    121 58323.1280 10
+V #123
+demo flat   dome    122 58323.1321 10
+R #124
+demo flat   dome    122 58323.1322 10
+R #124
+demo flat   dome    122 58323.1323 10
+R #124
+demo flat   dome    123 58323.1364 15
+V #123
+demo flat   dome    123 58323.1365 15
+V #123
+demo flat   dome    123 58323.1366 15
+V #123
+demo flat   dome    124 58323.1407 15
+R #124
+demo flat   dome    124 58323.1408 15
+R #124
+demo flat   dome    124 58323.1409 15
+R #124
+demo flat   sky     125 58323.1450 10
+V #123
+demo flat   sky     125 58323.1451 10
+V #123
+demo flat   sky     125 58323.1452 10
+V #123
+demo flat   sky     126 58323.1493 10
+R #124
+demo flat   sky     126 58323.1494 10
+R #124
+demo flat   sky     126 58323.1495 10
+R #124
+demo flat   sky     127 58323.1536 15
+V #123
+demo flat   sky     127 58323.1537 15
+V #123
+demo flat   sky     127 58323.1538 15
+V #123
+demo flat   sky     128 58323.1579 15
+R #124
+demo flat   sky     128 58323.1580 15
+R #124
+demo flat   sky     128 58323.1581 15
+R #124
+demo object program 129 58323.1622 300
+V #123
+demo object program 129 58323.1623 300
+V #123
+demo object program 129 58323.1624 300
+V #123
+demo object program 130 58323.1665 300
+R #124
+demo object program 130 58323.1666 300
+R #124
+demo object program 130 58323.1667 300
+R #124

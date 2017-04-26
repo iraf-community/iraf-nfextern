@@ -1,0 +1,785 @@
+include	<error.h>
+include	<math.h>
+include	<acecat.h>
+include	"ap.h"
+include	"ap0.h"
+include	"ap1.h"
+include	"ap2.h"
+include	"ap3.h"
+include	"ap4.h"
+
+define	NCATS	4		# Maximum number of output catalogs
+
+
+# T_ACEPAIRS -- Find pairs and write catalogs.
+
+procedure t_acepairs ()
+
+pointer	ap			# Catalog information
+pointer	pars			# Parameter information
+
+char	str[5]
+int	i
+pointer	sp
+
+bool	clgetb()
+int	clgwrd(), afn_gfn(), btoi()
+real	clgetr()
+pointer	afn_cl()
+
+errchk	acepairs
+
+begin
+	call smark (sp)
+	call salloc (ap, (NCATS+1)*AP_LEN, TY_STRUCT)
+	call salloc (pars, APP_LEN, TY_STRUCT)
+	call aclri (Memi[ap], (NCATS+1)*AP_LEN)
+	call aclri (Memi[pars], APP_LEN)
+	
+	# Set parameters.
+
+	AP_LIST(ap,0) = afn_cl ("icats", "catalog", NULL)
+	AP_LIST(ap,1) = afn_cl ("ocats", "catalog", AP_LIST(ap,0))
+	AP_LIST(ap,2) = afn_cl ("pcats", "catalog", AP_LIST(ap,0))
+	call clgstr ("icatdef", AP_DEF(ap,0), AP_SZFNAME)
+	call clgstr ("ocatdef", AP_DEF(ap,1), AP_SZFNAME)
+	call clgstr ("pcatdef", AP_DEF(ap,2), AP_SZFNAME)
+
+	call strcpy ("NOINDEF", APP_FILTER(pars,1), AP_SZFNAME)
+	call clgstr ("filter", APP_FILTER(pars,8), AP_SZFNAME)
+	APP_MINSEP(pars) = clgetr ("minsep")
+	APP_MAXSEP(pars) = clgetr ("maxsep")
+	APP_MAXDM(pars) = clgetr ("maxdm")
+	APP_ALIGN(pars) = 0.
+	APP_TYPE(pars) = clgwrd ("type", str, 5, APPTYPE)
+	APP_WEMPTY(pars) = btoi(clgetb("wempty"))
+
+	# Loop through catalogs.
+	while (afn_gfn (AP_LIST(ap,0), AP_NAME(ap,0), AP_SZFNAME) != EOF) {
+	    do i = 1, 2 {
+		if (afn_gfn (AP_LIST(ap,i), AP_NAME(ap,i), AP_SZFNAME) == EOF)
+		    AP_NAME(ap,i) = EOS
+	    }
+
+	    iferr {
+		call acepairs (ap, pars)
+	    } then
+		call erract (EA_WARN)
+	}
+
+	# Clean up.
+	do i = 2, 0, -1
+	    call afn_cls (AP_LIST(ap,i))
+	call sfree(sp)
+end
+
+
+# T_ACEPALIGN -- Find pair alignments (i.e. cosmic string candidates).
+
+procedure t_acepalign ()
+
+pointer	ap			# Catalog information
+pointer	pars			# Parameter information
+
+char	str[5]
+int	i
+pointer	sp
+
+bool	clgetb()
+int	clgwrd(), afn_gfn(), btoi()
+real	clgetr()
+pointer	afn_cl()
+
+errchk	acepairs
+
+begin
+	call smark (sp)
+	call salloc (ap, (NCATS+1)*AP_LEN, TY_STRUCT)
+	call salloc (pars, APP_LEN, TY_STRUCT)
+	call aclri (Memi[ap], (NCATS+1)*AP_LEN)
+	call aclri (Memi[pars], APP_LEN)
+	
+	# Set parameters.
+
+	AP_LIST(ap,0) = afn_cl ("icats", "catalog", NULL)
+	AP_LIST(ap,1) = afn_cl ("ocats", "catalog", AP_LIST(ap,0))
+	AP_LIST(ap,2) = afn_cl ("pcats", "catalog", AP_LIST(ap,0))
+	AP_LIST(ap,3) = afn_cl ("bcats", "catalog", AP_LIST(ap,0))
+	AP_LIST(ap,4) = afn_cl ("acats", "catalog", AP_LIST(ap,0))
+	call clgstr ("icatdef", AP_DEF(ap,0), AP_SZFNAME)
+	call clgstr ("ocatdef", AP_DEF(ap,1), AP_SZFNAME)
+	call clgstr ("pcatdef", AP_DEF(ap,2), AP_SZFNAME)
+	call clgstr ("bcatdef", AP_DEF(ap,3), AP_SZFNAME)
+	call clgstr ("acatdef", AP_DEF(ap,4), AP_SZFNAME)
+
+	call strcpy ("NOINDEF", APP_FILTER(pars,1), AP_SZFNAME)
+	call clgstr ("filter", APP_FILTER(pars,8), AP_SZFNAME)
+	APP_MINSEP(pars) = clgetr ("minsep")
+	APP_MAXSEP(pars) = clgetr ("maxsep")
+	APP_MAXDM(pars) = clgetr ("maxdm")
+	APP_MAXDW(pars) = clgetr ("maxdw")
+	APP_MAXDE(pars) = clgetr ("maxde")
+	APP_MAXDT(pars) = clgetr ("maxdt")
+	APP_MAXDP(pars) = clgetr ("maxdp")
+	APP_ALIGN(pars) = clgetr ("align")
+	APP_TYPE(pars) = clgwrd ("type", str, 5, APPTYPE)
+	APP_WEMPTY(pars) = btoi(clgetb("wempty"))
+
+	# Loop through catalogs.
+	while (afn_gfn (AP_LIST(ap,0), AP_NAME(ap,0), AP_SZFNAME) != EOF) {
+	    do i = 1, NCATS {
+		if (afn_gfn (AP_LIST(ap,i), AP_NAME(ap,i), AP_SZFNAME) == EOF)
+		    AP_NAME(ap,i) = EOS
+	    }
+
+	    iferr {
+		call acepairs (ap, pars)
+	    } then
+		call erract (EA_WARN)
+	}
+
+	# Clean up.
+	do i = NCATS, 0, -1
+	    call afn_cls (AP_LIST(ap,i))
+	call sfree(sp)
+end
+	
+
+# ACEPAIRS -- Find pairs and write catalogs.
+#
+# This can be used to find cosmic strings.
+
+procedure acepairs (ap, pars)
+
+pointer	ap			#I AP data
+pointer	pars			#I AP parameters
+
+int	i
+pointer	icat
+
+errchk	catopen, catrecs, catsort
+errchk	ap_pairs, ap_align, ap1_wcat, ap2_wcat, ap4_wcat
+
+begin
+	# Check if catalogs are specified.
+	do i = 1, NCATS {
+	    if (AP_NAME(ap,i) != EOS)
+		break
+	}
+	if (i > NCATS)
+	    return
+
+	# Get the sorted input records.
+	call catopen (icat, AP_NAME(ap,0), "", AP_DEF(ap,0), AP0_DEF, NULL, 1) 
+	call catrrecs (icat, APP_FILTER(pars,1), -1)
+	AP_RECS(ap,0) = CAT_RECS(icat); AP_NRECS(ap,0) = CAT_NRECS(icat)
+	call catsort (icat, Memi[AP_RECS(ap,0)], AP_NRECS(ap,0), AP0ID_Y, 1)
+
+	# Find pairs and alignment of pairs (i.e. string candidates).
+	call ap_pairs (ap, pars)
+	if (AP_NAME(ap,3) != NULL || AP_NAME(ap,4) != NULL)
+	    call ap_align (ap, pars)
+
+	# Write the catalogs as desired.
+	call ap1_wcat (ap, pars, icat)
+	call ap2_wcat (ap, pars, icat)
+	call ap3_wcat (ap, pars, icat)
+	call ap4_wcat (ap, pars, icat)
+
+	# Free and close structures.
+	do i = NCATS, 1, -1 {
+	    if (AP_RECS(ap,i) != NULL)
+		call mfree (AP_RECS(ap,i), TY_POINTER)
+	}
+	call catclose (icat, NO)
+
+end
+
+
+# AP_PAIRS -- Find pairs in input catalog.
+# First pairs based on cartesian distances are found.
+# Then the pair is evaluated against other criteria.
+
+procedure ap_pairs (ap, pars)
+
+pointer	ap			#I AP data
+pointer	pars			#I AP parameters
+
+int	i, j, n
+int	type, ia
+real	minsep, maxsep, maxdm, maxde, maxdw, maxdt
+real	xa, ya, xc, ma, ea, wa, ta, ua
+real	xb, yb, yc, mb, eb, wb, tb, ub
+real	xh, yh, dx, dy, dm, de, dw, dt
+real	minsep2, maxsep2, r2, p
+pointer	reca, recb, rec
+
+errchk	malloc, realloc
+
+begin
+	if (AP_RECS(ap,0) == NULL || AP_NRECS(ap,0) == 0)
+	    return
+
+	# Define pair criteria.
+	type = APP_TYPE(pars)
+	minsep = APP_MINSEP(pars)
+	maxsep = APP_MAXSEP(pars)
+	maxdm = APP_MAXDM(pars)
+	maxde = APP_MAXDE(pars)
+	maxdw = APP_MAXDW(pars)
+	maxdt = APP_MAXDT(pars)
+	minsep2 = minsep * minsep
+	maxsep2 = maxsep * maxsep
+
+	# Loop through y sorted records.
+	n = 0
+	do i = 1, AP_NRECS(ap,0)-1 {
+	    reca = Memi[AP_RECS(ap,0)+i-1]
+	    ia = AP0_I(reca)
+	    xa = AP0_X(reca)
+	    ya = AP0_Y(reca)
+	    ma = AP0_M(reca)
+	    ea = AP0_E(reca)
+	    wa = AP0_W(reca)
+	    ta = AP0_T(reca)
+	    ua = AP0_U(reca)
+	    do j = i+1, AP_NRECS(ap,0) {
+		recb = Memi[AP_RECS(ap,0)+j-1]
+
+		# Check image ID matching.
+		switch (type) {
+		case TYPE_IMAGE:
+		    if (AP0_I(recb) != ia)
+		       next
+		case TYPE_MOVING:
+		    if (AP0_I(recb) == ia)
+		       next
+		}
+
+		# Check separation critera.
+	        yb = AP0_Y(recb)
+	        dy = yb - ya
+	        if (dy > maxsep)
+	            break
+	        xb = AP0_X(recb)
+	        dx = xb - xa
+		if (dx > maxsep)
+		    next
+		r2 = dx * dx + dy * dy
+		if (r2 > maxsep2 || r2 < minsep2)
+		    next
+
+		# Apply similarity critera.
+		mb = AP0_M(recb)
+		eb = AP0_E(recb)
+		wb = AP0_W(recb)
+		tb = AP0_T(recb)
+		ub = AP0_U(recb)
+		dm = abs (mb - ma)
+		de = abs (eb - ea)
+		dt = tb - ta
+		if (dt > 90.)
+		   dt = 180 - dt
+		else if (dt < -90.)
+		   dt = 180 + dt
+		dw = abs (wb - wa)
+		if (!IS_INDEFR(maxdm) && maxdm > 0. && dm > maxdm)
+		    next
+		if (!IS_INDEFR(maxde) && maxde > 0. && de > maxde)
+		    next
+		if (ea > 0.25 && eb > 0.25) {
+		    if (!IS_INDEFR(maxdt) && maxdt > 0.) {
+			if (abs(dt) > maxdt)
+			    next
+		    }
+		} else {
+		    if (!IS_INDEFR(maxdw) && maxdw > 0. && abs(wb - wa) > maxdw)
+			next
+		}
+
+		# Apply moving criteria.
+		if (type == TYPE_MOVING) {
+		    ;
+		}
+		    
+		# Allocate records if necessary.
+		if (AP_RECS(ap,2) == NULL)
+		    call malloc (AP_RECS(ap,2), AP2_LEN*NALLOC, TY_STRUCT)
+		else if (mod (AP_NRECS(ap,2), NALLOC) == 0)
+		    call realloc (AP_RECS(ap,2),
+		        AP2_LEN*(AP_NRECS(ap,2)+NALLOC), TY_STRUCT)
+
+		# Compute Hough parameters.
+		call ap_hough (xa, ya, xb, yb, xc, yc, p, xh, yh)
+
+		# Record pair.
+		AP_NRECS(ap,2) = AP_NRECS(ap,2) + 1
+		n = n + 1
+		rec = AP2_REC(AP_RECS(ap,2),n)
+		AP2_RECA(rec) = reca
+		AP2_RECB(rec) = recb
+		AP2_ID(rec) = n
+		AP2_XC(rec) = xc
+		AP2_YC(rec) = yc
+		AP2_MAV(rec) = (ma + mb) / 2
+		AP2_UAV(rec) = (ua + ub) / 2
+		AP2_PA(rec) = RADTODEG(p)
+		AP2_XH1(rec) = xh
+		AP2_YH1(rec) = yh
+		AP2_SEP1(rec) = sqrt(r2) 
+		AP2_DM1(rec) = dm
+		AP2_DE1(rec) = de
+		AP2_DW1(rec) = dw
+		AP2_DT1(rec) = dt
+		AP2_DU1(rec) = ub - ua
+	    }
+	}
+end
+
+
+# AP_ALIGN -- Find alignments in the pair data.
+
+procedure ap_align (ap, pars)
+
+pointer	ap			#I AP data
+pointer	pars			#I AP parameters
+
+int	i, j, n
+real	maxdp, align
+real	xa, ya, pa, xb, yb, pb, xc, yc, pc, pd, dx, dy, dp1, dp2, xh, yh
+pointer	recs, reca, recb, rec
+
+int	ap2_compare()
+errchk	malloc, realloc
+extern	ap2_compare
+
+begin
+	if (AP_RECS(ap,2) == NULL || AP_NRECS(ap,2) == 0)
+	    return
+
+	# Define pair criteria.
+	maxdp = APP_MAXDP(pars)
+	align = APP_ALIGN(pars)
+
+	# Sort in y.  The pairs will already be nearly sorted but not exactly.
+	call malloc (recs, AP_NRECS(ap,2), TY_POINTER)
+	do i = 1, AP_NRECS(ap,2)
+	    Memi[recs+i-1] = AP2_REC(AP_RECS(ap,2),i)
+	call qsort (Memi[recs], AP_NRECS(ap,2), ap2_compare)
+
+	# Loop through y sorted records.
+	n = 0
+	do i = 1, AP_NRECS(ap,2)-1 {
+	    #reca = AP2_REC(AP_RECS(ap,2),i)
+	    reca = Memi[recs+i-1]
+	    xa = AP2_XC(reca)
+	    ya = AP2_YC(reca)
+	    pa = AP2_PA(reca)
+	    do j = i+1, AP_NRECS(ap,2) {
+		#recb = AP2_REC(AP_RECS(ap,2),j)
+		recb = Memi[recs+j-1]
+	        xb = AP2_XC(recb)
+	        yb = AP2_YC(recb)
+		pb = AP2_PA(recb)
+
+	        dx = xb - xa
+	        dy = yb - ya
+		dp1 = pb - pa
+		if (dp1 > 90.)
+		   dp1 = 180 - dp1
+		else if (dp1 < -90.)
+		   dp1 = 180 + dp1
+		if (abs(dp1) > maxdp)
+		    next
+
+		pc = (pa + pb) / 2 + align
+		if (pc > 180.)
+		    pc = pc - 180
+		pd = RADTODEG (atan2(dx,dy))
+		dp2 = pd - pc
+		if (dp2 > 90.)
+		   dp2 = 180 - dp2
+		else if (dp2 < -90.)
+		   dp2 = 180 + dp2
+		if (abs(dp2) > maxdp)
+		    next
+
+		# Allocate records if necessary.
+		if (AP_RECS(ap,4) == NULL)
+		    call malloc (AP_RECS(ap,4), AP4_LEN*NALLOC, TY_STRUCT)
+		else if (mod (AP_NRECS(ap,4), NALLOC) == 0)
+		    call realloc (AP_RECS(ap,4),
+		        AP4_LEN*(AP_NRECS(ap,4)+NALLOC), TY_STRUCT)
+
+		# Compute Hough distance.
+		call ap_hough (xa, ya, xb, yb, xc, yc, pd, xh, yh)
+
+		# Record pair.
+		AP_NRECS(ap,4) = AP_NRECS(ap,4) + 1
+		n = n + 1
+		rec = AP4_REC(AP_RECS(ap,4),n)
+		AP4_RECA(rec) = reca
+		AP4_RECB(rec) = recb
+		AP4_ID(rec) = n
+		AP4_XC(rec) = xc
+		AP4_YC(rec) = yc
+		AP4_PA(rec) = RADTODEG(pd)
+		AP4_XH1(rec) = xh
+		AP4_YH1(rec) = yh
+		AP4_DPA1(rec) = dp1
+		AP4_DPA2(rec) = dp2
+	    }
+	}
+	AP_NRECS(ap,4) = n
+end
+
+
+# AP1_WCAT -- Write single source catalog.
+
+procedure ap1_wcat (ap, pars, icat)
+
+pointer	ap				#I AP data
+pointer	pars				#I AP parameters
+pointer	icat				#I Input catalog pointer
+
+int	i, j, nrecs
+pointer	cat, recs, rec, orec
+
+errchk	malloc, catopen, catcreate, im2im, catwrec
+
+begin
+	# Writing a catalog is optional.
+	if (AP_NAME(ap,1) == EOS)
+	    return
+	if (AP_NRECS(ap,2) == 0 && APP_WEMPTY(pars) == NO)
+	    return
+
+	# Create the catalog
+	call catopen (cat, "", AP_NAME(ap,1), AP_DEF(ap,1), AP1_DEF, NULL, 1)
+	call catcreate (cat)
+
+	# Copy the input catalog header.
+	call im2im (CAT_IHDR(icat), CAT_OHDR(cat))
+
+	# Check for empty catalog.
+	if (AP_NRECS(ap,2) == 0) {
+	    CAT_NRECS(cat) = 0
+	    call catclose (cat, NO)
+	    return
+	}
+
+	# A source may be in multiple pairs so sort and remove records.
+	nrecs = 2 * AP_NRECS(ap,2)
+	call malloc (recs, nrecs, TY_POINTER)
+	do i = 1, AP_NRECS(ap,2) {
+	    Memi[recs+2*i-2] = AP2_RECA(AP2_REC(AP_RECS(ap,2),i))
+	    Memi[recs+2*i-1] = AP2_RECB(AP2_REC(AP_RECS(ap,2),i))
+	}
+	call asrti (Memi[recs], Memi[recs], nrecs)
+
+	call malloc (orec, CAT_RECLEN(cat), TY_STRUCT)
+	j = 0
+	do i = 1, nrecs {
+	    rec = Memi[recs+i-1]
+	    if (i > 1 && rec == Memi[recs+i-2])
+	        next
+	    AP1_I(orec) = AP0_I(rec)
+	    AP1_N(orec) = AP0_N(rec)
+	    AP1_X(orec) = AP0_X(rec)
+	    AP1_Y(orec) = AP0_Y(rec)
+	    AP1_M(orec) = AP0_M(rec)
+	    AP1_W(orec) = AP0_W(rec)
+	    AP1_E(orec) = AP0_E(rec)
+	    AP1_T(orec) = AP0_T(rec)
+	    AP1_U(orec) = AP0_U(rec)
+
+	    j = j + 1
+	    call catwrec (cat, orec, j)
+	}
+	CAT_NRECS(cat) = j
+	call mfree (orec, TY_STRUCT)
+
+	call catclose (cat, NO)
+end
+
+
+# AP2_WCAT -- Write pair catalog.
+
+procedure ap2_wcat (ap, pars, icat)
+
+pointer	ap				#I AP data
+pointer	pars				#I AP parameters
+pointer	icat				#I Input catalog pointer
+
+int	i
+pointer	cat, rec, reca, recb, orec
+
+errchk	malloc, catopen, catcreate, im2im, catwrec
+
+begin
+	# Writing a catalog is optional.
+	if (AP_NAME(ap,2) == EOS)
+	    return
+	if (AP_NRECS(ap,2) == 0 && APP_WEMPTY(pars) == NO)
+	    return
+
+	# Create the catalog
+	call catopen (cat, "", AP_NAME(ap,2), AP_DEF(ap,2), AP2_DEF, NULL, 1)
+	call catcreate (cat)
+
+	# Copy the input catalog header.
+	call im2im (CAT_IHDR(icat), CAT_OHDR(cat))
+
+	# Check for empty catalog.
+	if (AP_NRECS(ap,2) == 0) {
+	    CAT_NRECS(cat) = 0
+	    call catclose (cat, NO)
+	    return
+	}
+
+	call malloc (orec, CAT_RECLEN(cat), TY_STRUCT)
+	do i = 1, AP_NRECS(ap,2) {
+	    rec = AP2_REC(AP_RECS(ap,2),i)
+	    reca = AP2_RECA(rec)
+	    recb = AP2_RECB(rec)
+	    AP2_N(orec) = AP2_ID(rec)
+	    AP2_X(orec) = AP2_XC(rec)
+	    AP2_Y(orec) = AP2_YC(rec)
+	    AP2_M(orec) = AP2_MAV(rec)
+	    AP2_U(orec) = AP2_UAV(rec)
+	    AP2_P(orec) = AP2_PA(rec)
+	    AP2_XH(orec) = AP2_XH1(rec)
+	    AP2_YH(orec) = AP2_YH1(rec)
+	    AP2_SEP(orec) = AP2_SEP1(rec)
+	    AP2_DM(orec) = AP2_DM1(rec)
+	    AP2_DE(orec) = AP2_DE1(rec)
+	    AP2_DW(orec) = AP2_DW1(rec)
+	    AP2_DT(orec) = AP2_DT1(rec)
+	    AP2_DU(orec) = AP2_DU1(rec)
+	    AP2_NA(orec) = AP0_N(reca)
+	    AP2_XA(orec) = AP0_X(reca)
+	    AP2_YA(orec) = AP0_Y(reca)
+	    AP2_NB(orec) = AP0_N(recb)
+	    AP2_XB(orec) = AP0_X(recb)
+	    AP2_YB(orec) = AP0_Y(recb)
+	    call catwrec (cat, orec, i)
+	}
+	CAT_NRECS(cat) = AP_NRECS(ap,2)
+	call mfree (orec, TY_STRUCT)
+
+	call catclose (cat, NO)
+end
+
+
+# AP3_WCAT -- Write single pair align catalog.
+
+procedure ap3_wcat (ap, pars, icat)
+
+pointer	ap				#I AP data
+pointer	pars				#I AP parameters
+pointer	icat				#I Input catalog pointer
+
+int	i, j, nrecs
+pointer	cat, recs, rec, orec, reca, recb
+
+errchk	malloc, catopen, catcreate, im2im, catwrec
+
+begin
+	# Writing a catalog is optional.
+	if (AP_NAME(ap,3) == EOS)
+	    return
+	if (AP_NRECS(ap,4) == 0 && APP_WEMPTY(pars) == NO)
+	    return
+
+	# Create the catalog
+	call catopen (cat, "", AP_NAME(ap,3), AP_DEF(ap,3), AP3_DEF, NULL, 1)
+	call catcreate (cat)
+
+	# Copy the input catalog header.
+	call im2im (CAT_IHDR(icat), CAT_OHDR(cat))
+
+	# Check for empty catalog.
+	if (AP_NRECS(ap,4) == 0) {
+	    CAT_NRECS(cat) = 0
+	    call catclose (cat, NO)
+	    return
+	}
+
+	# A pair may be in multiple pairs of pairs so sort and remove records.
+	nrecs = 2 * AP_NRECS(ap,4)
+	call malloc (recs, nrecs, TY_POINTER)
+	do i = 1, AP_NRECS(ap,4) {
+	    Memi[recs+2*i-2] = AP4_RECA(AP4_REC(AP_RECS(ap,4),i))
+	    Memi[recs+2*i-1] = AP4_RECB(AP4_REC(AP_RECS(ap,4),i))
+	}
+	call asrti (Memi[recs], Memi[recs], nrecs)
+
+	call malloc (orec, CAT_RECLEN(cat), TY_STRUCT)
+	j = 0
+	do i = 1, nrecs {
+	    rec = Memi[recs+i-1]
+	    if (i > 1 && rec == Memi[recs+i-2])
+	        next
+	    reca = AP2_RECA(rec)
+	    recb = AP2_RECB(rec)
+	    AP3_N(orec) = AP2_ID(rec)
+	    AP3_X(orec) = AP2_XC(rec)
+	    AP3_Y(orec) = AP2_YC(rec)
+	    AP3_M(orec) = AP2_MAV(rec)
+	    AP3_U(orec) = AP2_UAV(rec)
+	    AP3_P(orec) = AP2_PA(rec)
+	    AP3_XH(orec) = AP2_XH1(rec)
+	    AP3_YH(orec) = AP2_YH1(rec)
+	    AP3_SEP(orec) = AP2_SEP1(rec)
+	    AP3_DM(orec) = AP2_DM1(rec)
+	    AP3_DE(orec) = AP2_DE1(rec)
+	    AP3_DW(orec) = AP2_DW1(rec)
+	    AP3_DT(orec) = AP2_DT1(rec)
+	    AP3_DU(orec) = AP2_DU1(rec)
+	    AP3_NA(orec) = AP0_N(reca)
+	    AP3_XA(orec) = AP0_X(reca)
+	    AP3_YA(orec) = AP0_Y(reca)
+	    AP3_NB(orec) = AP0_N(recb)
+	    AP3_XB(orec) = AP0_X(recb)
+	    AP3_YB(orec) = AP0_Y(recb)
+
+	    j = j + 1
+	    call catwrec (cat, orec, j)
+	}
+	CAT_NRECS(cat) = j
+	call mfree (orec, TY_STRUCT)
+
+	call catclose (cat, NO)
+end
+
+
+# AP4_WCAT -- Write line catalog.
+
+procedure ap4_wcat (ap, pars, icat)
+
+pointer	ap				#I AP data
+pointer	pars				#I AP parameters
+pointer	icat				#I Input catalog pointer
+
+int	i
+pointer	cat, rec, reca, recb, orec
+
+errchk	malloc, catopen, catcreate, im2im, catwrec
+
+begin
+	# Writing a catalog is optional.
+	if (AP_NAME(ap,4) == EOS)
+	    return
+	if (AP_NRECS(ap,4) == 0 && APP_WEMPTY(pars) == NO)
+	    return
+
+	# Create the catalog
+	call catopen (cat, "", AP_NAME(ap,4), AP_DEF(ap,4), AP4_DEF, NULL, 1)
+	call catcreate (cat)
+
+	# Copy the input catalog header.
+	call im2im (CAT_IHDR(icat), CAT_OHDR(cat))
+
+	# Check for empty catalog.
+	if (AP_NRECS(ap,4) == 0) {
+	    CAT_NRECS(cat) = 0
+	    call catclose (cat, NO)
+	    return
+	}
+
+	call malloc (orec, CAT_RECLEN(cat), TY_STRUCT)
+	do i = 1, AP_NRECS(ap,4) {
+	    rec = AP4_REC(AP_RECS(ap,4),i)
+	    reca = AP4_RECA(rec)
+	    recb = AP4_RECB(rec)
+	    AP4_N(orec) = AP4_ID(rec)
+	    AP4_X(orec) = AP4_XC(rec)
+	    AP4_Y(orec) = AP4_YC(rec)
+	    AP4_P(orec) = AP4_PA(rec)
+	    AP4_XH(orec) = AP4_XH1(rec)
+	    AP4_YH(orec) = AP4_YH1(rec)
+	    AP4_DP1(orec) = AP4_DPA1(rec)
+	    AP4_DP2(orec) = AP4_DPA2(rec)
+	    AP4_NA(orec) = AP2_ID(reca)
+	    AP4_XA(orec) = AP2_XC(reca)
+	    AP4_YA(orec) = AP2_YC(reca)
+	    AP4_NB(orec) = AP2_ID(recb)
+	    AP4_XB(orec) = AP2_XC(recb)
+	    AP4_YB(orec) = AP2_YC(recb)
+	    AP4_NAA(orec) = AP0_N(AP2_RECA(reca))
+	    AP4_NBA(orec) = AP0_N(AP2_RECB(reca))
+	    AP4_NAB(orec) = AP0_N(AP2_RECA(recb))
+	    AP4_NBB(orec) = AP0_N(AP2_RECB(recb))
+	    call catwrec (cat, orec, i)
+	}
+	CAT_NRECS(cat) = AP_NRECS(ap,4)
+	call mfree (orec, TY_STRUCT)
+
+	call catclose (cat, NO)
+end
+
+# AP_HOUGH -- Compute the Hough coordinate.
+#
+#    Variables:
+#	(x,y) = a point on the line
+#	d = distance between two points on the line
+#	r = distance from origin to a point on the line
+#	(xh,yh) = Hough point: minimizes r
+#	p = the position angle of the line
+#	dh = distance between (x,y) and (xh,yh)
+#
+#    Position angle:
+#        dx = xa - xb, dy = ya - yb, d = sqrt (dx**2 + dy**2)
+#        cos(p) = dx / d, sin(p) = dy / d, p = atan2 (dy, dx)
+#
+#    Basic equation:
+#	x - xh = dh * cos(p),  y - yh = dh * sin(p)
+#
+#    Minimizing r**2 = x**2 + y**2 yields:
+#	dh = x * cos(p) + y * sin(p)
+#	xh = x - dh * cos(p)
+#	yh = y - dh * sin(p)
+
+procedure ap_hough (xa, ya, xb, yb, xc, yc, p, xh, yh)
+
+real	xa, ya			#I Point on the line
+real	xb, yb			#I Point on the line
+real	xc, yc			#O Reference point (average of two points)
+real	p			#O Position angle (radians)
+real	xh, yh			#O Hough coordinate
+
+real	dx, dy, d, dh, cosp, sinp
+
+begin
+	# Compute position angle and reference point.
+	dx = xa - xb
+	dy = ya - yb
+	d = sqrt (dx**2 + dy**2)
+	cosp = dx / d
+	sinp = dy / d
+
+	xc = (xa + xb) / 2
+	yc = (ya + yb) / 2
+	p = atan2 (dy, dx)
+
+	# Compute Hough point.
+	dh = xc * cosp + yc * sinp
+	xh = xc - dh * cosp
+	yh = yc - dh * sinp
+end
+
+
+# AP2_COMPARE -- Sort comparison for pairs.
+
+int procedure ap2_compare (rec1, rec2)
+
+pointer	rec1, rec2
+
+begin
+	if (AP2_YC(rec1) < AP2_YC(rec2))
+	    return (-1)
+	else if (AP2_YC(rec1) == AP2_YC(rec2))
+	    return (0)
+	else
+	    return (1)
+end

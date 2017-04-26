@@ -1,0 +1,139 @@
+.help mimpar Aug07
+.ih
+NAME
+mimpars -- MEF/Mosaic display parameters
+.ih
+USAGE	
+mimpars
+.ih
+PARAMETERS
+.ls extname = ""
+MEF extension name patterns.  This is a comma-separated list of patterns
+which must match the entire extension name.
+.le
+.ls exttmpt = "_![1-9]*.*"
+Extension template to be appended to a rootname to select a set of
+single images.  This is applied if the \fImscdisplay\fR input file
+name is not found.
+.le
+.ls xgap = 72, ygap=36
+Gap to place between images when tiling the display.
+.le
+.ls process = no
+Apply "on-the-fly" calibrations when displaying.  This includes bias
+column subtraction, zero image subtraction, and flat field division.
+In addition to selecting this parameter the parameters \fIoverscan\fR,
+\fIzerosub\fR, and \fIflatfield\fR need to be set.
+.le
+.ls overscan = yes
+Do on-the-fly bias column subtraction?
+.le
+.ls zerosub = yes
+Do on-the-fly zero image subtraction?
+.le
+.ls flatfield = yes
+Do on-the-fly flat field division?
+.le
+.ls caldir = ""
+Directory containing the special flat field calibrations.  This must
+terminate with a directory delimiter (i.e. '/' or '$').  A keyword
+containing the directory path may be selected by prepending '!' to
+the keyword name.
+.le
+.ls filter = ""
+Filter ID for selecting a flat field calibration to use.  A keyword
+containing the filter may be specified by prepending '!' to the
+keyword name.
+.le
+.ih
+DESCRIPTION
+MIMPARS is a parameter set (pset) for the \fBmscdisplay\fR task.  Specific
+parameters may be stored in a parameter file or the current defaults for
+this pset task are used.  Executing this pset task enters the parameter
+editor (\fBeparam\fR) to set and modify the default parameters.
+
+SELECTING INPUT IMAGE TILES
+
+When multiextension format (MEF) files are display the \fIextname\fR
+parameter is used to select the extensions.  The parameter is a
+comma-separated list of patterns matching the entire extension name.
+Typically only a single pattern is needed but the list feature allows
+matching extension names that don't fit a single simple pattern.  It
+also allows simply listing the extension names; e.g. im1,im3,im4.
+
+When the input to be displayed is not a specific file the file template
+string given by \fIexttmpt\fR is appended to allow mosaic data which is not
+stored in MEF files but instead is stored as a set of single images with a
+particular filename pattern.  For example, the default template selects
+group images "abc_1.fits", "abc_2.fits", etc. where the input rootname is
+"abc".
+
+SETTING GAPS BETWEEN THE TILES
+
+The gap parameters allow forcing a minimum gap between images.  This is
+helpful either to distinguish the images when they might be overlapped
+or have no gap or to place gaps which are approximately correct for
+a particular camera.  If the tiling geometry (as defined by DETSEC
+keywords or WCS offsets) places images farther apart than the specified
+gap then that separation is used.
+
+ON-THE-FLY (OTF) PROCESSING
+
+When displaying unprocessed data it may be desirable to apply "on-the-fly"
+(OTF) calibrations when the instrumental signature overwhelms the science
+content.  There are currently three calibrations provided.  OTF processing
+is selected by the \fIprocess\fR parameter.  This turns on or off all
+processing.  The other processing parameters select individual processing
+operations.  OTF processing is also turned off if the header indicates the
+images have been calibrated by certain IRAF tasks.  The keywords checked are
+PROCDONE, OVERSCAN, ZEROCOR, and FLATCOR.  Note that sky subtraction is
+considered a zero subtraction.
+
+If OTF processing is applied the title sent to the display server will
+include indications of the operations applied.  It is up to the display
+server to present this information to the user.
+
+The parameter \fIoverscan\fR selects a line by line bias subtraction.  The
+bias values are obtained from one or more bias columns defined by the
+keyword BIASSEC.  The keyword value is an image section of the form
+"[c1:c2,*]" where c1 and c2 are the one-indexed bias columns in the image.
+At each line the pixel values between c1 and c2 are averaged and subtracted
+from all pixels in the line.
+
+A two-dimensional bias or zero level subtraction is selected by the
+\fIzerosub\fR parameter.  The image to be subtracted is specified by the
+parameter \fImscdisplay.zero\fR.  The specified name must expand to image
+tiles in the same way as for the data being displayed.  This OTF option may
+be used to apply a quick sky subtraction of infrared data including
+subtracting one exposure from an other.
+
+A flat field division is selected by the \fIflatfield\fR parameter.  This
+flat field or gain normalization uses a calibration library of previously
+constructed on-the-fly flat fields.  These are in a special format for
+rapid application.  The calibration library directory is specified by
+the parameter \fIcaldir\fR and the flat field is selected by the
+\fIfilter\fR parameter.  The filter parameter is often directed to
+the value of a keyword in the header.  As the parameter name implies,
+flat field calibration is generally filter dependent.
+
+The filter parameter is translated to a single word string to select
+a subdirectory of the calibration directory containing the OTF flat field
+data.  If there is a file "cal.men" in the calibration directory a
+translation is made using this file.  The file consists of two columns,
+the full string to match with the filter value and the single word string
+for the directory.  If the full filter string includes whitespace
+it must be quoted.
+
+If the calibration menu is absent or if an entry for the particular
+filter string is not found then the first word of the filter string
+is used and non-alphanumeric characters and periods are replaced by
+underscore.  If a subdirectory of the single word filter value is
+not found a directory "default" is used.
+
+If an OTF flat field is found the input image is divided by the
+flat field.
+
+.ih
+SEE ALSO
+mscdisplay
+.endhelp

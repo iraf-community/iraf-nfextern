@@ -1,0 +1,200 @@
+.help msccmd Aug07
+.ih
+NAME
+msccmd -- execute general command with image extension expansion
+.ih
+SYNOPSIS
+This tasks executes a command where any input and output image list
+arguments specified by $input, $in2, and $output are replaced by an
+expanded list of image extensions.  If there are no command line
+arguments the task runs as an interpreter with prompts until the
+command 'q' or 'quit' is entered.
+.ih
+USAGE	
+msccmd [command input output]
+.ih
+PARAMETERS
+.ls command
+Command to be executed.  Within the command the special strings
+"$input", "$output", and "$in2" will be replaced by images defined by
+the following parameters of the same name.  Except when \fIalist\fR=no
+and \fIflist\fR=no, only commands which take lists of input and output
+images may be used.  Since the command generally includes whitespace it
+must be quoted when specified on the command line.
+.le
+.ls input
+List of input images or MEF files.  MEF files are expanded into lists
+of images and substituted in the command string as a temporary @file
+unless \fIalist\fR=no and \fIflist\fR=no when the image name itself
+is substituted.
+.le
+.ls output
+List of output images or MEF files.  MEF files are expanded into lists
+of images and substituted in the command string as a temporary @file
+unless \fIalist\fR=no and \fIflist\fR=no when the image name itself
+is substituted.  If the command allows output images to be the same as
+input images then the output images or MEF files may be the same as the
+input files.
+.le
+.ls in2
+Second list of input images or MEF files for use with commands that
+operate on two lists of input images.  MEF files are expanded into lists of
+images and substituted in the command string as a temporary @file
+unless \fIalist\fR=no and \fIflist\fR=no when the image name itself
+is substituted.
+.le
+
+.ls extname = ""
+Extension name patterns to be selected from input MEF files.  See the
+help for \fBmscextensions\fR for a description of this parameter.
+.le
+.ls ikparams = ""
+Image kernel parameters to be applied to expanded extensions in MEF files.
+See the help for \fBmscextensions\fR for a description of this parameter.
+.le
+.ls dataless = no
+Include dataless images in the expansion of MEF files?  For example,
+this would be set to include an MEF primary image used as a global
+inherited header.  See the help for \fBmscextensions\fR for more information.
+.le
+
+.ls alist = no
+When the input or output parameters have lists of MEF files should all
+the extensions from all the MEF files be put in one @file for execution
+by the command?  If no then the command is repeated, substituting any
+extension expansions for each MEF file in the list.  If it is yes then
+all extensions from all input files are put in a single @file for
+a single execution.  The value of \fIflist\fR is ignored when this
+parameter is yes.
+.le
+.ls flist = yes
+Call the command with all the extensions in an MEF file as one @file?
+If no then the command is called substituting each image extension.
+Note that in this case the command may be one that expects a single
+image and not a list.  This parameter is ignored if \fIalist=yes\fR.
+.le
+
+.ls verbose = no
+Write the commands being executed to the standard output?
+.le
+.ls exec = yes
+Execute the commands?
+.le
+
+.ls prompt
+This parameter must not be set on the command line because it is used
+when the task is run in interpretive mode.
+.le
+.ih
+DESCRIPTION
+This task allows commands that work on single images or lists of images
+to be called with multiextension format (MEF) files containing multiple
+image extensions.  It does this by substituting single image extensions
+or @files into the specified command string.  The special strings
+"$input", "$output", and "$in2" are specified in the command string and
+the image extensions from the MEF files specified in the parameters of
+the same name are substituted before printing or executing the command.  
+Note that this task may work with non-MEF files which effective act
+as MEF files with a single image extension.
+
+The task may be run with the command given on the command line or as
+an interpreter when multiple commands can be entered and executed.  The
+interpreter mode is entered if no command line arguments are given and
+the task is not excuted in hidden mode (as occurs with the ":go"
+mode of \fBeparam\fR).
+
+The parameters \fIinput\fR and \fIin2\fR are expanded using the task
+\fBmscextensions\fR and some parameters of this task apply to that
+task.  In particular, the extension name patterns to selected only
+specific extensions, the image kernel parameters, and the parameter to
+include dataless images.
+
+The output is created by repeatedly appending to the specified output
+file.  Currently output only works with \fIalist=no\fR and \fIflist\fR=yes.
+
+The way the input images in the input lists are substituted in the command
+depends on the two parameters \fIalist\fR and \fIflist\fR.  If alist is
+no then the command is repeated for each file in the input list.  If the
+value is yes then all extensions from all files are put in a single @file
+for execution.  In the latter case The value of flist is ignored.
+
+When alist is no the flist parameter controls whether the command is
+executed for each extension separately (flist=no) or as an image list of
+all the extensions.  When an image list is substituted a temporary @file
+is used.  Note that when flist=no the command may be one that expects a
+single image but otherwise the command must allow an @file as input.
+
+The verbose parameter allows printing the command being executed on the
+standard output.  The execution parameter allows turning off the actual
+execution of the final command.  Along with the verbose option this can
+be used to check or debug the commands being generated.
+
+This task is a complex script layered on \fBmscextensions\fR to expand
+the MEF files.  Some of the most common tasks which might be executed
+over the extensions of MEF files have separate tasks and so \fBmsccmd\fR
+need not be used.  Some of these are \fBmscarith\fR, \fBmscstat\fR,
+\fBmscheader\fR, \fBmscedit\fR, and \fBmscselect\fR.
+.ih
+EXAMPLES
+1. Do image statistics.
+
+.nf
+    cl> msccmd "imstat $input" obj*fits
+.fi
+
+Since this is a common operation see \fBmscstat\fR instead.
+
+2. Do image arithmetic.
+
+.nf
+    cl> msccmd "imarith $input + $in2 $output"
+    List of input files: obj001
+    Second list of input files: obj002
+    List of output files: sum
+.fi
+
+Since this is a common operation see \fBmscarith\fR instead.
+
+3. Do HSELECT on the command line with no prompts.
+
+.nf
+    cl> msccmd "hselect $input $I,filter yes" obj001,obj002
+    [output]
+.fi
+
+Since this is a common operation see \fBmscselect\fR instead.
+
+4. Use in interpretive mode.
+
+.nf
+    cl> msccmd
+    msccmd> Command: imhead $input l-
+    [output]
+    msccmd> Command: hselect $input $I,filter
+    msccmd> Input files: obj001,obj002
+    [output]
+    msccmd> Command: hedit $input filter B verify-
+    msccmd> Input files (obj001,obj002):
+    msccmd> Command: print "This command has not input or output files."
+    This command has not input or output files.
+    msccmd> Command: q
+    cl>
+.fi
+
+5. The task \fBimplot\fR only allows a single image.  To run this task
+over a list of extensions use the mode where only a single extension is
+substituted in the command at a time.
+
+.nf
+    cl> msccmd "implot $input" meftest
+    [meftest[1] is plotted and graphic curor mode is entered.]
+    [After quiting the next extension is plotted, etc.]
+.fi
+
+.ih
+RESTRICTION
+Image sections are not allowed in the MEF filenames.
+.ih
+SEE ALSO
+mscarith, mscblkavg, mscedit, mscextensions, mscheader, mscselect, mscstat
+.endhelp

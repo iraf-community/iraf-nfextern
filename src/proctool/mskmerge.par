@@ -1,0 +1,10 @@
+# MSKMERGE parameters
+image,s,a,,,,"Image"
+masks,s,a,,,,"List of masks"
+output,s,a,,,,"Output merged mask"
+key,s,h,"",,,"Keyword to store mask in image"
+method,s,h,"map","map|min|max|add|or",,"Merging method"
+mapto,s,h,"1",,,"Mapping values"
+imageid,s,h,"",,,"Image ID expression (string)"
+logfiles,s,h,"STDOUT",,,"List of output logfiles"
+erraction,s,h,"warn","warn|error|quit",,"Error action code"

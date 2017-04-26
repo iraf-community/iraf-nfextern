@@ -1,0 +1,91 @@
+Jan 27 15:34 nfsetsky
+nftest13.fits[im1][sky][1][J][60.0][]
+nftest13.fits[im1]: sky subtraction = ($I-$S)
+$S = nftest16.fits[im1]
+nftest16.fits[im1][sky][1][J][60.0][]
+nftest16.fits[im1]: sky subtraction = ($I-$S)
+$S = nftest13.fits[im1]
+nftest17.fits[im1][sky][1][J][60.0][]
+nftest17.fits[im1]: sky subtraction = ($I-$S)
+$S = nftest20.fits[im1]
+nftest20.fits[im1][sky][1][J][60.0][]
+nftest20.fits[im1]: sky subtraction = ($I-$S)
+$S = nftest17.fits[im1]
+nftest21.fits[im1][sky][1][J][60.0][]
+nftest21.fits[im1]: sky subtraction = ($I-$S)
+$S = nftest24.fits[im1]
+nftest24.fits[im1][sky][1][J][60.0][]
+nftest24.fits[im1]: sky subtraction = ($I-$S)
+$S = nftest21.fits[im1]
+nftest25.fits[im1][sky][1][Ks][60.0][]
+nftest25.fits[im1]: sky subtraction = ($I-$S)
+$S = nftest28.fits[im1]
+nftest28.fits[im1][sky][1][Ks][60.0][]
+nftest28.fits[im1]: sky subtraction = ($I-$S)
+$S = nftest25.fits[im1]
+nftest29.fits[im1][sky][1][Ks][60.0][]
+nftest29.fits[im1]: sky subtraction = ($I-$S)
+$S = nftest32.fits[im1]
+nftest32.fits[im1][sky][1][Ks][60.0][]
+nftest32.fits[im1]: sky subtraction = ($I-$S)
+$S = nftest29.fits[im1]
+nftest33.fits[im1][sky][1][Ks][60.0][]
+nftest33.fits[im1]: sky subtraction = ($I-$S)
+$S = nftest36.fits[im1]
+nftest36.fits[im1][sky][1][Ks][60.0][]
+nftest36.fits[im1]: sky subtraction = ($I-$S)
+$S = nftest33.fits[im1]
+nftest07.fits[im1][object][1][J][5.0][]
+nftest07.fits[im1]: sky subtraction = ($I-$S)
+$S = nftest13.fits[im1]
+nftest08.fits[im1][object][1][J][5.0][]
+nftest08.fits[im1]: sky subtraction = ($I-$S)
+$S = nftest13.fits[im1]
+nftest09.fits[im1][object][1][J][5.0][]
+nftest09.fits[im1]: sky subtraction = ($I-$S)
+$S = nftest13.fits[im1]
+nftest14.fits[im1][object][1][J][60.0][]
+nftest14.fits[im1]: sky subtraction = ($I-$S)
+$S = nftest13.fits[im1]
+nftest15.fits[im1][object][1][J][60.0][]
+nftest15.fits[im1]: sky subtraction = ($I-$S)
+$S = nftest16.fits[im1]
+nftest18.fits[im1][object][1][J][60.0][]
+nftest18.fits[im1]: sky subtraction = ($I-$S)
+$S = nftest17.fits[im1]
+nftest19.fits[im1][object][1][J][60.0][]
+nftest19.fits[im1]: sky subtraction = ($I-$S)
+$S = nftest20.fits[im1]
+nftest22.fits[im1][object][1][J][60.0][]
+nftest22.fits[im1]: sky subtraction = ($I-$S)
+$S = nftest21.fits[im1]
+nftest23.fits[im1][object][1][J][60.0][]
+nftest23.fits[im1]: sky subtraction = ($I-$S)
+$S = nftest24.fits[im1]
+nftest10.fits[im1][object][1][Ks][5.0][]
+nftest10.fits[im1]: sky subtraction = ($I-$S)
+$S = nftest25.fits[im1]
+nftest11.fits[im1][object][1][Ks][5.0][]
+nftest11.fits[im1]: sky subtraction = ($I-$S)
+$S = nftest25.fits[im1]
+nftest12.fits[im1][object][1][Ks][5.0][]
+nftest12.fits[im1]: sky subtraction = ($I-$S)
+$S = nftest25.fits[im1]
+nftest26.fits[im1][object][1][Ks][60.0][]
+nftest26.fits[im1]: sky subtraction = ($I-$S)
+$S = nftest25.fits[im1]
+nftest27.fits[im1][object][1][Ks][60.0][]
+nftest27.fits[im1]: sky subtraction = ($I-$S)
+$S = nftest28.fits[im1]
+nftest30.fits[im1][object][1][Ks][60.0][]
+nftest30.fits[im1]: sky subtraction = ($I-$S)
+$S = nftest29.fits[im1]
+nftest31.fits[im1][object][1][Ks][60.0][]
+nftest31.fits[im1]: sky subtraction = ($I-$S)
+$S = nftest32.fits[im1]
+nftest34.fits[im1][object][1][Ks][60.0][]
+nftest34.fits[im1]: sky subtraction = ($I-$S)
+$S = nftest33.fits[im1]
+nftest35.fits[im1][object][1][Ks][60.0][]
+nftest35.fits[im1]: sky subtraction = ($I-$S)
+$S = nftest36.fits[im1]

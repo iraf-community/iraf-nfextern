@@ -1,0 +1,320 @@
+.help acequantities Mar07 "Catalog Quantities"
+
+.sh
+Introduction
+
+The source detection and cataloging task provides a number of quantities and
+functions of those quantities.  Whether they are recorded in a catalog and
+what catalog fields names are used is defined by the user through the
+\T(catdef) configuration file mechanism.  In this section all the currently
+available quantities and functions are described.  There may be new
+quantities and functions introduced in the future.
+
+For discussion the quantities are grouped into four sections;
+\S(reference), \S(astrometric), \S(photometric), and \S(morphological).
+
+In the discussion we use some terms as 
+
+.ls image
+The term image is used to refer to the image from which the sources
+were detected and quantities derived using the pixel values and header
+information.
+.le
+.ls X
+The letter X is used to refer to a pixel position in the image along
+the first image axis.  This is equivalent to the term image column.
+.le
+.ls Y
+The letter Y is used to refer to positions in the image along
+the second image axis.  This is equivalent to the term image line or
+row.
+.le
+.ls parent
+There is a stage of source detection that separates two or more new sources
+from previous sources.  When this happens the source from which the new
+sources are separated is called a parent.
+.le
+.ls children
+There is a stage of source detection that separates two or more new
+sources from previous sources.  When this happens the new sources are
+called children.  A source may be both a child and a parent since the
+splitting process is iterative.
+.le
+.ls single
+A source is called single if it has no children.  A single source may
+or may not have parents.
+.le
+.ls merged
+A source is called merged if it has children.  A merged source may
+or may not have parents.
+.le
+
+.sh
+Reference
+
+Reference quantities are those which identify sources, apart from position,
+or set flags about the source.
+
+.ls NUM, PNUM
+When sources are detected in an image an integer sequence number, starting
+with 11 (eleven), is assigned to the NUM quantity.  This number is only unique
+within a particular detection execution.  Sources are detected by scanning
+through an image line-by-line in increasing \L(Y) order.  A number is first
+assigned when a line no longer contains a pixel for a source.  Therefore the
+number is generally correlated with the maximum \L(Y) pixel position in a
+source.
+
+There is a another detection phase where merged sources are separated.
+When a merged source is separated into two or more new sources these
+\fL(parent) are assigned numbers continuing on from the last
+detection number.  The source number of the \fL(parent) is assigned to the
+PNUM quantity.  Sources which are not children of any parent have a
+PNUM value of zero.
+.le
+
+.ls FLAGS
+This is a string with characters that flag certain conditions for the
+source.  The characters in the string are:
+
+.nf
+    -    Place holder without further meaning
+    D    Object detection below sky (i.e. dark object)
+    E    Object was sucessfully evaluated
+    G    Object has pixels which were added by growing
+    S    Object is \L(single)
+    M    Object is \L(merged)
+    B    Object contains a bad pixel
+.fi
+
+.sh
+Astrometric
+
+Astrometric quantities provide positions associated with a source.
+The basic position quantities are measured as image pixel coordinates
+and come in \L(X) and \L(Y) pairs.  If the image has a world and/or
+pixel coordinate system then functions can be applied to the image
+pixel coordinates to produce
+.hr #s_world_coordinate_system_functions world coordinates
+and
+.hr #s_physical_coordinate_system_functions physical coordinates.
+
+.ls XMIN, XMAX, YMIN, YMAX
+The minimum and maximum pixel center coordinate values within the
+detection area.
+.le
+.ls X1, Y1
+The sky subtracted pixel value weighted centroid of the pixel center
+coordinates in the detection area.
+.le
+.ls XPEAK, YPEAK
+The pixel center coordinate of the brightest pixel above sky in the
+detection area.  The values are quantized to integer pixel center
+coordinates.
+.le
+.ls XAP, YAP
+The sky subtracted pixel value weighted centroid of the pixel center
+coordinates within a cartesian distance of 4 pixels of the peak pixel
+coordinate (XPEAK,YPEAK).
+.le
+.ls XVAR, YVAR, XYCOV
+The estimated variance and covariance of pixel center coordinates
+in the detection area.  The pixel uncertainties are the sky sigmas
+and not the Schott noise uncertain
+
+
+.ls XERR, YERR
+
+
+.sh
+Functions
+
+Rather than define magnitudes and world coordinates transformations for
+every flux or position quantity, special functions are provided.  Therefore,
+any flux quantity can be converted to a magnitude and any pixel position
+coordinate pair can be converted to a world coordinate based on the
+world coordinate system defined in the image.  Other functions may be
+added in the future.
+
+The functions are specified by a function name and arguments in parenthesis.
+The arguments may be any basic catalog quantity or any expression (see
+\T(expressions)) using the those quantities as operands.
+
+The magnitude function is simple.
+
+.hn magnitude
+.nf
+MAG(<flux>) = -2.5 * log10 (<flux>) + <magzero>
+.fi
+
+The magnitude zero point is that defined by the \fImagzero\fR
+task parameter.  This is often redirected to a image or catalog header
+quantity.  The <flux> argument may be a single catalog quantity or a
+more complex expression.
+
+The world coordinate functions come in pairs for each world coordinate.
+They each take two arguments for the x and y pixel coordinates.  These
+arguments can be expressions.  It is important to understand that
+world coordinate systems transform a pair of image pixel coordinates,
+x and y, into a pair of world coordinate axes.  The transformation may
+transpose the world axes relative to the logical axes and the longitude
+and latitude axes (e.g right ascension and declination or galactic
+longitude and latitude) may correspond to either the first or second
+world coordinate axis.  Therefore, it is up to the user to know the
+transformation.  However, there is one pair of functions (RA and DEC)
+that will interpret the system and return the right ascension and
+declination value regardless of the internal axes order.
+
+.ih
+World Coordinate System Functions
+
+The world coordinate function pairs have several flavors for different
+display formats.  Internally they all produce decimal degrees.  When the
+catalog quantities are written to binary tables the stored values are also
+degrees and table tools can be used to change the display format after the
+fact.  For catalogs in text files, however, the display format is what is
+written so that, for instance, the value may be a sexigesimal string in
+hours or degrees.
+
+.ls WX, WY
+The world coordinates for the first and second world coordinate axes
+displayed as double precision decimal degrees.  This applies to any world
+coordinate system.
+.le
+.ls WXD, WYD
+The world coordinates for the first and second world coordinate axes
+displayed as sexigesimal degrees.  This applies to any world
+coordinate system.
+.le
+.ls RA, DEC
+The world coordinates for the right ascension and declination displayed
+as sexigesimal hours and degrees.  The world coordinate system must be
+an RA/DEC type such as RA---TAN and DEC--TAN.
+.le
+.ls RAD, DECD
+The world coordinates for the right ascension and declination displayed
+as sexigesimal degrees.  The world coordinate system must be
+an RA/DEC type such as RA---TAN and DEC--TAN.
+.le
+.ls WRA, WDEC
+The world coordinates for the right ascension and declination displayed
+as double precision decimal degrees.  The world coordinate system must be
+an RA/DEC type such as RA---TAN and DEC--TAN.
+.le
+
+For some of these function a field label translation in the catalog
+definition file would probably be useful.  For instance:
+
+.nf
+WXD(XAP,YAP)  GLONG(XAP,YAP)
+WYD(XAP,YAP)  GLAT(XAP,YAP)
+.fi
+
+would identify fields as galactic longitude and latitude for the
+aperture center pixel coordinates.
+
+.ih
+Physical Coordinate System Functions
+
+A physical coordinate system is a reference raster coordinate system.  This
+may be detector pixels coordinate system or an original image pixel
+coordinate system from which the current image has been subrastered, block
+average, transposed, or even rotated.  The physical coordinate system
+functions are provided to transform the current image pixel coordinates,
+specified as two expression arguments, to the two coordinates of this parent
+physical coordinate system for data that has such a coordinate
+transformation.  A physical coordinate system is defined by the image header
+keywords LTVn and LTMm_n, where m and n are 1 and 2.
+
+.ls PX, PY
+Evaluate the physical coordinates from the image detection pixel
+coordinates.  The results are double precision decimal values with
+a display format having two decimal places to the left of the decimal
+point.
+.le
+
+.sh
+Expressions
+
+A general mechanism is provided to evalate any expression that operates on
+the basic quantities as operands and uses intrinsic functions and the
+special functions described above.  For a description of the standard
+expression syntax and intrinsic funcntions see \(expressions).  Expressions
+are specified in the catalog definition file \T(catdef) with the following
+syntax.
+
+.nf
+F<type><number>(<expression>)
+.fi
+
+where <type> specifies the resulting catalog quantity datatype, <number>
+is any sequence of digits, and <expression> is the expression using the
+basic caalog quantities.  The resulting catalog datatype is specified
+by one of the characters D (double precision), R (single precision), I
+(integer), and T (text);  so this syntax can be thought of as a
+datatype cast.  The "F<type><number>" part is a catalog identifier
+and not a function.  This means they cannot be referred to in expressions
+(at least with the current version).
+
+.sh
+SEE ALSO
+
+\T(expressions)
+
+.endhelp
+
+define  ID_NUM           1 # i "" ""		/ Object number
+define  ID_PNUM          2 # i "" ""		/ Parent number
+define	ID_FLAGS	12 # 8 "" ""		/ Flags
+
+define	ID_FLUX		 5 # r counts ""	/ Isophotal flux (I - sky)
+define	ID_SKY		17 # r counts ""	/ Mean sky
+define	ID_THRESH	18 # r counts ""	/ Mean threshold above sky
+define	ID_PEAK		19 # r counts ""	/ Peak pixel value above sky
+define	ID_FCORE	20 # r counts ""	/ Core flux (I - sky)
+define	ID_APFLUX_1	21 # r counts ""	/ Aperture flux
+define	ID_APFLUX1_1	22 # r counts ""	/ Aperture flux
+define	ID_APFLUX2_1	23 # r counts ""	/ Aperture flux
+define	ID_APFLUX3_1	24 # r counts ""	/ Aperture flux
+define	ID_APFLUX4_1	25 # r counts ""	/ Aperture flux
+define	ID_APFLUX5_1	26 # r counts ""	/ Aperture flux
+define	ID_APFLUX6_1	27 # r counts ""	/ Aperture flux
+define	ID_APFLUX7_1	28 # r counts ""	/ Aperture flux
+define	ID_APFLUX8_1	29 # r counts ""	/ Aperture flux
+define	ID_APFLUX9_1	30 # r counts ""	/ Aperture flux
+define	ID_FRACFLUX	31 # r counts ""	/ Apportioned flux
+
+define	ID_FRAC		32 # r "" ""		/ Apportioned fraction
+define	ID_FLUXVAR	47 # r counts ""	/ *Variance in the flux
+define	ID_FLUXERR	1011 # r counts ""	/ Error in flux
+
+define	ID_SIG		 8 # r counts ""	/ Sky sigma
+define	ID_ISIGAVG	 9 # r sigma ""		/ Average (I - sky) / sig
+define	ID_ISIGMAX	10 # r sigma ""		/ Maximum (I - sky) / sig
+define	ID_ISIGAVG2	11 # r sigma ""		/ *Ref average (I - sky) / sig
+
+define	ID_NPIX		 6 # i pixels ""	/ Number of pixels
+define	ID_NDETECT	 7 # i pixels ""	/ Number of detected pixels
+
+define	ID_X2		41 # r pixels ""	/ X 2nd moment
+define	ID_Y2		42 # r pixels ""	/ Y 2nd moment
+define	ID_XY		43 # r pixels ""	/ X 2nd cross moment
+define	ID_R		44 # r pixels %.3f	/ R moment
+define	ID_RI2		45 # r pixels %.3f	/ RI2 moment
+define	ID_FWHM		46 # r pixels %.3f	/ FWHM estimate
+
+define	ID_A		1001 # r pixels %.3f	/ Semimajor axis
+define	ID_B		1002 # r pixels %.3f	/ Semiminor axis
+define	ID_THETA	1003 # r degrees ""	/ Position angle
+define	ID_ELONG	1004 # r "" ""		/ Elongation = A/B
+define	ID_ELLIP	1005 # r "" ""		/ Ellipticity = 1 - B/A
+define	ID_R2		1006 # r pixels %.3f	/ Second moment radius
+define	ID_CXX		1007 # r pixels ""	/ Second moment ellipse
+define	ID_CYY		1008 # r pixels ""	/ Second moment ellipse
+define	ID_CXY		1009 # r pixels ""	/ Second moment ellipse
+
+define	ID_AERR		1014 # r "" ""		/ Error in A
+define	ID_BERR		1015 # r "" ""		/ Error in B
+define	ID_THETAERR	1016 # r degrees ""	/ Error in THETA
+define	ID_CXXERR	1017 # r pixels ""	/ Error in CXX
+define	ID_CYYERR	1018 # r pixels ""	/ Error in CYY
+define	ID_CXYERR	1019 # r pixels ""	/ Error in CXY

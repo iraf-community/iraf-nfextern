@@ -1,0 +1,53 @@
+# IMEDIT
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$set   LIBS1 = "-liminterp -lncar -lgks -lds -lxtools"
+	$set   LIBS2 = "-lgsurfit -lnlfit -lcurfit -lllsq"
+	$update libpkg.a
+	$omake	x_imedit.x
+	$link	x_imedit.o libpkg.a $(LIBS1) $(LIBS2) -o xx_imedit.e
+	;
+
+install:
+	$move xx_imedit.e nfebin$x_imedit.e
+	;
+
+generic:
+	$ifolder (epreplace.x, epreplace.gx)
+	    $generic -k epreplace.gx -o epreplace.x
+	$endif
+	;
+
+libpkg.a:
+	$ifeq (USE_GENERIC, yes) $call generic $endif
+
+	epbackground.x	epix.h
+	epcol.x		epix.h
+	epcolon.x	epix.h
+	epconstant.x	epix.h
+	epdisplay.x	epix.h <imhdr.h>
+	epdosurface.x	epix.h
+	epgcur.x	epix.h
+	epgdata.x	epix.h <imhdr.h>
+	epgsfit.x	epix.h <math/gsurfit.h>
+	epimcopy.x	<imhdr.h>
+	epinput.x	epix.h
+	epline.x	epix.h
+	epmask.x	epix.h
+	epmove.x	epix.h
+	epnoise.x
+	epreplace.x	epix.h <imhdr.h>
+	epsearch.x	epix.h <mach.h>
+	epsetpars.x	epix.h <error.h>
+	epstatistics.x	epix.h
+	epsurface.x
+	t_imedit.x	epix.h <error.h> <imhdr.h>
+	;

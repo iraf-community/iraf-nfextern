@@ -1,0 +1,19 @@
+# ACE Package
+
+aceall - master segmentation and cataloging task
+    acecatalog - catalog sources in images
+       - single image catalogs
+       - multiple image catalog using first image segmentation
+    acediff - catalog sources in the difference of images
+    aceevaluate - evaluate sources
+       - single image catalogs using reference catalog and segmentation
+       - multiple image catalog using reference catalog and segmentation
+    acesegment - segment images into
+	- sky images
+	- object masks
+	- sky subtracted images
+
+acefilter - filter catalogs and object masks
+
+acedisplay - display images with object mask isophote overlays
+acetvmark - display images with object filtered overlays

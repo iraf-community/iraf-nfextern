@@ -1,0 +1,12 @@
+# Help pages for the ACE package.
+
+revisions	sys=../Revisions
+
+acecutouts	hlp=acecutouts.hlp
+acefilter	hlp=acefilter.hlp
+acefocus	hlp=acefocus.hlp
+acesetwcs	hlp=acesetwcs.hlp
+acetvmark	hlp=acetvmark.hlp, src=../acetvmark.cl
+
+$acecat		= "./../lib/acecat/doc/"
+acecat		pkg = acecat$acecat.hd

@@ -1,0 +1,11 @@
+tbtyp.x
+mkpkg
+tbtables/mkpkg
+	The type for new files is text unless the extension is ".tab" for
+	STSDAS tables or ".fit", ".fits", ".??f" for FITS binary tables.
+	(5/13/03, Valdes)
+
+tbtables/mkpkg
+	Commented out use of CFITSIO.  (5/13/03, Valdes)
+
+Started with a copy of tables$lib/tbtables without cfitsio.  (5/13/03, Valdes)

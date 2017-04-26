@@ -1,0 +1,111 @@
+.help chskywcs May13 odi
+.ih
+NAME
+chskywcs -- Change sky WCS projection
+.ih
+SYNOPSIS
+The projection for sky WCS (longitude/latitude celestial world coordinate
+systems) is changed by fitting a new WCS projection to a grid of points
+evaluated from the old WCS projection.
+.ih
+USAGE   
+chskywcs input output projection
+.ih
+PARAMETERS
+.ls input
+List of input images whose WCS is to be refit by a new WCS.  The input
+WCS must be a celestial WCS which means it natively evaluates to a
+longitude and latitude in degrees.
+.le
+.ls output
+List of output images with the new WCS.  If this is an empty list ("")
+then the input images will be modified in place.  If the list is not
+empty it must match the input list in number.  If an input and output
+image names are the same the image is modified in place.
+.le
+.ls projection
+The desired output WCS projection.  This must be a celestial WCS.
+.le
+.ls gridspacing = 200
+Approximate grid spacing, in pixels, for fitting the new projection.  The
+value is adjusted so that an integer number of grid points span the image
+from the first to the last row or column.
+.le
+.ls verbose = yes
+Print information about the residuals between the original and new WCS
+representations at the grid points.
+.le
+
+For the two available distorted projections (tnx or zpx) the following
+parameters define the polynomial distortion function.  See \fBccmap\fR for more
+details.
+
+.ls function = "polynomial" (polynomial|chebychev|legendre)
+Distortion polynomial function type which is the same for each celestial axis.
+.le
+.ls xxorder, xyorder, yxorder, yyorder
+The order of the xi fit in x, the xi fit in y, the eta fit in x and the
+eta fit in y.
+.le
+.ls xxterm, yxterm ("full|half|none")
+The xi and eta cross term types.
+.le
+.ih
+DESCRIPTION
+A list of input images is matched to a list of output images, which may
+the same as the input or a null list.  The WCS ("world") coordinates of
+the input images are evaluated on a grid spanning the image.  This grid
+is fit using the \fBccmap\fR task to the requested new projection.
+The result is an image with a WCS having the requested projection.
+
+If the \fIverbose\fR parameter is set the residuals between
+the old and new coordinates at the grid points is output.  The four
+columns for each axis are the mean, the standard deviation, the minimum
+and the maximum of the residuals in milliarcseconds.  Residuals near
+the milliarcsecond level may mainly represent precision limits.
+
+As a special feature, if the output name is "velvect" then instead of a
+modified image the \fBvelvect\fR task is used to display the residuals
+as a vector plot.
+.ih
+EXAMPLES
+
+1. Approximate a ZPX WCS by TAN.
+
+.nf
+    odi> chskywcs zpximage tanimage tan
+    zpximage (ZPX) -> tanimage (TAN):
+      X residuals:   -21.6     62.8      -109.2    240.8     marcsec  
+      Y residuals:   23.1      96.6      -405.3    154.9     marcsec  
+.fi
+
+Note the residuals show an error of up to 0.4 arcseconds in this case.
+
+2. Convert a ZPX WCS to TNX using the default orders.
+
+.nf
+    odi> chskywcs zpximage tnximage tnx
+    zpximage (ZPX) -> tnximage (TNX):
+      X residuals:   0.1       0.7       -2.0      1.6       marcsec  
+      Y residuals:   0.1       0.3       -0.8      0.7       marcsec  
+.fi
+
+In this case the residuals are under 2 milliarcseconds.  Beware of
+overfitting just to minimize residuals since higher order functions can
+misbehave.  Also small residuals may be near the precision limit of the
+WCS.
+
+3. Make a vector residual plot. Make sure the \fBplot\fR package is loaded.
+
+
+.nf
+    odi> chskywcs zpximage velvect tnx
+    zpximage (ZPX) -> velvect (TNX):
+      X residuals:   0.1       0.7       -2.0      1.6       marcsec  
+      Y residuals:   0.1       0.3       -0.8      0.7       marcsec  
+.fi
+
+.ih
+SEE ALSO
+ccmap
+.endhelp

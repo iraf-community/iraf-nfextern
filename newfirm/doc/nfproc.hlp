@@ -1,0 +1,1493 @@
+.help nfproc Mar07 newfirm
+.ih
+NAME
+nfproc -- Process NEWFIRM data
+.ih
+USAGE   
+nfproc input output
+.ih
+PARAMETERS
+.ls input
+List of input images to process.  The files may be multi-extension
+FITS files (MEF) or single images.  The order in which the input images
+and MEF extensions are processed is controlled by the program.
+.le
+.ls output
+List of output images, a pattern based on the input filenames, or an
+expression.  An expression begins with '(' and evaluates to a filename.
+If it is not an expression then '+' characters in the string identify a
+pattern where those characters are substituted with the input filename
+excluding any path and extension.  If the value is neither an expression
+or pattern then it is a list which must match the input list.
+Note that a list can be an image template which also includes a replacement
+syntax (see example 2 of
+.hr imrename \fBimrename\fR
+).  The output format will be the
+same as the input format such that input MEF files will produce output
+MEF files.  If the input has non-image extensions they will be ignored
+and excluded from the output.  The special value "+LIST+" will produce
+log output without processing the input.
+.le
+.ls logfiles = "STDOUT"
+List of logfiles for recording processing information.  The special value
+"STDOUT" may be used to write to the terminal and multiple files may be
+specified to tee the output to more than one file.  The output is appended
+to any existing output.
+.le
+
+.ce
+PROCESSING SWITCHES
+
+The following parameters select the correction and calibration operations
+to be performed.  The allowed operations and the order in which they are
+performed is controlled by the
+.hr #l_dorder \fIorder\fR,
+.hr #l_dorder \fIdorder\fR,
+and
+.hr #l_dorder \fIforder\fR
+parameters.  A single letter processing code is used to identify an
+operation in the order parameters.  For an operation to be performed the
+processing switch must be enabled AND the operation must be listed in
+the order of operations.  Unless the
+.hr #l_override \fIoverride\fR
+parameter is "yes",
+steps are skipped that have already been performed as identified in the
+image header keyword PROCDONE.
+
+.ls trim = yes [processing code: T]
+Trim the image by removing edge lines and columns?  This requires
+specification of the region to be retained with the
+.hr #l_trimsec \fItrimsec\fR
+parameter.  The trimming is done on input and so it doesn't matter
+where the code appears in the processing order parameters.  Trimming
+may only be done in the first group of operations.
+.le
+.ls fixpix = no [processing code: P]
+Fix bad pixels using linear interpolation from neighboring pixels?
+Bad pixels are those identified by the input image mask (see
+.hr #l_bpm \fIbpm\fR
+).  The interpolation is done on input and so it doesn't matter where the
+code appears in the processing order.  To apply the interpolation after
+other operations the operation may be specified in later order groups or
+with a second invocation of the task.
+.le
+.ls biascor = no [processing code: B]
+Subtract bias using bias or reference pixels?  This uses the
+the
+.hr #l_biassec \fIbiassec\fR
+and the bias processing parameters.
+.le
+.ls darkcor = yes [processing code: D]
+Apply dark exposure correction?  This uses the
+.hr #l_darks \fIdarks\fR
+parameter.
+.le
+.ls lincor = yes [processing code: L]
+Apply a linearity correction?  This uses the the
+.hr #l_linexpr \fIlinexpr\fR
+and
+.hr #l_linexpr \fIlinimage\fR
+parameters.
+.le
+.ls flatcor = yes [processing code: F and/or G]
+Apply flat field correction?  This uses the
+.hr #l_flats \fIflats\fR,
+.hr #l_ftype \fIftype\fR,
+.hr #l_gtype \fIgtype\fR,
+and
+.hr #l_flatexpr \fIflatexpr\fR
+parameters.
+.le
+.ls skysub = yes [processing code: S]
+Subtract a sky image?  This uses the
+.hr #l_skies \fIskies\fR,
+.hr #l_skymatch \fIskymatch\fR,
+and
+.hr #l_skymode \fIskymode\fR
+parameters.
+.le
+.ls replace = yes [processing code: R]
+Replace pixels.  This uses the
+.hr #l_repexpr \fIrepexpr\fR
+and
+.hr #l_repimage \fIrepimage\fR
+parameters.
+Typically the replacement expression would affect only a subset of the
+pixels using thresholds or masks and the '?' conditional expression
+operator.
+.le
+.ls normalize = yes [processing code: N]
+Normalize the data.  The default expression is "max(0.1,$I/PROCMEAN)".
+Since the keyword PROCMEAN is computed by this task (but only for
+flat fields), the normalize
+operation is normally done after the first group of operations.
+.le
+
+.ce
+PROCESSING ORDER
+
+.ls dorder = "PTB", forder = "TPBDL,N", order = "TPBDLF,S"
+Allowed operations and the order, specified from left to right, in
+which the selected processing steps are to be performed for dark images
+(\fIdorder\fR), flat images (\fIforder\fR), and all other images
+(\fIorder\fR).  The image types are identified by the expressions
+specified in the parameters
+.hr #l_dtype \fIdtype\fR
+and
+.hr #l_ftype \fIftype\fR
+for data in the
+input list.  Each processing step has a processing code letter as shown
+in the processing switch section.  For a step to be performed it must
+both be present in the order specification and the processing switch
+must be enabled.  Note that the position of the trim and fixpix codes
+are irrelevant since these operations are applied upon input.
+
+Groups of operations may be separated by a comma.  The operations in each
+group are performed in the indicated order on each line as a single pass
+through the data for all input images of a particular type.  So by using
+commas and the input ordering feature it is possible to apply operations
+in multiple passes through the data and have dependent images be processed
+in the order darks, flats, and skies.  For example "DF,S" means do dark
+and flat processing on each line in the input image and then do
+sky subtraction.
+
+These parameters may be specified by expressions (see help topic
+.hr procexpr \fBprocexpr\fR
+) to allow header driven application.
+.le
+
+.ce
+PROCESSING PARAMETERS
+
+The processing parameters provide data for the various operations selected
+by the processing switches.  All parameters may be expressions
+(see help topic
+.hr procexpr \fBprocexpr\fR
+).
+
+.ls bpm = "(bpm)"
+List of bad pixel masks or an expression evaluating to a bad pixel mask.
+If a list is specified it must either be empty to not use a mask,
+be a single mask to be applied to all input, or a list which matches
+the input list.  If no mask is specified all pixels are assumed to
+be good.  The masks are used for the
+.hr #l_fixpix \fIfixpix\fR
+operation and/or in
+expressions with the operand $M.  For \fIfixpix\fR only mask values of
+1 are interpolated.  The mask is matched to the input image using
+physical coordinates (those defined by the LTV/LTM keywords) and so
+the mask need not be the same size.  Pixels which do not overlap the
+mask are treated as good having pixel values of 0.
+.le
+.ls obm = "(objmask)"
+List of object masks or an expression evaluating to an object mask.  If a
+list is specified it must either be empty to not use a mask, be a single
+mask to be applied to all input, or a list which matches the input list.
+If no mask is specified all pixels are assumed to be good.  The masks
+are used for the
+.hr l_skysub \fIskysub\fR
+median option and/or in expressions with
+the operand $O.  For \fIskysub\fR this parameter must be an expression and
+not a list.  The mask could really be any type of mask but it is intended
+to be used for object masking in sky subtraction.  See
+.hr acesegment \fBacesegment\fR
+for creating object masks.  The mask is matched to the input image using
+physical coordinates (those defined by the LTV/LTM keywords) and so the
+mask need not be the same size.  Pixels which do not overlap the mask
+are treated as good having pixel values of 0.
+.le
+.ls trimsec = "(trimsec)"
+Image section to apply when the trimming operation is selected.
+This may be specified as an explicit image section or by an expression
+that evaluates to an image section.
+.le
+.ls biassec = "(biassec)"
+Image section defining the bias reference pixels to apply when the
+bias correction operation is selected.  This may be specified as an
+explicit image section or by an expression that evaluates to an image
+section.  The section must span the input image along one and only one
+dimension.  If it spans all rows in the image a row-wise
+bias correction will be applied and if it spans all columns in the image 
+a column-wise correction will be made.
+.le
+.ls linexpr = ""
+Linearity expression computing the corrected pixel value given the
+uncorrected pixel value represented by the operand "$I".  The expression
+may use any of the standard mathematical operators and functions described
+in
+.hr procexpr \fBprocexpr\fR.
+If no expression is specified but a linearity correction
+is requested the task will skip the linearity correction.  Linearity
+expressions generally apply coefficients which may constants, defined
+by keywords, or taken from the linearity image.
+.le
+.ls linimage = ""
+Optional image list or an expression evaluating to an image providing
+per pixel coefficients for the linearity expression.  An image list may
+include MEF files which expand to all image extensions.  When selecting
+a linearity image from a list to apply to a particular input image the
+nearest, based on the
+.hr #l_sortval \fIsortval\fR
+parameter, which has the same value
+for the
+.hr #l_imageid \fIimageid\fR
+parameter (e.g. extension in an MEF) is selected.
+Note that typically there is only one linearity file though it must
+be an MEF if the input data is MEF.  When an image is selected by an
+expression there is no check made for the \fIimageid\fR value.  If the file
+is required by the linearity expression and an error occurs accessing it
+then the task will abort.  A selected image must match the input size in
+the first two dimensions.  A third dimnension may be used for expressions
+with multiple coefficients.  The values are referenced with L<index>,
+i.e. L1, L2, etc., where <index> is the index of the third dimension.
+.le
+.ls darks = ""
+List of dark calibration images or an expression evaluating to an image.
+If a null list is specified the input list is searched for files that
+satisfy the
+.hr #l_dtype \fIdtype\fR
+selection expression.  An image list may include
+MEF files which expand to all image extensions.  The list will be searched
+for an image with a matching
+.hr #l_imageid \fIimageid\fR
+value, the closest
+.hr #l_exptime \fIexptime\fR
+value to the input image and finally the nearest
+.hr #l_sortval \fIsortval\fR.
+Note that
+only requiring a near match in exposure time allows bias or zero exposures
+(those with a zero or very small exposure time) to be used in the absence
+of a dark image obtained with a similar exposure time.  The dark image
+is referred to in expressions by $D.
+.le
+.ls flats = ""
+List of flat calibration images or an expression evaluating to an image.
+If a null list is specified the input list is searched for files
+that satisfy the
+.hr #l_ftype \fIftype\fR
+and
+.hr #l_gtype \fIgtype\fR
+selection expressions.
+The \fIftype\fR and \fIgtype\fR expressions are also applied to the images
+in this list to discriminate two types of flat fields (e.g. lamp on and
+lamp off or dome and sky).  However, if an image does not match either
+expression then it is assumed to be an F type flat field.  The list
+may include MEF files which expand to all image extensions.  The list
+will be searched for an image with a matching
+.hr #l_imageid \fIimageid\fR
+value,
+the same
+.hr #l_filter \fIfilter\fR
+value as the input image and finally the nearest
+.hr #l_sortval \fIsortval\fR.
+The flat field images are referred to in expressions by
+$F and $G.
+.le
+.ls flatexpr = ""
+Optional flat fielding expression (for the F code) which overrides the
+default expression "($I/$F)" and any expression found in the
+.hr #l_opdb \fIopdb\fR
+file.  An override is provided to make it easy to combine the $F and $G
+flat field types; i.e. "($I/($F-$G))" or "($I/($F*$G))".
+.le
+.ls skies = ""
+List of sky images or an expression evaluating to an image.  If a null
+list is specified the input list is searched for files that satisfy
+the
+.hr #l_stype \fIstype\fR
+selection expression or, if no \fIstype\fR value is
+specified, the entire input list, not identified as dark or flat, is used
+as potential sky images.  The list may include MEF files which expand
+to all image extensions.  The use of the sky images is defined by the
+.hr #l_skymode \fIskymode\fR
+parameter.  The 
+.hr #l_skymatch \fIskymatch\fR
+parameter may also apply
+when matching a single sky to an input.  In all cases only images with
+the same 
+.hr #l_imageid \fIimageid\fR
+and 
+.hr #l_filter \fIfilter\fR
+values as the input will be used.
+In all cases the input image will never be used as a sky for itself.
+.le
+.ls skymatch = ""
+Sky matching logical expression.  If specified the expression is evaluated
+for each potential sky image against the input image.  If the result is
+true the sky image is used and if it is false it is not used.  The
+expression operands use A_ to refer to a sky image and B_ to refer to
+the target input image.  For example, B_CRVAL1 refers to the CRVAL1 keyword in
+the input image.  This parameter is may be used with the "arcsep"
+function (see
+.hr procexpr \fBprocexpr\fR
+) to select skies that are nearby but
+offset by a minimum amount.
+.le
+.ls skymode = "nearest" (nearest|before|after|median <N> <AVG> <CLIP>)
+The type of sky background estimation when sky subtraction is enabled.
+This applies when the
+.hr #l_skies \fIskies\fR
+parameter does not explicitly assign
+a sky image.  As described in the \fIskies\fR parameter, a list of
+sky images which match the input in filter and image ID is defined for
+a particular input image.  The list will also exclude the input image,
+if it is in the list, and will apply the
+.hr #l_skymatch \fIskymatch\fR
+expression to further define the list.  The final list is sorted by the
+.hr #l_sortval \fIsortval\fR.
+The parameter choices are "nearest" to select the
+nearest image in sort value, "before" for the nearest before, "after"
+for the nearest after, and "median" to form a median from the images.
+
+The "median" option takes three optional arguments specifying the number of
+images nearest the input image, in sort value, to be used in the median, the
+number of central values to average, and the clipping factor to eliminate
+positive outliers.  The defaults are 5, 1, and 2.  A value of 0 for
+the clipping factor turns off the clipping as does less than three
+images.  It will also make use of any object mask (
+.hr #l_obm \fIobm\fR
+) associated with a sky to exclude sources from the median.  For more
+details on the sky methods see the SKY SUBTRACTION section.
+.le
+.ls repexpr = ""
+A general replacement expression for output pixel values.
+Typically the replacement expression would affect only a subset of the
+pixels using thresholds and masks and the '?' conditional expression
+operator.  If no expression is specified but the replacement option
+is selected the task will skip the operation.  One use for this is to
+replace saturated or underflow pixels by a limit or flag value.
+Saturation values might be specified by a keyword.  An image giving
+values, such as saturation, for each pixel may be used by include
+$R, $R1, $R2, etc in the expression.  The image is given by the
+.hr #l_repimage \fIrepimage\fR
+parameter.
+.le
+.ls repimage = ""
+Optional image list or an expression evaluating to an image providing
+per pixel value for the replacement expression.  An image list may
+include MEF files which expand to all image extensions.  When selecting a
+replacement image to apply to a particular input image the nearest based on
+the 
+.hr #l_sortval \fIsortval\fR
+parameter which has the same value for the 
+.hr #l_imageid \fIimageid\fR
+parameter is selected.  When an image is selected by an expression there
+is no check made for the 
+\fIimageid\fR
+value.  If the file is required
+by the replacement expression and an error occurs accessing it then the
+task will abort.  A selected image must match the input size in the
+first two dimensions.  A third dimension may be used for expressions
+with multiple parameters.  The values are referenced with R<index>,
+i.e. R1, R2, etc., where <index> is the index of the third dimension.
+.le
+
+.ls btype = "fit" (fit|ifit|mean|median|minmax)
+The type of bias region algorithm for setting the row or column values to
+subtract.  The bias pixels and the bias subtraction direction (rows or columns)
+are defined by the 
+.hr #l_biassec \fIbiassec\fR
+parameter.  The set of pixels
+at each row or column are collapsed to a single bias value to be subtracted
+from the entire image row or column.  The 
+.hr #l_btype \fIbtype\fR
+parameter selects
+how the pixels are collapsed to a single bias value.  The "fit", "ifit",
+and "mean" methods average the pixels.  The "ifit" and "fit" choices
+smooth the bias values by fitting a polyomial function interactively or
+non-interactively respectively.  The "median" choice collapses pixels
+using the median.  The "minmax" choice rejects the high and low values
+before averaging provided there are at least three pixels.
+.le
+
+The following parameters are used for the "fit" and "ifit" bias type options.
+.ls bfunction = "legendre" (legendre|chebyshev|spline1|spline3)
+Fitting function taken from the following list.
+.nf
+     legendre - legendre polynomial
+    chebyshev - chebyshev polynomial
+      spline1 - linear spline
+      spline3 - cubic spline
+.fi
+.le
+.ls border = 1
+Number of polynomial terms or spline pieces in the fit.  Note that an
+order of 1 is a constant when using a polynomial function.
+.le
+.ls bsample = "*"
+Sample lines to use in the fit.  The string "*" specifies all
+lines otherwise an
+.hr icfit \fBicfit\fR
+range string is used.
+.le
+.ls bnaverage = 1
+Number of points to average or median to form fitting points.  Positive
+numbers specify averages and negative numbers specify medians.
+.le
+.ls bniterate = 1
+Number of rejection interations to remove deviant points from the overscan fit.
+If 0 then no points are rejected.
+.le
+.ls blreject = 3., bhreject = 3.
+Low and high sigma rejection factors for rejecting deviant points from the
+overscan fit.
+.le
+.ls bgrow = 0.
+One dimensional growing radius for rejection of neighbors to deviant points.
+.le
+
+.ce
+SELECTION AND GROUPING EXPRESSIONS
+
+Processing depends on the type of exposure, the the detector, the filter,
+and other characteristics of the instrument.  To make it easy to process
+mixtures of images, to check for proper types of calibrations, and to allow
+configuration for instruments with different characteristics and keywords
+the following parameters are used to interpret the data.  It is an error
+if an input image matches more than one of the 
+.hr #l_dtype \fIdtype\fR, 
+.hr #l_ftype \fIftype\fR,
+.hr #l_gtype \fIgtype\fR,
+and 
+.hr #l_stype \fIstype\fR
+expressions.
+
+.ls intype = ""
+Logical expression used to select images from the input image list, such
+as by their observation type keywords.  The null string may be used to
+select all images from the input list.  Note that to select dark, flat
+field, or sky images using the expressions specified with the 
+.hr #l_dtype \fIdtype\fR,
+.hr #l_ftype \fIftype\fR, 
+.hr #l_gtype \fIgtype\fR
+or 
+.hr #l_stype \fIstype\fR
+parameters one can redirect this
+parameter with the value ")<parameter>".  The ")" is a feature of the
+parameter system to refer to a value from a different parameter.
+.le
+.ls dtype = "(obstype=='dark')"
+Logical expression used to identify dark exposures in the input list
+for processing and possible use as calibration.  This does not apply
+to images in the 
+.hr #l_darks \fIdarks\fR
+list.  The default expression matches the
+words "dark" or "zero" anywhere in the keyword OBSTYPE and ignores case.
+A null expression does not match.
+The processing steps applied to exposures matching this expression are
+specified by the 
+.hr #l_dorder \fIdorder\fR
+parameter.
+.le
+.ls ftype = "(obstype=='flat')"
+Logical expression used to identify the F-type flat field exposures
+(e.g. lamp on) in the input list or 
+.hr #l_flats \fIflats\fR
+list.  The default
+expression matches the word "flat" anywhere in the keyword OBSTYPE and
+ignores case.  A null expression does not match any images in the input
+list and matches all images in the 
+.hr #l_flats \fIflats\fR
+list.  The processing
+steps applied to exposures matching this expression are specified by the
+.hr #l_forder \fIforder\fR
+parameter.
+.le
+.ls gtype = ""
+Logical expression used to identify the G-type flat field exposures
+(e.g lamp off or illumination) in the input list or 
+.hr #l_flats \fIflats\fR
+list.
+The default expression, the null string, does not match any images.
+The processing steps applied to exposures matching this expression are
+specified by the 
+.hr #l_forder \fIforder\fR
+parameter.
+.le
+.ls stype = ""
+Logical expression used to identify sky exposures in the input list for
+processing and use as calibration.  This does not apply to images in the
+.hr #l_skies \fIskies\fR
+list.  Images identified as sky in the input are processed
+after dark and flat images but before any other types.  If sky images
+are specified by the 
+.hr #l_skies \fIskies\fR
+list then this parameter is ignored.
+The default expression matches all images which are not identified as
+dark or flat.
+.le
+.ls imageid = "(imageid)"
+String valued expression that groups images from instruments that produce
+multiple image elements from multiple readout streams.  Examples of this
+are multiple CCD amplifiers, multiple section readouts, multiple arrays in
+a mosaic detector.
+.le
+.ls filter = "(filter)"
+String valued expression that groups images where the characteristics of
+the calibration depend on the detected photon energies.  Examples of this
+are different filters and different grating settings.  The simplest
+expression is a keyword name that evaluates to the value of the keyword.
+However, an expression can combine the values of several keywords if there
+are multiple filters or gratings.
+.le
+.ls sortval = "(@'mjd-obs')"
+Numeric valued expression used to sort images into a sequence.  In the
+absence of an expression, the null string "", the order in the list
+is used.  Beware of keywords that have periodic boundaries such as time
+of day.  The "epoch" or "julday" functions may be used to convert a date
+and time to a running value.  It is a fatal error if a sort expression
+does not evaluate to a numeric value.
+.le
+.ls exptime = "(exptime)"
+Numeric valued expression producing the exposure time.  The units of the
+exposure time are not significant provided it is consistent for the
+dataset and the relative times are linearly related.
+.le
+
+.ls obdb = "newfirm$obdb.dat"
+Operation database.  This text file allows overriding and customizing
+the definitions of most of the various operations.  It also allows adding
+some custom operations.  See the
+.hr #s_operation_expressions_and_the_operation_database OPERATION EXPRESSIONS AND THE OPERATION DATABASE
+section for details.
+.le
+.ls override = no
+Override previous processing as given by the PROCDONE keyword?  If set to
+yes then the selected processing will be performed on images which have
+header keywords indicating the operations have been peformed previously.
+.le
+.ls copy = no
+Copy the input image to the output if no processing is required.
+This may be needed in processing scripts and pipelines that don't wish to
+deal with the situtation where an expected output is not produced.
+.le
+.ls erraction = "warn" [warn|abort|quit]
+Action to take if an ignorable error is encountered.  If "warn" is set
+then a warning is issued and the task will continue, either skipping the
+operation or skipping the input image depending on the type of error.
+If "abort" is set then the task will abort with an "ERROR" message.
+The "quit" mode prints a error to the standard output and the task exits
+normally.  The purpose of this is allow a calling script to read the error
+without causing the script to abort.  .le .ls gdevice = "stdgraph" Graphics
+device.  The string "stdgraph" selects the standard interactive grpahics
+device which is usually the graphics terminal.  This is currently only
+used for interactive bias fitting.  .le .ls gcursor = "" Graphics cursor.
+The value "" selects the standard graphics cursor.  This is currently
+only used for interactive bias fitting.  .le .ls gplotfile = "" Output
+plot file for graphics.  This is currently only used for recording the
+results of fitting the bias.
+.le
+
+.sh
+DESCRIPTION
+
+\fBNFPROC\fR processes detector array data (CCDs, IR arrays), stored
+as images, to correct or calibrate defects, electronic and detector
+bias, signal dependent linearity, flat field response, and sky background.
+The output images may also be trimmed to specified regions to exclude
+bad edges and non-imaging pixels such as bias or reference pixels.
+
+The 
+.hr #l_input \fIinput\fR
+is a list of files to be processed, along with optional
+bad pixel masks (
+.hr #l_bpm \fIbpm\fR
+) and object masks (
+.hr #l_obm \fIobm\fR
+), and the
+.hr #l_output \fIoutput\fR
+is a matching list of output files, a pattern substitution,
+or an expression that returns an output filename.  The input files may
+be simple images or multi-extension FITS (MEF) files.  When an MEF input
+file is specified, the global header (i.e. a data-less primary FITS HDU)
+is copied to the output, the images (which may include a populated primary
+HDU) are processed, and all other extensions are ignored.  The masks are
+associated with the input either through header information, or a single
+mask file to apply to all input files (with matching extension names if
+the inputs are MEFs), or a matching list.
+
+The order in which the input images and MEF extensions are processed
+is controlled by the program.  If different types of exposures, such as
+dark, flat field, sky, and object, are in the input list then all the dark
+exposures are done first, followed by the flat exposures, followed by the
+sky exposures, and finally the object exposures.  Other types of ordering
+imposed by the task are by 
+.hr #l_imageid \fIimageid\fR,
+.hr #l_filter \fIfilter\fR
+and 
+.hr #l_sortval \fIsortval\fR.
+Since 
+.hr #l_imageid \fIimageid\fR
+is usually the extension in MEF files, the output
+MEF will be built up in multiple passes where all of one extension are
+done before going on to the next extension.  This is done for efficiency
+reasons.
+
+The output files are single images or MEF files to match the input.
+Output MEF files are created by appending each processed input image
+extension to the output file.  Global headers and inheritance structure
+are preserved.
+
+The output file cannot be the same as the input file because in some case
+the input file is also used as calibrations such as for sky subtraction.
+However, output file names are often variants of the input names and
+a special pattern substitution feature is provided.  The character '+'
+in the output parameter will be substituted with the name of the input
+image minus any path or extension.  Other types of substitutions include
+prepending and appending with '//' and '%' (see
+.hr imrename \fBimrename\fR
+).
+Alternatively one can use an expression that can build filenames, typically
+by using a keyword in the input image header.
+
+Log output (
+.hr #l_logfiles \fIlogfiles\fR
+) is provided to zero or more text streams or
+files and to the header keywords PROCnnnn (where nnnn is a four digit
+sequence number).  In addition, the special 
+.hr #l_output \fIoutput\fR
+value "+LIST+"
+may be used to produce log output without processing the input.
+
+This task is very flexible to accommodate different instruments,
+calibration methods and processing modes.  This flexibility is provided by
+ubiquitous use of expressions.  An expression is a syntax using variables
+and constants that evaluate to logical, numeric, and string values.
+The power lies in variables, also called operands, whose values are keyword
+or pixel values from the input or calibration images.  For a description
+and discussion of expressions see
+.hr procexpr \fBprocexpr\fR.
+For more specifics of this task see the section
+.hr #s_operation_expressions_and_the_operation_database OPERATION EXPRESSIONS AND THE OPERATION DATABASE.
+
+Often one wants to process different types or groups of exposures.
+This may be done explicitly by naming only the files to be processed in
+the input list.  Alternatively a larger list, such as "*.fits" may be used
+and either have the task identify a particular subset of images or group
+the exposures and process them in a standard order.  The 
+.hr #l_intype \fIintype\fR
+
+parameter provides a selection expression (one with a logical result)
+that is applied to each input image.  If no selection expression is
+specified then all the input images are processed.
+
+A common type of input selection is to process bias, dark, and
+flat field exposures before combining them into master calibrations
+to be applied to the science exposures.  Because this is so common
+the 
+.hr #l_dtype \fIdtype\fR,
+.hr #l_ftype \fIftype\fR,
+.hr #l_gtype \fIgtype\fR
+and 
+.hr #l_stype \fIstype\fR
+selection
+parameters may be used with the 
+.hr #l_intype \fIintype\fR
+parameter by
+using the syntax ")<parameter>" (e.g. ")ftype" to use the flat
+field selection expression).  As discussed later, there are "order"
+parameters that allow different types of exposures to be processed
+differently.
+
+The 
+.hr #l_dtype \fIdtype\fR,
+.hr #l_ftype \fIftype\fR,
+.hr #l_gtype \fIgtype\fR,
+and 
+.hr #l_stype \fIstype\fR
+parameters are
+also used for identifying and grouping of input images.  The processing
+of a mixed input list of exposure types is done in the following order.
+First all bias/dark images, then all flat images, then all sky images,
+then all remaining images.
+
+Another winnowing of the input list is a check for previous processing.
+The task adds the keyword PROCDONE to the output headers.  When a
+previously processed image is used as an input image the keyword is checked
+to determine what was done.  Therefore, if all the requested steps have
+been done the image will be skipped and if only some have been done
+just the new steps are performed.
+
+The 
+.hr #l_override \fIoverride\fR
+parameter may be used to override this prohibition
+against repeating operations that have been previously done.  Note that
+a valid, though not recommended, alternative is to delete or edit the
+PROCDONE header keyword.  There are some operations that do make sense to
+repeat, albeit with different parameters or calibrations.  These include
+corrections to the flat field, detecting and fixing additional bad pixels,
+and using additional data for sky subtraction.
+
+A related parameter is 
+.hr #l_copy \fIcopy\fR.
+This tells the task whether to
+create an output image even if there are no steps to be performed;
+either because they have been done or none are selected.  The output
+image would be a copy of the input, hence the parameter name.  This
+may be needed in processing scripts and pipelines that don't wish to
+deal with the situtation where an expected output is not produced.
+
+The 
+.hr #l_erraction \fIerraction\fR
+parameter is provided to control whether an error will
+abort the task, and so any calling scripts that don't catch the abort,
+or if only a warning or error message is printed to the standard error
+output.  The distinction is most useful when processing a list of images.
+In some cases one would like the processing to stop immediately, including
+the parent script, to fix the source of the error.  But in more automated
+situations one may want to continue on to other images in the list and
+deal with the warning messages later.  The "quit" mode is intermediate
+between an abort and a warning in that it lets the task exit immediately
+but without aborting a parent script.  The script can monitor the standard
+error output to detect the exit.
+
+.ih
+PROCESSING
+
+Processing consists of applying a set of operations to each input pixel
+in a particular order.  The task defines a set of standard operations
+using common detector calibration nomenclature, along with associated
+parameters, and provides the ability to customize these as well as adding
+additional operations.
+
+The standard operations are:
+
+.in 4
+.hn table1
+\fBTable 1: Standard processing operations.\fR
+
+.nf
+               trimming - removing bad or non-imaging border areas
+bad pixel interpolation - replacing pixels by interpolation
+  bad pixel replacement - replacing pixels by other values
+   linearity correction - correct for non-linearity
+       bias subtraction - subtraction of bias from reference pixels
+       dark subtraction - subtraction of a dark calibration
+          flat fielding - division by a flat field calibration
+        sky subtraction - subtraction of background sky in various ways
+          normalization - divide by a constant and provide a minimum value
+.fi
+.in -4
+
+Applying a processing operation consists of several steps:
+
+.ls 4 1.
+Selecting the operation with its processing switch parameter.
+.le
+.ls 4 2.
+Specifying where in the order of operations it is to be performed.
+.le
+.ls 4 3.
+Setting parameters associated with the operation.
+.le
+.ls 4 4.
+Deciding whether an operation previously performed is to be skipped
+or repeated.
+.le
+
+In the most common cases the default parameters are sufficient and one
+need only specify the calibration files.
+
+In addition to setting up the operations the task also needs information
+about how to:
+
+.ls 4 1.
+interpret the exposure type; currently the types are
+dark, two types of flat fields (e.g. lamp on and lamp off dome
+flats or dome and sky flats), sky images for subtraction, and
+science target exposures.
+.le
+.ls 4 2.
+select the appropriate calibration from a set of alternatives; such
+as by detector (in a mosaic), filter, exposure time, and nearby in
+time or space.
+.le
+
+Each potential operation, including user defined operations, has a single
+letter code (see
+.hr #table2 Table 2
+and the sections below).  The order parameters --
+.hr #l_dorder \fIdorder\fR,
+.hr #l_forder \fIforder\fR,
+and 
+.hr #l_order \fIorder\fR
+-- are specified as strings
+of operation codes.  There are different order parameters applied
+depending on the observation type of the input image.  Different observation
+types
+have different allowed operations or special operations.  The order of the
+codes defines the order of the operations and the absence or presence of a
+code defines whether or not an operation is allowed.  Note that whether an
+operation is allowed and whether it is to be done are not the same thing.
+Operations to be performed are selected using processing switch (yes/no)
+parameters.  This means that to perform an operation requires that both
+its processing switch is enabled and its operation code appears in in
+the order parameter.
+
+The combination of processing switches and order parameters, which may
+be expressions based header keywords, provides flexibililty in how this
+task is used.  Normally the order of operations is rarely changed and
+the operations are controlled through the processing switches.  But by
+setting all the switches to yes the processing steps may be controlled
+by the order parameters.  Because the order parameters may be set by an
+expression it is possible to control processing through header keywords
+as might be desired in a pipeline situation.
+
+The sequence of operations are performed on each line of an input image
+before going on to the next line.  However, operations can also be defined
+to occur after all lines are processed by preceeding operations.  This is
+done by delimiting "groups" of operation codes with commas in the order
+parameters.  In execution, all operations from the first group are applied
+to all lines, followed by all operations of the next group applied to all
+lines, etc.  The operations in the first group result in creating the
+output image and subsequent groups work in-place on the output image.
+
+Trimming and bad pixel interpolation are performed when the input image
+read.  Therefore, where the operation codes for these occur in the order
+parameters is not relevant except that bad pixel interpolation can be
+done in any processing group while trimming is limited to just the first
+group because in-place processing cannot alter the size of the image.
+
+The different processing operations have related parameters which must
+be set.  These are things like image sections defining the bias pixels
+and trim region and calibration image lists.  These parameters and how the
+various operations are performed are described in the following sections.
+
+.ih
+OPERATION EXPRESSIONS AND THE OPERATION DATABASE
+
+Most of the operations performed by this task are defined by expressions
+that produce pixel values using image and keyword operands (see the
+.hr #s_expression_operands EXPRESSION OPERANDS
+section as well as 
+.hr procexpr \fBprocexpr\fR
+).  The result of one operation is
+used as the input value for the next operation with the final operation
+producing the output image pixel values.
+
+The operation expressions are set in three steps.  First the task
+defines default expressions for each operation it provides (see
+.hr #table2 Table 2
+).  Then an operation database may be read to override these and also to
+add new expressions which can be referenced in the order parameters.
+The default operation database usually consists of the same expressions as
+the task defaults; see below for the default/sample operation database for
+this task.  Finally, some operations have explicit task parameters, such
+as 
+.hr #l_linexpr \fIlinexpr\fR,
+to make it convenient to set and override expressions
+without needing to copy and edit an operation database.
+
+An operation database is a text file that may be specified with the
+.hr #l_opdb \fIopdb\fR
+parameter.  This database allows overriding many of the
+operation definitions and adding new operations.  The first word is a
+single letter operation code.  The second word is a label used in the
+logging, and the third word is the expression.  Note that the words must
+be quoted if they contain whitespace.  Null strings, specified as "",
+leave the current definition unchanged.
+
+When defining new operations they may only reference the image operands
+shown in table X.  Remember that the operation code also needs to be
+added to the processing order parameters to be applied.
+
+Below is a sample operation database.  The expressions are generally
+the same as the default expressions and so are not actually needed.
+The example shows defining a "user" expression that combines dark subtraction
+and flat fielding into a single operation.  The example quotes the second
+and third words though this is not strictly necessary in cases where
+there is no whitespace.
+
+.in 4
+.hn table2
+\fBTable 2: Sample Operation Database\fR
+
+.in 4
+.nf
+# Operation database.
+
+B  "bias correction"            "($I-$B)"
+D  "dark calibration"           "($I-$D)"
+F  "flat calibration"           "($I/$F)"
+G  "flat calibration"           "($I/$G)"
+N  "normalize"                  "(max(0.1,$I/procmean))"
+S  "sky subtraction"            "($I-$S)"
+U  "user"                       "(($I-$D)/$F)"
+.fi
+.in -8
+
+
+.ih
+EXPRESSION OPERANDS
+
+Pixel and keyword values are referenced in expressions by
+'$<code>[<index>]' and [<code>.]<keyword>, respectively, where <code>
+is a single letter image operand code and <index> is an optional band
+index.  Table 3 shows the possible image operands available in this task.
+Note that the image, or derived image in some cases, is only accessed when
+an expression is evaluated and requires that various supporting parameters,
+for instance 
+.hr #l_darks \fIdarks\fR,
+be appropriately specified.  These refer to
+the input image or those associated or assigned to the input image.
+Derived data do not have keywords.
+
+.in 4
+Table 3: Image Operands for Expressions
+
+.in 4
+.nf
+I - input image
+M - bad pixel mask
+O - object mask
+D - dark image
+F - flat field
+G - flat field
+L - linearity image
+R - replacement image
+S - derived or actual sky image
+B - derived bias
+.fi
+.in -8
+
+For pixel values $I refers to the input values after prior operations
+have been applied.
+
+.ih
+STANDARD PROCESSING OPERATIONS
+
+.ls TRIM (T)
+The input image is trimmed to the image section specified by the
+
+.hr #l_trimsec \fItrimsec\fR
+parameter.  This trim should be the same as that used for
+the calibration images.  The trimming is done on input and so it doesn't
+matter where the 'T' code appears in the processing order parameters.
+Trimming may only be done on the first pass set of operations because
+subsequent pass are done in-place on the output image and trimming
+cannot be done in-place.  After trimming the keywords TRIMSEC, BIASSEC,
+and DATASEC are removed if they are present.
+
+The 
+.hr #l_trimsec \fItrimsec\fR
+parameter is typically either an explicit trim section
+or an expression pointing to a keyword whose value is the section.  A
+more sophisticated trim section expression might create the section from
+keywords in the header.
+
+.in 4
+\fBFigure 3: Examples of 
+.hr #l_trimsec \fItrimsec\fR
+expressions\fR
+
+.nf
+trimsec = "[2:2023,2:2023]"
+trimsec = "(trimsec)"
+trimsec = "('[2:'//str(naxis1-1)//',2:'//str(naxis2-1)//']')"
+.fi
+.in -4
+.le
+.ls FIXPIX (P)
+Bad pixels are replaced by linear interpolation from neighboring lines
+and columns.  The bad pixels are those with values of one in the bad
+pixel mask specified by the 
+.hr #l_bpm \fIbpm\fR
+parameter.  A mask is matched to an
+input image using physical pixels (the LTV/LTM mapping in the header).
+The interpolation is done when a line is first read at the start of
+a group and does not depend on where the 'P' code is in the order
+parameter.  To apply pixel interpolation after other operations the
+order parameter needs to break the operations into groups and the 'P'
+code is then in a that later group.  For example, the order parameter
+"DF,P" specified interpolation after the input image has been dark and
+flat field calibrated.
+.le
+.ls BIASCOR (B)
+The bias correction calculates a bias value for an image line or column,
+from either the bias pixels from just that line or column or from all
+the bias pixels, and subtracting that value from all the pixels in the
+line/column.  There are a number of parameters defining this correction.
+
+The first is the 
+.hr #l_biassec \fIbiassec\fR
+parameter which is an image section
+identifying the bias pixels and whether it applies to lines or columns.
+The section must span the input image along one and only one dimension.
+If it spans all rows in the image a row-wise bias correction will
+be applied and if it spans all columns in the image a column-wise
+correction will be made.  For example, in a 1000x2000 image the section
+"[1:1000,1937:2000]" is a section along the top of the image and the
+bias correction is column oriented while the section "[1:64,1:2000]"
+will be row oriented.  Remember '*' in an image section refers to the
+size of the image along columns or rows depending on where it is used.
+Note that the task requires the bias pixels are recorded in the image
+data as a contiguous strip.
+
+As with the 
+.hr #l_trimsec \fItrimsec\fR
+parameter the bias section may be an
+explicit string or an expression.  Expressions are usually a single
+keyword whose value is the section though a section could be built
+up from multiple keywords.
+
+The 
+.hr #l_btype \fIbtype\fR
+parameter specifies the algorithm.  There two types
+of algorithms.  One is where only the bias pixels for an image line/column
+are used and the other is where all the bias pixels are used.
+The line/column algorithms are "mean", "median", and "minmax".
+The mean algorithm uses the mean of all the bias pixels on the line/column
+for the bias value.  Because there may be bad bias pixels the
+"median" option uses the median for the bias value.  But the median is
+not a very statistically efficient estimate (meaning for a given sample
+size it has larger uncertainty than the mean if bad data is not present).
+So the another algorithm is to assume that bad pixels are rare so that by
+excluding the highest and lowest values from the mean the statistical
+estimate is not affected by the bad data.  This estimate for the bias value
+has the option name "minmax".
+
+The algorithm that combines all the bias pixels collapses the bias pixels
+at each line/column as mean value.  The collection of mean bias values
+as a function of the line/column is the "bias vector".  Because the individual
+mean bias values may be noisy due to small number sampling, the bias
+vector is smoothed by fitting a function.  This assumes that the
+trends in the bias during readout are smooth.  Note that one type of function
+is a constant which is equivalent to averaging all the bias pixels into a
+single value for the image.  The bias types for this algorithm are "fit"
+and "ifit" for an interactive and non-interactive fit respectively.
+The fit uses the standard IRAF curve fitting package
+.hr icfit \fBicfit\fR.
+.le
+.ls LINEARITY CORRECTION (L)
+The linearity correction replaces pixel values by a new value which is a
+function of the orginal pixel value.  The correction is specified in
+the operation database or the 
+.hr #l_linexpr \fIlinexpr\fR
+parameter.  The latter takes
+precedence over the former.  The linearity expression is in terms of the
+uncorrected pixel value, represented in the expression by the operand $I,
+and the result is the corrected pixel value.
+
+The expression is typically a monotonically increasing polynomial.
+The coefficients of the polynomial are constants, keywords pointing to
+constants, or pixel values from a coefficient image specified by the
+.hr #l_linimage \fIlinimage\fR
+parameter.  In the first two cases all pixels use the same
+coefficients and in the last case the linearity correction can be different
+for each pixel.  Values from the linearity image are specified by
+$L, $L1, $L2, etc (see
+.hr #s_expression_operands EXPRESSION OPERANDS
+).
+
+Typical expressions, with and without positional dependence, might be a
+polynomials such as
+
+.in 4
+.nf
+"$I * (1 + $L1 * $I)"         # With linearity image
+"$I * (1 + 0.001 * $I)"       # Without linearity image
+"$I * (1 + LINCOEFF * $I)"    # With coefficient in header
+.fi
+.in -4
+
+Fairly complex expressions can be built up, particularly using the
+conditional evaluation operator:
+
+.in 4
+.nf
+"$I*(1+$I*($I<100?$L1:($I<25000?$L1+$L2*($I-100) : 2.5)))"
+"$I*(1+$I*($I<100?0.01 : ($I<25000?0.01+0.0001*($I-100) : 2.5)))"
+.fi
+.in -4
+
+Long expressions may be put into a file and referenced with the syntax
+"@(<filename>)".
+
+The task will select a linearity image with the same 
+.hr #l_imageid \fIimageid\fR
+and 
+.hr #l_filter \fIfilter\fR.
+When there is more than one the the nearest in
+.hr #l_sortval \fIsortval\fR
+is selected.
+.le
+.ls DARK CORRECTION (D)
+Normally dark correction consists of subtracting
+a dark calibration image which is an average of one or more exposures with
+no light falling on the detector, either because the shutter is closed or
+a dark filter is used.
+
+There are two common dark correction methods.  One is to use a
+dark calibration image taken with the minimum exposure time.  This is
+sometimes called a zero or bias calibration.  Typically this is used
+when the detector is "quiet" and signal does not appreciable accumulate
+with time when no light is falling on the detector.  This is common with
+CCD detectors.  The second method is to subtract a calibration taken with
+the same, or nearly the same exposure time, as the image being calibrated.
+Either method may be used with this task.  The expression may also
+apply a scaling based on the ratio of input image dark exposure time and
+the exposure time of the dark calibration.
+
+When a list of dark calibrations (either from 
+.hr #l_darks \fIdarks\fR
+or 
+.hr #l_input \fIinput\fR
+)
+is used the task will select the one with the same 
+.hr #l_imageid \fIimageid\fR
+which is nearest in 
+.hr #l_exptime \fIexptime\fR
+to the input image.  When there is more
+than one the the nearest in 
+.hr #l_sortval \fIsortval\fR
+is selected.  In other words,
+matching the exposure time has higher precedence but if when there is more
+than one possibility then the nearest in 
+.hr #l_sortval \fIsortval\fR
+is used where
+the sort value is typically the time of the exposure.
+.le
+.ls FLAT FIELD CALIBRATIONS (F,G)
+Flat fielding consists of applying a relative response correction to
+each pixel.  Typically this is done by dividing by a calibration image
+of an assumed uniform illumination.  These are derived from dome lamp,
+twilight, or dark sky stacked exposures.  Variants in the infrared include
+dividing by the different of exposures with a dome lamp on and off.
+
+There are two types of flat field calibration images and operations
+that may be identified and used separately or in combination.  Users have
+the flexibility to define these two types and the operations performed.
+Two common cases are dome flats with the lamp on and the lamp off
+and dome flat fields and illumination or sky flat field changes relative
+to the dome flat field.  An example of an operation
+that might be used which combines the lamp on and off flat field types is
+"($I/($F-$G))".
+
+The flat field calibration images are selected using the 
+.hr #l_flats \fIflats\fR
+parameter or, if the parameter is a null string, from the list of input
+images.  Flat field images are identified by the expressions 
+.hr #l_ftype \fIftype\fR
+and 
+.hr #l_gtype \fIgtype\fR.
+If images are specified by the 
+.hr #l_flats \fIflats\fR
+parameter
+and an image does not match either type expression then the image will be
+assumed to be an F-type flat field.  If an images matches both expressions
+then it is an error.
+
+Flat field images must match the input based on the 
+.hr #l_imageid \fIimageid\fR
+and
+.hr #l_filter \fIfilter\fR
+expressions.  When there is more than one candidate flat
+field the nearest based on the 
+.hr #l_sortval \fIsortval\fR
+parameter is selected.
+For instance, when the sort value is time of the exposure the nearest
+in time of the appropriate filter and image element (e.g. mosaic extension)
+is selected.
+
+For the most common case of a single type of flat field the default
+expression "($I/$F)" is the one to use.  But having the option to
+identify and use more than one type of flat field, particularly for
+the lamp on and lamp off method, requires flexibility in setting the
+operation.  As with other operations, one can make a personal version
+of the default operation database.  But the task also provides the
+.hr #l_flatexpr \fIflatexpr\fR
+parameter to make it convenient to set the the F-type
+flat fielding expression.  This expression, if not null, overrides
+the task default and the operation database.
+
+The default expression "($I/$F)" does not apply a scale factor or check
+for division by zero.  Therefore, the flat field calibration images should
+be normalized and values near or below zero replaced by a default value.
+These steps (normalization and checking for bad flat field values) can be
+done when first processing the flat field exposures (see the normalize
+operations).  Alternatively, one can modify the expression to include a
+scale factor and threshold.  For example, "($I/max(0.01,$F/F.procmean)))"
+would normalize the flat field by the value of a keyword PROCMEAN in the
+flat field image header and protect against division by zero or negative
+values).
+.le
+.ls SKY SUBTRACTION (S)
+Sky subtraction is selected by the 
+.hr #l_skysub \fIskysub\fR
+switch and the S operation
+code.  The candidate sky images are specified by the 
+.hr #l_skies \fIskies\fR
+parameter
+or, if null, selected the input list.  The 
+.hr #l_skies \fIskies\fR
+parameter may be a
+list of images or an expression resolving to an image for each input image.
+An expression typically selects an image header keyword associating a
+sky image with the input image.  In this case sky subtraction is just a
+simple single image subtraction ignoring the 
+.hr #l_skymode \fIskymode\fR
+and other sky
+parameters and with no checks on the filter or image ID as described in
+the remainder of this section.
+
+When the 
+.hr #l_skies \fIskies\fR
+parameter is null the 
+.hr #l_stype \fIstype\fR
+expression is used
+to identify sky images from the input list.  This parameter is not used
+otherwise.  If the 
+.hr #l_stype \fIstype\fR
+expression is null then all images not
+identified as dark or flat field by the other type selection expressions
+are candidate sky images.  This is typically done when sky subtracting from
+dithered sparse-field observations.  Note that if 
+.hr #l_stype \fIstype\fR
+is not null,
+it is an error if a sky image also matches as a dark or flat field image.
+
+One or more sky images is then selected for each input image.  Note
+that the sky selection process may include the input image but it is
+excluded as sky for itself.  The sky images must have the same value
+of the 
+.hr #l_imageid \fIimageid\fR
+and 
+.hr #l_filter \fIfilter\fR
+expressions as the input image.
+In addition, sky images must satistfy the 
+.hr #l_skymatch \fIskymatch\fR
+expression which
+allows comparing keywords from the input and candidate sky image using the
+references "A_<keyword>" and "B_<keyword>".  One example is to require a
+sky image to be near, but not too near, the position of the input image.
+The following uses a file containing an expression based on the separation
+of the two images in arc seconds.
+
+.in 4
+.nf
+skymatch = "@(arcsep.dat)"
+
+where the file arcsep.dat contains
+
+(arcsep(A_RA,A_DEC,B_RA,B_DEC)>600 &&
+ arcsep(A_RA,A_DEC_B_RA,B_DEC)<3600))
+
+or
+
+(arcsep(A_CRVAL1/15,A_CRVAL2,B_CRVAL1/15,B_CRVAL2)>600 &&
+ arcsep(A_CRVAL1/15,A_CRVAL2,B_CRVAL1/15,B_CRVAL2)<3600))
+.fi
+.in -4
+
+Note that the CRVAL1 values are right ascension in degrees while the arcsep
+function requires hours.  Note that if the data have offset parameters
+those would be easier to use.
+
+Another example might be that the sky and input images have different
+nod flags as in the following.
+
+.in 4
+.nf
+skymatch = "(A_NOD!=B_NOD)"
+.fi
+.in -4
+
+Once a set of candidate sky images is selected for a particular input
+image the 
+.hr #l_skymode \fIskymode\fR
+parameter selects from this list and specifies how
+they are used.  The candidate list is sorted by the 
+.hr #l_sortval \fIsortval\fR
+values.
+The options "before", "after", or "nearest" select a single sky image
+to subtract which has is the nearest before, after, or on either side
+of the input image, respectively.  If there is no image before or
+after as requested then the nearest is used.
+
+The option "median [<N> [<AVG>] [<CLIP>]]" (where the default value of N is
+5, of AVG is 1, and of CLIP is 2) selects the nearest N/2 (rounded down to
+an integer) sky images before the input image and the (N-1) subsequent
+images.  When there are not enough images before or after then images are
+added at the other end.  Of course if there are fewer than N images then all
+are used.  Again, note that if the input image is in the candidate list it
+is excluded with the result that median is computed from N-1 images.
+
+The clipping option computes the difference between the median (before
+clipping) and the lowest value.  This difference multiplied by the
+clipping factor and reflected to values above the median.  Values
+beyond this clipping threshold are excluded from the final median
+calculation.  A clipping value less than or equal to zero may be used
+to skip the clipping.
+
+The median calculation will make use of any object mask (
+.hr #l_obm \fIobm\fR
+)
+associated with a sky to exclude sources from the median.  When pixels
+are excluded then the median is taken over a smaller number of pixels.
+After the pixels are sorted the specified average of the central values
+is taken.  Note that if the number of values averaged is rounded
+up to an even number when the number of remaining pixels is even or
+rounded up to an odd number when number of pixels is odd to insure
+a symmetric statistic.  When the average is 1, a classic median,
+this means that for an even number of pixels the average of the central
+two values is the median value.
+
+Please note that during processing that the input list is processed in
+an order determined by the different observation types and within each
+type by the sort value.  For median sky subtraction this means that
+a running median window can be used with an algorithm optimized to
+make use of this order.
+
+One observing mode is when the science fields are sparse and
+dithered exposures are taken with the intent that sky will be
+obtained from a median of temporally close exposures.  This would
+use the running median method.  One could process the science
+exposures for instrumental calibrations first and then do the
+running median sky subtraction.  However, using the operation
+grouping feature of the order parameters the two stages can be combined into
+one execution.  The parameters that would result in this type
+of processing are
+
+.in 4
+.nf
+skysub = yes		   # Apply sky subtraction
+order = "TPBDFL,S"	   # Sky subtract after other processing
+skies = ""		   # Use the input list
+stype = ""		   # Use all science exposures
+skymatch = ""		   # Use all science exposures
+skymode = "median 10 5"	   # Using 10 images near input
+imageid = "(imageid)"	   # Match by IMAGEID
+filter = "(filter)"	   # Match by FILTER
+sortval = "(@'mjd-obs')"   # Sort by MJD-OBS
+.fi
+.in -4
+.le
+.ls REPLACE (R)
+The replace operation provides a general expression, given by the
+.hr #l_repexpr \fIrepexpr\fR
+parameter, that can be used for
+a variety of purposes.  As its name implies, it is intented for replacing
+input pixels with some characteristic, say saturated, by some other value
+such as a limit or special value.  Typically the expression would only
+modify a subset of the input pixels.  This is accomplished using the
+conditional expression where one branch is the unmodified value $I and
+the other is the modified value.  As an example, suppose there is a
+keyword defining saturation and we want to replace all values above
+the saturation by the saturation threshold.  The expression would be
+
+.in 4
+.nf
+repexpr = "($I>saturate ? saturate : $I)"
+.fi
+.in -4
+
+An image can be used to provide one or more numeric values for each
+pixel.  This image is specified by the 
+.hr #l_repimage \fIrepimage\fR
+parameter and
+referenced in an expression using $R, $R1, $R2, etc.
+
+Note that another image that might be referenced is the input bad pixel
+mask with $M.  So if instead of using the 
+.hr #l_fixpix \fIfixpix\fR
+operation to
+interpolate across bad pixels one could replace bad pixels by some
+value. In the following example bad pixels are replaced by the value
+of a BAD keyword.
+
+.in 4
+.nf
+repexpr = "($M > 0 ? blank : $I)"
+.fi
+.in -4
+.le
+.ls NORMALIZE (N)
+The normalize operation provides a predefined expression for normalizing
+an input image.  This is typically used for creating normalized flat fields
+using the PROCMEAN keyword computed by this task (see
+.hr #s_keywords KEYWORDS
+).
+Because the PROCMEAN keyword is not defined until after all the pixels
+have been processed during the first "group" of operations in the
+order definition, the normalize operation based on PROCMEAN is specified
+in a second group of operations.
+
+The default normalize operation defined by the task and in the default
+operation database is "(max(0.1,$I/procmean))".  To apply this
+operation when processing a flat field the following parameters would
+be used and appropriately set.
+
+.in 4
+.nf
+normalize = yes
+forder = "TPBDL,N"
+.fi
+.in -4
+
+In this example the flat field would be processed for the various options
+in the forder parameter before the comma.  The PROCMEAN keyword would be
+set over the pixels values from the first group operations.  Then a
+second pass is made over the data to divide each pixel by the PROCMEAN
+value except that normalized values below 10% would be set to 0.1.
+
+.ih
+KEYWORDS
+
+This task can be highly header driven using keyword expressions for all
+calibration images and parameters.
+
+On output any DETSEC, CCDSEC, BIASSEC, and TRIMSEC keywords are removed
+when the trim operation is performed.  The keywords NEXTEND, PROCMEAN,
+PROCAVG, PROCSIG, PROCnnnn, and PROCDONE are added or modified.
+
+For flat field images, during the first group of order operations, the average and
+sigma of the output pixels is computed.  The computation excludes pixels
+with non-zero bad pixel mask values.
+The average and sigma are recorded in the
+output image header under the keywords PROCAVG and PROCSIG.  For MEF
+input files that then produce output MEF files, a global average over
+all the extensions is computed and recorded under the keyword PROCMEAN
+and the number of extensions is recorded under the NEXTEND keyword.
+
+Time stamped processing information providing the operation expression
+and operands is recorded under a sequence of PROCxxxx keywords.
+The set of operations performed, using the same syntax of a concatenation
+of operation codes, is recorded under the keyword
+PROCDONE.  The latter is used to identify previous processing when
+output files are operated on by this task as input files.  The
+.hr #l_override \fIoverride\fR
+is required to repeat an operation already found in the
+PROCDONE keyword.  New operations are appended to the keyword with a
+comma delimiter.
+
+The figure below shows typical output for an image in an MEF mosaic
+where the first two keywords are in the global header and the rest
+are in the extension header.
+
+.in 4
+.nf
+NEXTEND =                    4
+PROCMEAN=             1442.294
+PROC0001= 'Feb 28  9:08 Trim $I'
+PROC0002= 'Feb 28  9:08 trimsec = [2:2047,2:2047]'
+PROC0003= 'Feb 28  9:08 Fixpix $I'
+PROC0004= 'Feb 28  9:08 $M = CALDIR$bpm0702[im1]'
+PROC0005= 'Feb 28  9:08 dark calibration = ($I-$D)'
+PROC0006= 'Feb 28  9:08 $D = Drk120[im1]'
+PROC0007= 'Feb 28  9:08 flat calibration = ($I/$F)'
+PROC0008= 'Feb 28  9:08 $F = SFH2[im1]'
+PROCDONE= 'TPDF    '
+PROCAVG =              1493.96
+PROCSIG =             110.5403
+.fi
+.in -4
+.ih
+SEE ALSO
+.hf nfskysub nfskysub
+.hr procexpr procexpr
+.hr ccdred.ccdproc ccdred.ccdproc
+.hr mscred.ccdproc mscred.ccdproc
+.hr quadred.ccdproc quadred.ccdproc
+.hr fixpix fixpix
+.hr icfit icfit
+.endhelp

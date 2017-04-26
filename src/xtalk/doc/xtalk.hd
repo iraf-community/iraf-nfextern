@@ -1,0 +1,6 @@
+# Help directory for IRPROC.
+
+revisions	sys=../Revisions
+
+xtcoeff		hlp=xtcoeff.hlp
+xtalkcor	hlp=xtalkcor.hlp

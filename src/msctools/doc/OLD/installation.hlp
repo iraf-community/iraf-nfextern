@@ -1,0 +1,805 @@
+.help installation Dec03 mscred
+
+.ce
+\fBMSCRED: CCD MOSAIC REDUCTION PACKAGE\fR
+.ce
+Release Notes and Installation Instructions
+
+.sh
+SUMMARY
+The MSCRED external package is used to reduce CCD mosaic data in which
+the data is in the mosaic MEF data format.
+
+.sh
+RELEASE INFORMATION
+The following summary only highlights the major changes.  There will also
+be minor changes and bug fixes.
+
+.ls V4.8: May 11, 2004
+MSCCMATCH now allows any number of sources to be rejected by the bad
+pixel/saturation mask during the fine centroiding.  The coarse search
+works as before and ignores the mask if more than half the search regions
+have bad pixels flagged.  There is also now another output log line giving
+the average x/y shifts which is different than the tangent point shift which
+is a function of the WCS solution.
+.le
+.ls V4.8: February 25, 2004
+MSCGETCATALOG now outputs an extra digit of precision.
+
+An error in MSCCMATCH about too many "ctran" descriptors was fixed.
+.le
+.ls V4.8: December 30, 2003
+MSCFOCUS/MSCSTARFOCUS was not working correctly since the April version.
+
+XTALKCOR was modified to allow mosaics with few extensions than given in
+the coefficient file provided that the extensions don't reference any
+missing extensions.
+
+MSCSHUTCOR was added to allow measuring shutter corrections in mosaic
+format data.
+.le
+.ls V4.8: November 6, 2003
+MSCCMATCH was fixed to allow automatic outlier rejection by setting the
+"reject" parameter.  This function was not working even though the parameter
+was present because a hidden parameter for the number of rejection iterations
+was not set.
+
+MSCSETWCS would not work on database files produced by MSCTPEAK using non-MEF
+data.
+.le
+.ls V4.8: July 30, 2003
+A bug was fixed which caused a memory corrupted error when combining data
+in physical coordinate space when there is a relative flip between images.
+This type of combining occurs when merging multiple amplifiers.  Note this
+only affects data where the raw storage order of multiple amplifiers is
+flipped.  Some systems, such as at NOAO, flip the data to a standard
+orientation during readout.
+.le
+.ls V4.8: July 28, 2003
+This fixes a bug in CCDPROC when the data storage order is flipped with
+respect to the CCD pixels and the TRIMSEC.  This bug causes the LTV keyword
+to be off when applying the trimming operation.  The LTV error affects
+merging amplifiers and other operations based on the physical CCD
+coordinate system.
+.le
+.ls V4.8: June 24, 2003
+This fixes a bug in CCDPROC on Solaris when using the fixpix option.
+.le
+.ls V4.8: April 11, 2003
+This fixes a bug affecting MSCZERO, MSCCMATCH, MSCCTRAN, MSCTVMARK,
+MSCPIXAREA, MSCGETCAT, and MSCIMAGE.  This bug was introduced in the
+March releases.  It is reported in IRAF bug log #552.  There is
+no workaround and anyone who installed one of the March releases should
+upgrade.
+.le
+.ls V4.8: March 25, 2003
+PATFIT/RMFRINGE/RMPUPIL had a bug when using the block averaging with
+certain combinations of background levels.
+.le
+.ls V4.8: March 14, 2003
+PATFIT/RMFRINGE/RMPUPIL now have an option to block average the input,
+pattern, weight, and masks to reduce noise.  Note that there are new
+parameters in RMFRINGE.
+
+The merging of masks with the "merge" option in CCDPROC had a bug when
+the masks are added to during CCDPROC.  This has now been fixed.
+.le
+.ls V4.8: November 4, 2002
+MSCCMATCH has additional parameters and the parameters are functionally
+grouped in epar.  The new parameters allow finer control of the centroiding
+and failure conditions.  The default values produce the same results as
+before.
+
+XTCOEFF coefficients were biased by not using an accurate victim background
+and not using any source background.  A new version includes parameters for
+the backgrounds as well as for an object mask to be applied to the victim
+to exclude contaminating objects.
+
+COMBINE and related tasks were incorrectly reporting the mask file used
+in the logfile though the correct mask was being used for the combining.
+
+CCDPROC did not recognize setting the bleed trail value relative to
+the saturation value.
+.le
+.ls V4.7: June 14, 2002
+Fixed a bug in COMBINE (which is called by various other tasks such
+as ZEROCOMBINE, FLATCOMBINE, and MSCIMAGE) which could cause a segmentation
+violation.
+.le
+.ls V4.7: May 28, 2002
+This version has features that require IRAF V2.12.  In particular, use of
+nproto.objmasks to make object masks for proper fringe and pupil removal
+and support for masks in FITS files.  However, the package will still work
+with V2.11.3 and with pl masks.  Note that not all tasks, such as
+CCDPROC, have been updated to use FITS masks.
+
+Two new non-interactive tasks, RMFRINGE and RMPUPIL, automate removal of
+fringe and pupil patterns.  The old interactive tasks have been renamed
+to IRMFRINGE and IRMPUPIL.  As part of this change the task MSCPUPIL
+has a new output type "mask" to produce a mask for identifying the
+pixels corresponding to the pupil pattern.
+
+MSCGETCATALOG is now interfaced with the V2.12 ASTCAT package to provide
+access to multiple on-line catalogs.
+.le
+.ls V4.6: December 7, 2001
+MKMSC is a new task for creating multiextension format files from data in
+which multiple amplifier readouts are stored as regions in an image.  This
+allows CTIO ARCON QUAD and ESO VLT FORS1 formats to be converted to allow
+MSCRED to be used to reduce the data.  There may be other formats for which
+this task might also be useful.
+.le
+.ls V4.6: December 4, 2001
+A bug was fixed in COMBINE when applying scale factors from a file or keywords.
+The values were improperly normalized.  This probably only affects Linux
+versions.
+.le
+.ls V4.6: November 26, 2001
+MSCCMATCH has been revised to detect bad coordinate matches.  In
+particular, when the fine centroiding is done on all the input coordinates,
+it will detect a failure to centroid on a real object.  Previously
+positions near the estimated positions would be found even when there is no
+object resulting in an apparently reasonable pattern of sources for the
+coordinate correction.  If more than half of the candidate coordinates fail
+to centroid the matching is considered to have failed and an error is
+reported.  Other changes include being more robust when large search radii
+are used.  Mainly this means that with large search areas around each
+candidate objects, where the probablility of including bad pixels becomes
+high, the bad pixel map is not used to exclude candidates in this search.
+Note that bad pixels in the fine centroiding box will still exclude the
+object from consideration.  MSCCMATCH will also now work with single images
+as well as MEF mosaics.
+
+CCDPROC has been revised to add the processing parameter "split".  If this
+parameter is selected then the extensions are split into separate images
+during processing.  This is intended for applications where the CCDPROC
+processed images will be used in further analysis as individual images.
+Splitting the extensions during processing not only saves a later splitting
+step but is somewhat more efficient in execution.
+
+MSCDISPLAY has a new feature useful for generic multi-extension data or
+for sets of images that are tiled.  If there is no DETSEC keyword but there
+is a WCS then the display will be tiled using the nearest approximation
+based on the WCS.  Approximation means that nearest display pixel center
+is used but the images are not rotated or resampled.
+.le
+.ls V4.5: May 4, 2001
+CCDPROC has a new option to identify bleed trails.  The bleed trails may
+be marked in an output mask and/or removed from the data by linear
+linear interpolation.
+
+CCDPROC will now merge pixel masks when merging multiple amplifiers from
+the same CCD.  This is done only if the resulting pixel mask is different.
+
+MSCCMATCH was enhanced to work with simple single images.
+.le
+.ls V4.4: March 6, 2001
+There is a new version of MSCIMAGE which handles arbitrary rotations,
+creation of MEF resampled data, and parameters to explicitly set a simple
+standard output coordinate system.  The new version has been carefully
+compared with the old version and gives identical results down to the the
+roundoff error.  However, the old version may be excuted with the hidden
+task MSCOIMAGE.
+
+MSCZERO was updated again to correctly handle CFH12K data.
+.le
+.ls V4.3: February 23, 2001
+An error in creating the distribution file mscred.tar resulted an older
+version of the sources being used but with new binaries.  This distribution
+is the correct one for the February 8, 2001 release along with the
+following changes.
+
+MSCMEDIAN is a new task that allows running the IMAGES.MEDIAN or
+IMAGES.FMEDIAN tasks on the extensions of a mosaic file.  It also has the
+option to output the difference between the input and the median filtered
+data.  Using this task with difference output on a sky flat created from
+data without fringing removed will produce a fringe frame for application
+with RMFRINGE.
+.le
+.ls V4.3: February 8, 2001
+A bug in the V4.2 version of CCDPROC which could potentially lose data in
+situations where the input to CCDPROC consists of a mixture of processed
+and unprocessed files is fixed (see bug log 479 for details).
+
+COMBINE and the related task MSCSTACK were modified to provide additional
+supplementary outputs.  Bad pixel mask are specified by the new parameter
+"bpmasks", where mask values of 1 indicate no output data and 0 indicate
+combined data.  Exposure masks are specified by the new parameter
+"expmasks", where mask values are the sum of the input exposure times.  The
+headers of the input images may be saved as dataless FITS extensions in a
+FITS multiextension file specified by the new parameter "headers".  The
+previously available output mask giving the number of pixels rejection is
+now specified by the parameter "nrejmasks" instead of "plfile".
+
+The output header is a copy of the first input file in the list as before,
+but now the exposure time and dark time are not modified by an attempt to
+give an effective exposure time.  Now the input data is scaled to the first
+input for combining rather than some average value as previously done.
+This means that the keywords in the output header, such as exposure time
+and airmass, will be representative of the final data.
+
+The output header will contain indexed keywords IMCMBnnn and PROCIDnn.
+The former will be the filenames of the images combined.  The latter will
+occur only when the data contain the keyword OBSID or PROCID and will
+be copies of the keywords from the input data.  PROCID is generated by
+CCDPROC and COMBINE from OBSID if present and thereafter PROCID is updated
+when the data has been modified by these and certain other reduction
+tasks.
+
+A bug in COMBINE with the "grow" option that caused memory usage to increase
+until an out-of-memory or memory corruption error occurred was fixed.
+This would typically occur with the variant SFLATCOMBINE.
+
+A bug was fixed in MSCFINDGAIN where the specified bad pixel mask was not
+actually used.
+.le
+.ls V4.2: January 30, 2001
+XTALKCOR was upgraded from a script to a complied task.  This new version
+supports multiple amplifiers affecting the same victim extension.  It also
+adds the capability to create bad pixel masks of the affected pixels.
+The parameter file has additional parameters.
+
+CCDPROC was modified to use the new crosstalk correction routine.  It functions
+in the same way as previously with no new parameters.  The application to
+multiple amplifiers is transparently determined by the crosstalk correction
+file.
+
+CCDPROC was also modified to change the default for the "merge" parameter to
+yes.  This is a no-op for data where there is only one amplifier per CCD
+and is the correct thing to do for multiple amplifier per CCD mosaic data.
+.le
+.ls V4.1: December 14, 2000
+The "saturation" parameter in CCDPROC, which works in conjunction with
+"bpmasks", may now be specified with the following syntax.  The first
+word is the desired saturation value.  It may be either a number (INDEF
+to not look for saturated pixels) or a keyword name with or without a
+leading '!'.  The second word is the units which may either be "ADUs"
+or "electrons" with abbreviation allowed.  If no unit is specified then
+it defaults to ADU.  If electrons is specified then the header must contain
+the "gain" keyword.  Both the saturation keyword and the gain keyword
+may be translated through the translation file.
+
+A minor enhancement of MSCZERO to work with data which have both flips
+and TRIMSEC.
+.le
+.ls V4.1: December 13, 2000
+This version fixes a memory usage problem with CCDPROC as reported in
+bug 476.
+.le
+.ls V4.1: December 7, 2000
+In certain circumstances CCDPROC could apply different normalizations to
+each extension when flat fielding.  This release fixes this potential
+problem as described in bug enty 474.
+.le
+.ls V4.1: December 5, 2000
+MSCFINDGAIN was improved to allow use of bad pixel masks and sigma clipping.
+The output format was also improved.
+
+MSCDISPLAY and MSCZERO had minor bugs dealing with extensions that are
+stored flipped relative to the way they should be displayed; i.e. the
+amplifier readout order relative to the CCD is not corrected when
+recording the data.
+.le
+.ls V4.1: October 2, 2000
+CCDPROC was fixed to eliminate a query for an output bad pixel mask when
+processing a dependent calibration image.
+
+MSCCMATCH was improved during the automatic search.  Previously regions
+which partially fell outside an image would be excluded without replacement
+by another region leading to possibly poor statistics and a failure to find
+the offsets.
+
+A potential problem was fixed where an explicit extension, such as
+image[1], is accidentally given instead of the root MEF name could lead to
+an infinite loop.
+.le
+.ls V4.1: September 20, 2000
+This is a minor bug fix release only.  The only significant bugs were
+in MSCTPEAK.  So the only reason to update is if you use this task.
+
+The other bug to be aware of is that using "*" in the "extname" parameter
+of various tasks may cause the task to hang.  The extension name parameter
+is for pattern matching rather than filename matching and "*" means to
+match zero or more of the preceeding character; so what should be used is
+"?*".  The pattern matching all extensions in MSCRED is "".  A bug fix was
+made to treat the special case of "*" in the way many users expect, which
+is to match all extensions names in the same way as "" currently does.
+.le
+.ls V4.1: September 6, 2000
+MSCIMAGE was modified to better mask the interpolated edge pixels and to
+provide user control of the boundary extension.  The new parameters are
+"boundary" with a default value of "reflect" and "constant" with a default
+value of 0.  The masking at the edges is now done differently by having the
+"ntrim" parameter apply to the input pieces rather than the projected
+rectangle in the output sections.  Previously it was possible, because of
+the distortions and rotations of the CCDs, for the trimming to not exclude
+edge data uniformly thus requiring a much larger trim than is really
+necessary.  Trimming the input is easier to comprehend and provides good
+control of interpolation edge effects.  The help page was revised to
+described the changes and better explain the use of this task.
+
+MSCIMAGE and MSCTPEAK will now work with single images as well as
+multiextension mosaic exposures.  This satisfies requests to use these
+tasks (along with MSCDISPLAY, MSCZERO, and a few other tasks) for
+non-mosaic data.  These changes were made because it was easy to do.
+
+MSCEXAMINE has a new key, 't', and new parameters "output", "ncoutput",
+and "nloutput".  This key outputs a section of the displayed mosaic
+field centered on the cursor.  The output name is a specified rootname,
+defaulting to the name of the mosaic exposure, with a sequence
+number that is incremented for each new output.  IMEXAMINE will include
+this feature in the next IRAF release.  Among the uses of this feature
+is the extraction of wavefront measurement stars at the telescope using
+a mosaic as the detector.
+.le
+.ls V4.0: August 22, 2000
+This version includes the following major enhancements.
+
+MSCCMATCH can locate zeropoint offsets of a few hundred pixels along with
+small rotations of order a degree.  This is done by looking for position
+correlations among the brightest sources in the coordinate list.  The
+"coarse search" is enable with new parameters.  If a significant correlation
+is found then the centroiding of all the input sources for the fine
+adjustments of a few pixels is done as before followed by the fitting of
+a global coordinate system correction for offset, scale, rotation, and
+atmospheric refraction.  For the fitting the rejection sigma is now a
+parameter.  Other new features include use of bad pixel masks to exclude
+sources with bad pixels, the ability to output a revised coordinate list
+of just those sources in the field which have no bad pixels and were not
+removed during centroiding, and the ability to execute a task to get a
+coordinate list of sources for the input exposures.  The last feature is
+very useful in conjunction with the new task MSCGETCATALOG noted below.
+The new parameters are "outcoords", "usebpm", "nsearch", "search",
+"rsearch", "reject", "listcoords", " graphics", and "cursor".
+
+MSCGETCATALOG is a new task that queries a web-based catalog server for
+coordinates and magnitudes of sources covered by one or more mosaic
+exposures.  The task is an interim task to be eventually be replaced by
+general IRAF catalog access tools.  This task provides access to the USNO
+A2 catalog provided by two servers.  It is used to get coordinate lists for
+various MSCRED tasks including the on-the-fly feature of MSCCMATCH
+mentioned previously.
+
+MSCZERO has many new keystrokes as described by typing "?" for the cursor
+input.  Some of the new features are automatically getting coordinates to
+mark based on the MSCGETCATALOG task and selecting marked sources to use
+for the zero point adjustment.
+
+MSCFINDGAIN is a new task that implements the Janesick method using two
+flat field and two zero exposures to estimate the gain and readout noise
+of the extensions in multiextension mosaic CCD exposures.
+
+XTCOEFF is a new task that estimates crosstalk coefficients between a
+source and victim extension.  It produces the information used by the
+crosstalk correction calibration step in CCDPROC.
+
+CCDPROC can identify saturated pixels (defined in one of several ways)
+and produce an output bad pixel mask which is a combination of an input bad
+pixel mask (usually a static mask common to all exposures) and the saturated
+pixels.  The new parameters are "bpmasks" and "saturation".
+
+The minor enhancements involving parameter additions are as follows.
+MSCPUPIL has a new parameter "lmedian" which removes a line-by-line median
+prior to fitting the pupil ghost.  MSCSETWCS has an equinox parameter to
+identify the keyword for the equinox of the right ascension and declination
+keywords.  The WCS zeropoint is set to the right ascension and declination
+given by the keywords precessed to 2000 from the equinox given by the
+equinox keyword.
+
+Finally there have been the usual round of bug fixes and better handling of
+uncommon and error situations.
+.le
+
+
+
+.ls V3.2.3: November 24, 1999
+MSCDISPLAY was modified to use the "fill" parameter.  When fill=yes then
+the display buffer will be filled.  This is the previous behavior.  If
+fill=no then the display buffer will tile the mosaic pieces using only
+block averaging and no interpolation.  This avoids possible interpolation
+effects.  Note that this meaning of fill=no is different than in DISPLAY.
+
+MSCIMAGE was modified to delete additional keywords from the final image
+which are inherited from one of the extensions but which are not appropriate
+for a single image.  This is desirable to allow MSCDISPLAY to also display
+the single image correctly.
+.le
+.ls V3.2.2: November 17, 1999
+New tasks MSCSPLIT and MSCJOIN allow splitting and rejoining MEF files
+to/from separate images.
+
+MSCDISPLAY now makes use of the "fill" parameter.  If fill=no the
+mosaic data will be block averaged to the nearest blocking factor that
+will fit in the display frame buffer.  Depending on the mosaic size and
+gap parameter values and the display frame buffer size the amount of the
+frame buffer used will vary.  With fill=yes the same block averaging
+is done but then the result is interpolated to fill the display frame
+buffer but preserving the aspect ratio.  This is the same result produced
+by earlier versions.  The advantage of fill=no is that there will be
+no interpolation effects in the display.
+.le
+.ls V3.2.1: September 3, 1999
+MSCIMATCH had a bug that if iterative rejection was used (niterate>0)
+then a floating operand error would occur on some systems (Linux for one).
+MSCIMATCH also has a new parameter, "measured", that should be left
+blank for normal operation.  If a file name is given and the file does
+not exist then the measurements used for the scale determinations will
+be written.  If the file exists, say from a previous execution, the
+file will be read and the measurment step will be skipped.  This is
+primarily for debugging but it potentially could be used to input
+photometry measurements obtained in some other way.
+.le
+.ls V3.2: August 27, 1999
+MSCCMATCH was modified to allow a slightly more general and appropriate
+solution for refraction distortions.  MSCDISPLAY has a modified output
+showing the individual scaling factors and what is actually displayed.
+MSCTVMARK was fixed to correctly handle untrimmed data.  This is the
+version to be used at KPNO and CTIO during observing for the fall
+semester.
+.le
+.ls V3.1: June 17, 1999
+MSCSTACK was fixed to correct problem with the WCS of the stacked
+image possibly being off depending on the order of the input images.
+.le
+.ls V3.1: June 11, 1999
+Changes were made to MSCCMATCH to fix a problem when data are binned;
+specifically the logical and physical coordinates are not the same.  For
+most people there is no need to get this update.
+.le
+.ls V3.1: June 8, 1999
+MSCIMAGE would produce a finer pixel sampling if the input data was
+block averaged or observed with binning.  This was changed so that the
+pixel sampling is similar between the input data and the resampled data.
+.le
+.ls V3.1: June 3, 1999
+Problems with MSCTVMARK, MSCZERO, and MSCTPEAK were fixed.  The first two
+only affect data with binning or that have been trimmed by CCDPROC.
+MSCZERO would also produce wrong results after doing an 'm' to mark
+coordinates from a file.  The latter now creates a coordinate database
+solution that can be directly applied with MSCSETWCS without having to edit
+the solution fields of the database.
+.le
+.ls V3.1: May 1999
+.nf
+- RMFRINGE: New task to interactively remove a fringe image.
+- MSCSETWCS: New task to set WCS from astrometric database solution.
+- RMPUPIL: Parameter changes to skip initial automatic scaling if desired.
+- MSCEXAM: Fixed to work with data which has flips between extensions.
+- Fixed bug that would limit the number of MEF files that could be handled.
+.fi
+.le
+.ls V3.0: April 1999
+The main areas of addition are:
+
+.nf
+- Support for multiple amplifiers from the same CCD
+- Support for non-NOAO Mosaics
+- Bug fixes
+.fi
+
+The new features are:
+
+.nf
+- New task MSCPIXAREA to compute and apply pixel area correction from WCS.
+- New task MSCTVMARK to mark coordinates in MSCDISPLAY display.
+- New task MSCBLKAVG to block average mosaic data.  This includes proper
+  updating of RDNOISE, GAIN, CCDSUM, etc.
+- New task MSCSKYSUB to fit and subtract a sky surface in the single
+  mosaic images produced by MSCIMAGE; i.e. remove gradients prior to
+  stacking.  The mean of the sky surface is not subtracted to keep the
+  photon statistics roughly correct.
+- New default instrument translation file which can be used as a template
+  for other sites.
+- CCDPROC now includes a crosstalk correction option.
+- MSCSTAT includes a global mode calculation.
+- MSCIMAGE uses the first extension as WCS reference if one is not given.
+- MSCRFITS/MSCWFITS aborts on a tape error.
+- RMPUPIL was improved to allow lists of images and some logging.
+- MSCIMATCH allows use of masks to exclude bad data and use of a SKYMEAN
+  keyword constrain the relative zero level offsets while fitting the
+  relative intensity scales.
+- Changes to CCDPROC to merge amplifiers from the same CCD into a single
+  extension after processing.
+- Changes to CCDPROC to support relative flips between DATASEC and
+  CCDSEC/DATASEC.
+- Changes to MSCDISPLAY to support relative flips between DATASEC and
+  CCDSEC/DATASEC.  Also to support binning.
+- Changes to MSCZERO adding an 'r' key to reload the display and 'm' to
+  mark objects from an RA/DEC list.  This uses new MSCTVMARK.
+- Change to CCDPROC to remove an error causing a string overflow in the
+  expansion of the extensions.
+.fi
+.le
+
+
+
+.ls V2.0: September 1998 (requires IRAF V2.11.1)
+This version has many changes.  It is the version intended to support the
+new NOAO Mosaic Imager with the science grade thin CCDs.  This is the version
+used by observers at NOAO for the 1998 fall semester.
+
+.nf
+- support for on-the-fly calibration during display
+- new tasks for dealing with the Mayall pupil image
+- mscdb is now a separate distribution outside of the mscred package
+- COMBINE can output a rejection mask showing which pixels in which
+  images are rejected
+- CCDPROC has an optional output parameter
+- CCDPROC computes ccdmean value with sigma clipping
+- new faster and more sophisticated version of MSCIMATCH
+- SETINSTRUMENT is now organized by site and telescope
+- supports adding the IMMATCHX external package to allow sinc
+  interpolation
+- new user's guide
+.fi
+.le
+
+
+
+.ls V1.1: February 1998 (requires IRAF V2.11.1)
+The software now uses the V2.11.1 "tnx" world coordinate system.  This is
+a image header representation of a tangent plane projection plus non-linear
+distortion terms.  This eliminates the need for the WCSSOL keyword to point
+to an external data file.  The NOAO Mosaic Data Capture Agent will produce
+the new WCS during future observations.  The software is backward compatible
+with the WCSSOL representation.
+
+MSCDISPLAY has a new parameter to allow display of a mosaic of separate
+images.
+.le
+.ls V1.0: January 1998
+New task MSCCMATCH matches (registers) the coordinate systems using a list of
+common coordinates.  The WCS registration includes scale and rotation
+adjustments which correct for differences due to atmospheric refraction.
+New task MSCIMATCH intensity match individual constructed images for zero
+point and transparency based on photometry of common objects.  A new task
+SFLATCOMBINE combines exposures to make a sky flat field.  SFLATCOMBINE
+includes a new feature of COMBINE to provide a 2D rejection growing.
+MSCZERO has more keystrokes and was made more efficient for adjusting
+a set of exposures to a common WCS zero point.  The MSCGUIDE was updated
+to this version.
+.le
+
+
+
+.ls V0.2: November 1997
+Improved MSCRFITS for quicker listing of tapes, new COMBINE that scales
+Mosaic images with the same scaling for all extensions, improved MSCZERO
+with '?' help, MSCEXAM now uses full database solution for world coordinates,
+new tasks MSCCMD, MSCARITH, and MSCSTAT.
+.le
+.ls V0.1: September 1997
+First user and mosaic developer evaluation version with minimal
+documentation.  Requires V2.11.
+.le
+.ls August 1997
+A better prototype.  This release requires V2.11 (or V2.11Beta + patch1).
+Help is skimpy.  Only mscguide and imtextensions have help.
+.le
+.ls November 1996
+This is a prototype.
+.le
+.sh
+INSTALLATION INSTRUCTIONS
+Installation of this external package consists of obtaining the files,
+creating a directory containing the package, compiling the executables or
+installing precompiled executables, and defining the environment to load
+and run the package.  For NOAO Mosaic Imager data a separate instrument
+database distribution also needs to be installed.  The package may be
+installed for a site or as a personal installation.  If you need help with
+these installation instructions contact iraf@noao.edu or call the IRAF
+HOTLINE at 520-318-8160.
+.ls [arch]
+In the following steps you will need to know the IRAF architecture
+identifier for your IRAF installation.  This identifier is similar to the
+host operating system type.  The identifiers are things like "ssun" for
+Solaris, "alpha" for Dec Alpha, and "linux" or "redhat" for most Linux
+systems.  The IRAF architecture identifier is defined when you run IRAF.
+Start the CL and then type
+
+.nf
+    cl> show arch
+    .ssun
+.fi
+
+This is the value you need to know is without the leading '.'; i.e. the
+IRAF architecture is "ssun" in the above example.
+.le
+.ls [1-site]
+If you are installing the package for site use login as IRAF
+and edit the IRAF file defining the packages.
+
+.nf
+    % cd $hlib
+.fi
+
+Define the environment variables mscred and mscdb to be the pathnames to
+the mscred package root directory and the instrument database.  The '$'
+character must be escaped in the VMS pathname and UNIX pathnames must be
+terminated with a '/'.  Edit extern.pkg to include the following.
+
+.nf
+    reset mscred = /local/mscred/
+    reset mscdb = /local/mscdb/
+    task  mscred.pkg = mscred$mscred.cl
+.fi
+
+Near the end of the hlib$extern.pkg file, update the definition of
+helpdb so it includes the mscred help database, copying the syntax
+already used in the string.  Add this line before the line 
+containing a closing quote:
+
+.nf
+    ,mscred$lib/helpdb.mip\
+.fi
+.le
+.ls [1-personal]
+If you are installing the package for personal use define a host
+environment variable with the pathname of the directory where the package
+will be located (needed in order to build the package from the source
+code).  Note that pathnames must end with '/'.  For example:
+
+.nf
+    % setenv mscred /local/mscred/
+.fi
+
+In your login.cl or loginuser.cl file make the following definitions
+somewhere before the "keep" statement.
+
+.nf
+    reset mscred = /local/mscred/
+    reset mscdb = /local/mscdb/
+    task  mscred.pkg = mscred$mscred.cl
+    printf ("reset helpdb=%s,mscred$lib/helpdb.mip\nkeep\n",
+        envget("helpdb")) | cl
+    flpr
+.fi
+
+If you will be compiling the package, as opposed to installing a binary
+distribution, then you need to define various environment variables.
+The following is for Unix/csh which is the main supported environment.
+
+.nf
+    # Example
+    % setenv iraf /iraf/iraf/             # Path to IRAF root (example)
+    % source $iraf/unix/hlib/irafuser.csh # Define rest of environment
+    % setenv IRAFARCH ssun                # IRAF architecture
+.fi
+
+where you need to supply the appropriate path to the IRAF installation root
+in the first step and the IRAF architecture identifier for your machine
+in the last step.
+.le
+.ls [2]
+Login into IRAF.  Create a directory to contain the package files and the
+instrument database files.  These directory should be outside the standard
+IRAF directory tree.
+
+.nf
+    cl> mkdir mscred$
+    cl> mkdir mscdb$
+    cl> cd mscred
+.fi
+.le
+.ls [3]
+The package and instrument database are distributed as tar archives for the
+sources and, as an optional convenience, a tar archive of the executables
+for select host computers.  The instrument database distribution includes
+calibration files for the NOAO Mosaic Imager.  For other instruments this
+file is not necessary though it can be used as a template for instrument
+files for your mosaic.  Note that IRAF includes a tar reader.  The tar
+file(s) are most commonly obtained via anonymous ftp.  Below is an example
+from a Unix machine where the compressed files have the ".Z" extension.
+Files with ".gz" or ".tgz" can be handled similarly.
+
+.nf
+    cl> ftp iraf.noao.edu (140.252.1.1)
+    login: anonymous
+    password: [your email address]
+    ftp> cd iraf/extern/mscred
+    ftp> get mscred.readme
+    ftp> binary
+    ftp> get mscred.tar.Z
+    ftp> get mscred-bin.<arch>.Z  (optional)
+    ftp> cd ../mscdb
+    ftp> get mscdb.tar.Z (optional)
+    ftp> quit
+    cl> !uncompress mscred.tar
+    cl> !uncompress mscdb.tar (optional)
+    cl> !uncompress mscred-bin.<arch> (optional)
+.fi
+
+The readme file contains these instructions.  The <arch> in the
+optional executable distribution is replaced by the IRAF architecture
+identification for your computer.
+
+Upon request the tar file(s) may be otained on tape for a service
+charge.  In this case you would mount the tape use rtar to extract
+the tar files.
+.le
+.ls [4]
+Extract the source files from the tar archive using 'rtar".
+
+.nf
+    cl> softools
+    so> rtar -xrf mscred.tar
+    so> bye
+.fi
+
+On some systems, an error message will appear ("Copy 'bin.generic'
+to './bin fails") which can be ignored.
+Sites should leave the symbolic link 'bin' in the package root
+directory pointing to 'bin.generic' but can delete any of the
+bin.<arch> directories that won't be used.  If there is no binary
+directory for the system you are installing it will be created
+when the package is compiled later or when the binaries are installed.
+
+If the binary executables have been obtained these are now extracted
+into the appropriate bin.<arch> directory.
+
+.nf
+    # Example of sparc installation.
+    cl> cd mscred
+    cl> rtar -xrf mscred-bin.sparc      # Creates bin.sparc directory
+.fi
+
+If the instrument database files for the NOAO Mosaic have been obtained
+extract these.
+
+.nf
+    cl> move mscdb.tar.Z mscdb$
+    cl> cd mscdb
+    cl> rtar -xf mscdb.tar
+.fi
+.le
+
+The various tar files can be deleted once they have been
+successfully installed.
+.ls [5]
+For a source installation you now have to build the package
+executable(s).  First go to the package root directory with
+
+.nf
+    cl> cd mscred
+.fi
+
+If you are updating to a newer version and you earlier built the libraries
+and executables it is necessary to delete these.   Otherwise, depending on
+the dates of files in the new version and the locally built libraries,
+it may cause the new version to be ignored.  To do this the package is
+configured "generic" which puts all the binary files in one binary
+directory, the files are deleted and then you continue in the same way
+as a completely new installation.
+
+.nf
+    cl> mkpkg generic
+    cl> delete bin.<arch>/*      # Substitute sparc, ssun, alpha, etc.
+.fi
+
+Configure the package for the particular architecture to be built.
+
+.nf
+    cl> mkpkg <arch>            # Substitute sparc, ssun, alpha, etc.
+.fi
+
+This will change the bin link from bin.generic to bin.<arch>.  The binary
+directory will be created if not present.  If an error occurs in setting
+the architecture then you may need to add an entry to the file "mkpkg".
+Just follow the examples in the file.
+
+To create the executables and move them to the binary directory
+
+.nf
+    cl> mkpkg -p mscred         # build executables
+    cl> mkpkg generic           # optionally restore generic setting
+.fi
+
+Check for errors.  If the executables are not moved to the binary directory
+then step [1] to define the path for the package was not done correctly.
+The last step restores the package to a generic configuration.  This is not
+necessary if you will only have one architecture for the package.
+.le
+
+This should complete the installation.  You can now load the package
+and begin testing and use.
+.endhelp

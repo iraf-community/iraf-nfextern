@@ -1,0 +1,4 @@
+# NFSKYSUB expression database.
+# Copy and modify this if desired.
+
+S	"sky subtraction" 	"($I-$S)"

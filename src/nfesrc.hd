@@ -1,0 +1,13 @@
+# Help directory for the NFEXTERN tools.
+
+$acehlp		= "./ace/doc/"
+$cmbhlp		= "./combine/doc/"
+$mschlp		= "./msctools/doc/"
+$prchlp		= "./proctool/doc/"
+$xthlp		= "./xtalk/doc/"
+
+acehlp		pkg = acehlp$ace.hd
+cmbhlp		pkg = cmbhlp$combine.hd
+mschlp		pkg = mschlp$msctools.hd
+prchlp		pkg = prchlp$proctool.hd
+xthlp		pkg = xthlp$xtalk.hd

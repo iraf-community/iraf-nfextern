@@ -1,0 +1,118 @@
+# Make ACE.
+
+#$update libpkg.a
+#$omake	zzdebug.x
+#$link	zzdebug.o libpkg.a -lacecat
+#;
+
+
+$call	relink
+$exit
+
+update:
+	$call	update@aceproto
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$update libpkg.a
+	$call ace
+	;
+
+ace:
+	$omake	x_ace.x
+	$omake	dtcscl.x
+	$iffile (lib$libtbtables.a)
+	    $link x_ace.o dtcscl.o libpkg.a -lacecat -lnfe -ltbtables -lds -lgsurfit \
+	        -lcurfit -lxtools -liminterp -lnlfit -lslalib -o xx_ace.e
+	$else
+	    $link x_ace.o dtcscl.o libpkg.a -lacecat -lnfe -lds -lgsurfit \
+	        -lcurfit -lxtools -liminterp -lnlfit -lslalib -o xx_ace.e
+	$endif
+	;
+
+install:
+	$move	xx_ace.e nfebin$x_ace.e
+	$copy	aceall nfebin$aceall
+	$copy	acecatalog nfebin$acecatalog
+	$copy	acediff nfebin$acediff
+	$copy	aceevaluate nfebin$aceevaluate
+	$copy	acesegment nfebin$acesegment
+	;
+
+host:
+	$ifolder (txt.x: lib/aceobjs.h, lib/catdef.dat, aceall.par, \
+	    acecatalog.par, acediff.par, aceevaluate.par, acesegment.par, \
+	    acefocus.h)
+	    !rm -f txt.x
+	    !txtcompile lib/aceobjs.h txt.x f_acestruct
+	    !txtcompile lib/catdef.dat txt.x f_catdef
+	    !txtcompile aceall.par txt.x p_aceall
+	    !txtcompile acecatalog.par txt.x p_acecatalog
+	    !txtcompile acediff.par txt.x p_acediff
+	    !txtcompile aceevaluate.par txt.x p_aceevaluate
+	    !txtcompile acesegment.par txt.x p_acesegment
+	    !txtcompile acefocus.h txt.x f_acefocus
+	$endif
+	;
+
+libpkg.a:
+	@stf
+
+	$call host
+	txt.x
+
+	ace.x		ace.h acedetect.h detect.h filter.h <acecat.h>\
+			<acecat1.h> <aceobjs.h> <error.h> <fset.h> <imhdr.h>\
+			<imset.h> <pmset.h>
+	acefunc.x	<acecat.h> <aceobjs.h>
+	acemulticat.x	acedetect.h filter.h <fset.h> <acecat.h> <aceobjs.h>
+	aceoffsets.x	<imset.h>
+	aceoverlay.x	ace.h <error.h> <imhdr.h> <imset.h> <pmset.h>
+	bndry.x		ace.h <pmset.h>
+	caflux.x	<acecat.h> <acecat1.h> <aceobjs.h> <imhdr.h>
+	catshape.x	<acecat.h> <acecat1.h> <aceobjs.h> <math.h>
+	convolve.x	ace.h <ctype.h> <imhdr.h>
+	detect.x	ace.h detect.h sky.h skyblock.h split.h <acecat.h>\
+			<acecat1.h> <aceobjs.h> <imhdr.h> <mach.h> <pmset.h>
+	eaflux.x	eaflux.h <acecat.h> <acecat1.h> <aceobjs.h>
+	evaluate.x	ace.h eaflux.h evaluate.h gwt.h <acecat.h> <acecat1.h>\
+			<aceobjs.h> <error.h> <imhdr.h> <math.h> <pmset.h>
+	grow.x		ace.h grow.h <acecat.h> <acecat1.h> <aceobjs.h>\
+			<pmset.h>
+	gwt.x		gwt.h <acecat.h> <acecat1.h> <aceobjs.h>
+	mapio.x		<error.h> <imhdr.h>
+	maskcolor.x	
+	mgs.x		<error.h> <imio.h> <math/gsurfit.h> <imhdr.h>
+	mim.x		<error.h> <imset.h> <math/iminterp.h> <imhdr.h>
+	noisemodel.x	
+	omcat.x		ace.h <acecat.h> <acecat1.h> <aceobjs.h> <imhdr.h>\
+			<pmset.h>
+	omwrite.x	ace.h filter.h <acecat.h> <acecat1.h> <aceobjs.h>\
+			<imhdr.h> <pmset.h>
+	pars.x		detect.h evaluate.h grow.h sky.h skyblock.h skyfit.h\
+			split.h filter.h <ctype.h> <math/curfit.h>\
+			<math/gsurfit.h>
+	sky.x		sky.h <error.h>
+	skyblock.x	skyblock.h <ctype.h> <error.h> <imhdr.h> <imset.h>\
+			<mach.h>
+	skyfit.x	skyfit.h <imhdr.h> <math/curfit.h> <math/gsurfit.h>
+	skyimages.x	<error.h> <imhdr.h>
+	split.x		ace.h split.h <acecat.h> <acecat1.h> <aceobjs.h>\
+			<mach.h> <pmset.h>
+	t_acefocus.x	acefocus.h stf/starfocus.h <acecat.h> <mach.h>
+	t_acematch.x	acematch.h <error.h> <fset.h> <mach.h> <math.h>\
+			<imhdr.h> <acecat.h> <math/gsurfit.h>
+	t_acecopy.x	<acecat.h> <error.h>
+	t_ace.x		ace.h acedetect.h filter.h
+	t_acedisplay.x	display.h gwindow.h <ctype.h> <error.h> <imhdr.h>\
+			<imset.h> <mach.h> <pmset.h> <imhdr.h> <imset.h> <mach.h>
+	t_acegeomap.x	acematch.h <acecat.h> <error.h> <fset.h> <imhdr.h>\
+			<mach.h> <math.h>
+	t_acesetwcs.x	acesetwcs.h <acecat.h> <imhdr.h> <math.h>\
+			<math/gsurfit.h> <mwset.h> <pkg/skywcs.h>
+	#t_imext.x	<ctype.h> <error.h> <imhdr.h> <imset.h> <mach.h>
+	#t_mscext.x	<error.h> <imhdr.h> <imset.h>
+	x_ace.x	
+	;

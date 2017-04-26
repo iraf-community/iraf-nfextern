@@ -1,0 +1,37 @@
+.help catnext Jun03 acecat
+.ih
+NAME
+catnext -- get the next defined record
+.ih
+SYNOPSIS
+nextrec = catnext (cat, rec)
+
+.ih
+ARGUMENTS
+.ls cat (I)
+Catalog pointer.  If NULL a NULL record pointer is returned.
+.le
+.ls rec (I)
+Last record pointer.  Currently this is not used 
+.ih
+.ls nextrec (function value)
+The next defined record pointer or NULL when the previous record is
+the last.
+.le
+DESCRIPTION
+This procedure finds the next defined (non-NULL) record in the array of
+records since the last call to CATHEAD or CATNEXT.  When the previous
+record is the last a NULL pointer is returned to indicated the end of
+the defined records.  This procedure is usually used in combination with
+CATHEAD as shown in the example.
+.ih
+EXAMPLE
+To go through the non-NULL records in index order the following construct
+might be used.
+
+.nf
+    while (rec=cathead(cat); rec!=NULL; rec=catnext(cat,rec))
+.fi
+.ih
+SEE ALSO
+acecat, cathead

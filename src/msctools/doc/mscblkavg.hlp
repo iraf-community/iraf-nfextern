@@ -1,0 +1,76 @@
+.help mscblkavg Aug07
+.ih
+NAME
+mscblkavg -- block average or sum n-dimensional images
+.ih
+SYNOPSIS
+This task block averages or sums images of MEF files by specified block
+factors.  It updates the RDNOISE, GAIN, CCDSUM, DATASEC, BIASSEC, TRIMSEC,
+and CCDSEC parameters.  The output pixel type is the same as the input
+pixel type.  For this reason block averaging of raw unsigned short data
+may lead to undersampling the noise.  The output name may be the same as
+the input name to replace the input by the block average output.
+.ih
+USAGE	
+.nf
+mscblkavg input output b1 b2 b3 b4 b5 b6 b7
+.fi
+.ih
+PARAMETERS
+.ls input
+List of images or multiextension format (MEF) files to be block averaged.
+Image sections are allowed.
+.le
+.ls output
+List of output names.  If the output name is the same as the input
+name then the block averaged image replaces the input file.
+.le
+.ls b1
+The number of columns to be block averaged (dimension 1, or x).
+.le
+.ls b2
+The number of lines to be block averaged (dimension 2, or y).
+.le
+.ls b3
+The number of bands to be block averaged (dimension 3, or z).
+.le
+.ls b4
+The number of pixels to be block averaged in dimension 4 (... etc. for b5-b7).
+.le
+.ls option = "average"
+Type of block average.  The choices are "average" and "sum".
+.le
+.ih
+DESCRIPTION
+The list of input images or multiextension format (MEF) files are block
+averaged or summed to form the output files.  MEF input files produce
+MEF output files with only the image extensions.  The output file names
+are specified by the output list.  The number of output file names must
+be the same as the number of input files.  An output file name may be the
+same as the corresponding input file in which case the block averaged file
+replaces the input file.  The last column, line, etc. of the output file
+may be a partial block.  The option parameter selects whether to block
+average or block sum.
+
+This is a script layered on top of \fBblkavg\fR.
+.ih
+EXAMPLES
+1. To block average a 2-d image in blocks of 2 by 3:
+
+    cl> mscblkavg imagein imageout 2 3
+
+2. To block sum two 2-d images in blocks of 5 by 5:
+
+    cl> mscblkavg image1,image2 out1,out2 5 5 op=sum 
+
+3. To block average a 3-d image by 4 in x and y and 2 in z:
+
+    cl> mscblkavg imagein imageout 4 4 2
+
+		or
+
+    cl> mscblkavg imagein imageout b1=4 b2=4 b3=2
+.ih
+SEE ALSO
+msccmd, blkavg
+.endhelp

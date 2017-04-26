@@ -1,0 +1,82 @@
+# ACEALL
+
+images,f,a,,,,"List of input images"
+masks,s,h,"!BPM",,,"List of bad pixel masks"
+exps,s,h,"",,,"List of exposure maps"
+gains,s,h,"",,,"List of gain maps"
+scales,s,h,"",,,"List of image intensity scale factors"
+extnames,s,h,"",,,"Extension names"
+logfiles,s,h,"",,,"List of log files"
+verbose,i,h,2,0,,"Verbose level
+
+# Reference Image(s)"
+rimages,f,h,,,,"List of reference images"
+rmasks,s,h,"!BPM",,,"List of reference bad pixel masks"
+rexps,s,h,"",,,"List of reference exposure maps"
+rgains,s,h,"",,,"List of reference gain maps"
+rscales,s,h,"",,,"List of reference intensity scale factors"
+roffset,s,h,"",,,"Offset for reference image
+
+# Cataloging"
+rcatalogs,s,h,"",,,"List of input reference catalogs"
+catalogs,s,h,"+_cat",,,"List of output catalogs"
+catdefs,s,h,"",,,"List of catalog definitions"
+catfilter,s,h,"",,,"Output catalog filter"
+order,s,h,"",,,"Ordering expression"
+nmaxrec,i,h,INDEF,,,"Maximum number of output records"
+magzero,s,h,"INDEF",,,"Magnitude zero point"
+fwhm,r,h,4,,,"Default FWHM (pix)"
+cafwhm,r,h,2,,,"Default circular ap diameter (FWHM)"
+gwtsig,r,h,INDEF,,,"Mag weighting PSF sigma (pix)"
+gwtnsig,r,h,INDEF,,,"Centroid weighting scale (sigma)
+
+# Object masks"
+objmasks,s,h,"+_obm",,,"List of object masks"
+omtype,s,h,"all","boolean|numbers|bboolean|bnumbers|all",,"Object mask type
+
+# Sky"
+skyotype,s,h,"subsky","sky|subsky",,"Sky output type"
+skyimages,s,h,"",,,"List of output sky images"
+sigimages,s,h,"",,,"List of output sigma images"
+skies,s,h,"+_skymap",,,"List of sky maps"
+sigmas,s,h,"+_sigmap",,,"List of sigma maps"
+rskies,s,h,"",,,"List of reference skies"
+rsigmas,s,h,"",,,"List of reference sky sigmas"
+fitstep,i,h,100,1,,"Line step for sky sampling"
+fitblk1d,i,h,10,,,"Block average for line fitting"
+fithclip,r,h,2.,,,"High sky clipping during 1D sky estimation"
+fitlclip,r,h,3.,,,"Low sky clippling during 1D sky estimation"
+fitxorder,i,h,1,1,,"Sky fitting x order"
+fityorder,i,h,1,1,,"Sky fitting y order"
+fitxterms,s,h,"half","none|full|half",,"Sky fitting cross terms"
+blkstep,i,h,1,0,,"Line step for sky sampling"
+blksize,i,h,-10,,,"Block size (+=pixels, -=blocks)"
+blknsubblks,i,h,2,1,,"Number of subblocks per axis
+
+# Detection"
+hdetect,b,h,yes,,,"Detect objects above sky?"
+ldetect,b,h,no,,,"Detect objects below sky?"
+updatesky,b,h,yes,,,"Update sky after detection, splitting, and growing?"
+bpdetect,s,h,"1-100",,,"Input bad pixel values in image"
+bpflag,s,h,"1-100",,,"Input bad pixel values to flag in sources"
+convolve,s,h,"bilinear 3 3",,,"Convolution kernel"
+hsigma,r,h,3.,.1,,"Sigma threshold above sky"
+lsigma,r,h,10.,.1,,"Sigma threshold below sky"
+neighbors,s,h,"8","4|8",,Neighbor type
+minpix,i,h,6,1,,"Minimum number of pixels in detected objects"
+sigavg,r,h,4.,0.,,"Sigma of mean flux cutoff"
+sigmax,r,h,4.,0.,,"Sigma of maximum pixel"
+bpval,i,h,INDEF,,,"Output bad pixel value"
+rfrac,r,h,0.5,,,"Minimum fraction of reference flux in difference
+
+# Splitting"
+splitstep,r,h,0.4,,,"Splitting steps in convolved sigma"
+splitmax,r,h,INDEF,,,"Maximum sigma above sky for splitting"
+splitthresh,r,h,5.,,,"Splitting threshold in sigma"
+sminpix,i,h,8,1,,"Minimum number of pixels in split objects"
+ssigavg,r,h,10.,0.,,"Sigma of mean flux cutoff"
+ssigmax,r,h,5.,0.,,"Sigma of maximum pixel
+
+# Growing"
+ngrow,i,h,2,0,,"Number of grow rings"
+agrow,r,h,2.,0,,"Area grow factor"

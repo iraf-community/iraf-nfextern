@@ -1,0 +1,42 @@
+.help catfilter Jun03 acecat
+.ih
+NAME
+catfilter -- evaluate boolean filter function
+.ih
+SYNOPSIS
+(true|false) = catfilter (cat, rec, filter)
+
+.ih
+ARGUMENTS
+.ls cat (I)
+Catalog pointer.  If NULL a value of false is returned.
+.le
+.ls rec (I)
+Record pointer.  If NULL a value of false is returned.
+.le
+.ls filter (I)
+Filter string to evaluate.  The filter string references field values in
+the record by their application name.  The standard boolean functions are
+provided though currently only numeric fields are allowed.  It is an
+error if the filter string does not evaluate to a boolean.
+.ih
+DESCRIPTION
+A boolean filter evaluation using the record field values is performed
+and the result is returned.  The filter string refrences field values in
+the record by their application name.  The standard boolean functions are
+provided though currently only numeric fields are allowed.  It is an
+error if the filter string does not evaluate to a boolean.
+.ih
+EXAMPLE
+To perform some operation on records that meet a filter criteria:
+
+.nf
+    while (rec=cathead(cat); rec!=NULL; rec=catnext(cat,rec)) {
+        if (!filter (cat, rec, "X+Y<5&&Z>0"))
+	    next
+	...
+    }
+.fi
+.ih
+SEE ALSO
+acecat, catrrecs

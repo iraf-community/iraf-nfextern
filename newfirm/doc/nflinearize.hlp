@@ -1,0 +1,129 @@
+.help nflinearize Nov08 newfirm
+.ih
+NAME
+nflinearize -- Linearize NEWFIRM data
+.ih
+USAGE   
+nflinearize input output
+.ih
+PARAMETERS
+.ls input			
+List of input NEWFIRM MEF files.  Files which have already been linearized
+are silently skipped.
+.le
+.ls output			
+List, pattern, or expression defining output filenames for each input
+file. See \fBproctool.output\fR for a description of the various
+options.
+.le
+.ls coeffs = "parameter" (parameter|exprdb|keyword|image)
+Coefficients
+.le
+.ls lin1, lin2, lin3, lin4
+Linearity coefficients for each NEWFIRM extension.  These parameters
+are only used when the \fIcoeffs\fR parameter is "parameter".  This
+allows easy user control.  The default values are
+.nf
+    lin1 = -5.404E-6	
+    lin2 = -5.952E-6	
+    lin3 = -6.123E-6	
+    lin4 = -7.037E-6	
+.fi
+
+which were recommended in Nov. 2008.
+.le
+.ls linimage = ""		
+List of linearity coefficient images.  The images must be the same
+size as the NEWFIRM arrays and pixels are matched by pixel
+coordinates. The pixel values are the coefficient values for the
+linearization expression.  The list need not match the
+input list and the last coefficient image is used for longer input lists
+while extra coefficient images in the list are not used.  The typical
+usage would be a single MEF or one image for each extension.  The
+images are matched to the input by the IMAGEID keyword.  This
+parameter is only used with \fIcoeffs\fR is "image".
+.le
+.ls exprdb = "newfirm$exprdb.dat" 
+Expression database.  This file is critical to the linearization
+operation because it defines the linearization expression used by
+this task.  It also contains many of the instrument parameters and
+recommended coefficients for NEWFIRM.  This file may be updated
+independently of this task if new linearization expressions and
+coefficients are recommended.  Users may copy the default file to
+their own directory, make modifications and reset this parameter.
+.le
+.ls list = no		
+Verbose list output only?  This maps to the "vlist" output type
+described in \fBproctool.output\fR.
+.le
+.ls logfiles = "STDOUT"	
+List of log files for log output.  The special value "STDOUT" may be
+used to write to the terminal.  The output is appending to any
+existing output.  This is described further in \fBproctool.output\fR.
+.le
+
+.sh
+DESCRIPTION
+
+This task applies a linearization expression to each input pixel to
+correct from measured counts to linear counts.  This task is based on
+the more general, and hence complex, task \fBnfproc\fR.  It simplifies
+the parameters and generates the recommended linearization
+expressions.
+
+.ih
+EXPRESSIONS
+
+.ls coeffs = "parameter"
+%(lin(nflinearize.lin\I))
+.le
+.ls coeffs = "exprdb"
+%(lin(L\I))
+.le
+.ls coeffs = "keyword"
+%(lin(lincoeff))
+.le
+.ls coeffs = "image"
+%(lin($L))
+.le
+
+The "lin" macro is defined in the expression database.  That macro is
+further expanded by other macros.  The example below shows the final
+expression that is actually executed.
+.ih
+NFPROC
+
+This task simply formats the linearity expression and hides and fixes
+most of the parameters for \fBnfproc\fR.  The command that is executed
+is
+
+.nf
+    nfproc (input, output, outtype=outtype, logfiles=logfiles,
+	trim=no, fixpix=no, biascor=no, lincor=yes, permask=no,
+	darkcor=no, flatcor=no, skysub=no, replace=no, normalize=no,
+	dorder="TXBD", forder="TXBDLR,N", order="TXBDLFR,S",
+	bpm="(bpm)", obm="(objmask)", trimsec="(trimsec)",
+	biassec="(biassec)", linexpr=expr, linimage=linimage,
+	persist="", perwindow="5", darks="", flats="", flatexpr="",
+	skies="", skymatch="", skymode="median 10", repexpr="",
+	repimage="", btype="fit", bfunction="legendre",
+	bsample="*", border="1", bnaverage="1", bniterate="1",
+	bhreject="3.", blreject="3.", bgrow="0.", intype="",
+	dtype="(obstype='dark')", ftype="(obstype='flat')",
+	gtype="", stype="", imageid="(str(imageid))",
+	filter="(filter)", sortval="(@'mjd-obs')", exptime="(exptime)",
+	opdb="newfirm$opdb.dat", exprdb=exprdb, override=no, copy=no,
+	erraction="warn", gdevice="stdgraph", gcursor="", gplotfile="")
+.fi
+
+where "expr" is the expression created by this task.
+
+.sh
+REFERENCES
+
+Dickinson, M. 2008, NEWFIRM Linearity Calibration,
+
+.ih
+SEE ALSO
+nfproc, proctool.output
+.endhelp

@@ -1,0 +1,115 @@
+.help odireformat May12 odi
+.ih
+NAME
+odireformat -- Reformat ODI exposure data formats
+.ih
+SYNOPSIS
+An input ODI raw or calibrated exposure, specified as a directory containing
+FITS files for each OTA, is reformated into one of a) a "cell-merged"
+image for each OTA, b) a single large flat image of the focal plane, or c)
+a multi-extension format (MEF) where each extension is a "cell-merged"
+OTA image.  The user is allowed to select a subset of OTAs and whether
+to scale cells to similar levels when merged into a single OTA image and
+whether to scale OTAs to similar levels when forming a single image of
+the mosaic field of view.
+.ih
+USAGE   
+odireformat input output
+.ih
+PARAMETERS
+.ls input
+A directory containing the OTA files of an ODI exposure.  It will
+automatically determine if the OTA files are raw cell MEF files or
+cell-merged processed files.
+.le
+.ls output
+Output directory or file name where the type is set by
+the \fIouttype\fR parameter.
+.le
+.ls outtype = "ota" (ota|image|mef)
+The reformated output type.  The "ota" type is a directory of OTA files
+where the input OTA files are cell-merged as needed.  Note that is legal to
+have the input be cell-merged files but then the operation is essentially
+a copy.  For "image" the input OTA files are cell-merged as needed and
+then put together into a single image of the focal plane.  For "mef" the
+input OTA files are cell-merged as needed and stored as a single MEF file.
+This format is convenient for use with the \fBmsctools\fR package.
+.le
+.ls pattern = ".*.fits"
+A pattern appended to <input>/<input>.  For instance if
+input is "o20111101T012313.0" then the default will be the
+pattern "o20111101T012313.0/o20111101T012313.0.*.fits"; e.g.
+"o20111101T012313.0/o20111101T012313.0.22.fits".  If input has a path
+the the path is removed in the second use of the input name for the
+files within the directory.  A potential use is for a pattern like
+".[234][234].fits to match the central part of pODI.
+.le
+.ls adjust = "scale" (none|zero|scale)
+Cell/OTA adjustments when combining cells into cell-merged OTA images or
+when combining OTA images into a single focal plane image.  The choices
+are "none" to preserve the pixel values, "zero" to zero point offset the
+cell or OTA mode values to a common mode, and "scale" to normalize the
+cell or OTA mode images to to a common mode.
+.le
+.ls override = yes
+If the output already exists replace it?
+.le
+.ls verbose = yes
+Provide some progress output.
+.le
+.ih
+DESCRIPTION
+
+An input ODI raw or calibrated exposure, specified as a directory containing
+FITS files for each OTA, is reformated into one of a) a "cell-merged"
+image for each OTA, b) a single large flat image of the focal plane, or c)
+a multi-extension format (MEF) where each extension is a "cell-merged"
+OTA image.  These reformated version allow more convenient use of other
+IRAF tasks such as the \fBmsctools\fR package and to make simple images of
+the focal plane, or parts of the focal plane, for other purposes.
+
+The user is allowed to select a subset of OTAs and whether to scale
+cells to similar levels when merged into a single OTA image and whether
+to scale OTA to similar levels when forming a single image of the mosaic
+field of view.
+
+Raw exposures consist of a directory of MEF files where the extensions
+are of individual "cell" readouts with associated overscan and metadata.
+For interacting with a single OTA file the \fBmsctools\fR package is
+appropriate but for a whole directory it is more convenient to reformat
+the data.  One step is merging the cell extensions into a single detector
+image.  This is done during processing but this task also provides a
+quick and simple version of this by simply extracting the data regions
+of the cells, possibly applying a zero-point or gain adjustment to the
+values in each cell, and tiling them together into the cell-merged format.
+See also \fBmkpodimef\fR for a tool that actually does a quick overscan
+subtraction prior to calling this task.
+
+.ih
+EXAMPLES
+
+1. Create a flat image of the field of view from a raw exposure prior to
+constructing a portal view.
+
+.nf
+    cl> odireformat o20111031T123456.00 portalraw adjust=none
+.fi
+
+2.  Create a flat image of the field of view from a processed exposure
+prior to constructing a portal view.
+
+.nf
+    cl> odireformat 20111031_full-R_O-20111102T063645 portalred
+.fi
+
+3.  Create a gain adjusted MEF of a pODI raw exposure for further
+exploration.
+
+.nf
+    cl> odireformat o20111031T123456.0 o20111031T123456.0 outtype=mef
+.fi
+
+.ih
+SEE ALSO
+mkpodimef
+.endhelp

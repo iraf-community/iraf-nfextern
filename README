@@ -1,0 +1,228 @@
+INSTALLATION (Mar08)            nfextern            INSTALLATION (Mar08)
+                 NFEXTERN: NEWFIRM/IR REDUCTION PACKAGE
+              Release Notes and Installation Instructions
+SUMMARY
+The NFEXTERN external package is a container package  for  tools  useful
+for  basic  instrumental  calibration  of  NEWFIRM IR data and for image
+segmentation and catalog.  The packages in the  container  are  NEWFIRM,
+MSCTOOLS,  and  ACE.   The  NEWFIRM  package has basic tools for NEWFIRM
+reductions.  The MSCTOOLS has general  tools  for  handling  MEF  format
+data  such as NEWFIRM, and the ACE package provides tools for segmenting
+images and making source catalogs.
+
+
+
+RELEASE INFORMATION
+The following summary only highlights the  major  changes.   There  will
+also  be minor changes and bug fixes.  The version of a distribution may
+be found with
+
+     cl> =nfextern.version
+     20080320
+
+Version: V2.44: 20140623
+Added a workaround for DS9 in msczero to eliminate the coordinate not
+in an
+image error.  DS9 returns a WCS of [1-9]00 instead of
+[1-9][0-9][1-9],[1-9][[1-9][0-9].  In particular, for frame 1 it
+returns 100
+instead of 101 or higher.  To quickly fix this we check for a 00 and
+increment it by 1.
+
+Version:20111204
+    64-bit bug fixes for nfproc and ace.  A logical bug fixed in nfwcs
+
+Version:20111121
+    A few bug fixes to the ace package
+
+Version:20110811
+    The file nfdat_ctio/nflincoeffs.fits was incorrect
+    Some minor bug fixes
+
+Version: 20110524
+    Rename nfdat to nfdat_kpno
+    Added nfdat_ctio for CTIO data
+    The default definition for nfdat$ is nfdat_ctio
+    A few minor bug fixes
+
+Version: 20090126
+    Added nfdat$bpm.
+    New task nfgroup.
+    New NEWFIRM package help pages.
+
+Version: 20090115
+    Bug fix in the boundary setting of object masks in ace.
+
+Version: 20090109
+    Internal version for SDM NEWFIRM Project testing.
+
+Version: 20080320
+    Initial release of the NEWFIRM, MSCTOOLS, and  ACE  packages.   This
+    version  should  be  considered  BETA  level.  Documentation is only
+    partially complete.
+
+
+
+INSTALLATION INSTRUCTIONS
+Installation of this external package consists of obtaining  the  files,
+creating  a  directory containing the package, compiling the executables
+or installing precompiled executables, and defining the  environment  to
+load  and  run  the package.  The package may be installed for a site or
+as a personal installation.  If you need help  with  these  installation
+instructions contact Frank Valdes (valdes@noao.edu).
+
+[arch]
+    In  the  following steps you will need to know the IRAF architecture
+    identifier for your IRAF installation.  This identifier  is  similar
+    to  the host operating system type.  The identifiers are things like
+    "ssun" for Solaris, "linux" or "redhat" for most Linux systems,  and
+    "macosx"  or  "macintel"  for  Mac  systems.   The IRAF architecture
+    identifier is defined when you run IRAF.  Start the CL and then type
+    
+        cl> show arch
+        .redhat
+    
+    The value you need to know is without  the  leading  '.';  i.e.  the
+    IRAF architecture is "redhat" in the above example.
+
+[1-site]
+    If  you  are  installing  the package for site use login as IRAF and
+    edit the IRAF file defining the packages.
+    
+        % cd $hlib
+    
+    Define the environment variable nfextern to be the pathnames to  the
+    nfextern  package root directory.  Pathnames must be terminated with
+    a '/'.  Edit extern.pkg to include the following.
+    
+        reset nfextern = /local/nfextern/
+        task  nfextern.pkg = nfextern$nfextern.cl
+    
+    Near the end of the hlib$extern.pkg file, update the  definition  of
+    helpdb so it includes the nfextern help database, copying the syntax
+    already  used  in  the  string.   Add  this  line  before  the  line 
+    containing a closing quote:
+    
+        ,nfextern$lib/helpdb.mip\
+
+[1-personal]
+    If  you  are  installing  the package for personal use define a host
+    environment variable with the pathname of the  directory  where  the
+    package  will  be located (needed in order to build the package from
+    the source code).  Note that  pathnames  must  end  with  '/'.   For
+    example:
+    
+        % setenv nfextern /local/nfextern/
+    
+    In your login.cl or loginuser.cl file make the following definitions
+    somewhere before the "keep" statement.
+    
+        reset nfextern = /local/nfextern/
+        task  nfextern.pkg = nfextern$nfextern.cl
+        printf ("reset helpdb=%s,nfextern$lib/helpdb.mip\nkeep\n",
+            envget("helpdb")) | cl
+        flpr
+    
+    If you will be compiling the package, as  opposed  to  installing  a
+    binary  distribution,  then  you  need to define various environment
+    variables.   The  following  is  for  Unix/csh  which  is  the  main 
+    supported environment.
+    
+        # Example
+        % setenv iraf /iraf/iraf/             # Path to IRAF root (example)
+        % source $iraf/unix/hlib/irafuser.csh # Define rest of environment
+        % setenv IRAFARCH redhat              # IRAF architecture
+    
+    where   you  need  to  supply  the  appropriate  path  to  the  IRAF 
+    installation root in  the  first  step  and  the  IRAF  architecture
+    identifier for your machine in the last step.
+
+[2] Login  into  IRAF.  Create a directory to contain the package files.
+    This directory should be outside the standard IRAF directory tree.
+    
+        cl> mkdir nfextern$
+        cl> cd nfextern
+
+[3] The package is distributed as tar archives for the sources  and,  as
+    an  optional  convenience,  a  tar  archive  of  the executables for
+    select host computers.  The tar file(s) are most  commonly  obtained
+    via anonymous ftp.  Below is an example.
+    
+        cl> ftp iraf.noao.edu (140.252.1.1)
+        login: anonymous
+        password: [your email address]
+        ftp> cd iraf/extern
+        ftp> get nfextern.readme
+        ftp> binary
+        ftp> get nfextern-src.tgz
+        ftp> get nfextern-bin.<arch>.tgz  (optional)
+        ftp> quit
+        cl> !uncompress nfextern-src
+        cl> !uncompress nfextern-bin.<arch> (optional)
+    
+    The  readme  file  contains  these  instructions.  The <arch> in the
+    optional  executable  distribution   is   replaced   by   the   IRAF 
+    architecture identification for your computer.
+
+[4] Extract  the  source  files  from the tar archive using the standard
+    "tar" utility (or possibly "rtar" which is distributed with IRAF).
+    
+        % tar -xvf nfextern-src
+    
+    On some systems, an error message will appear  ("Copy  'bin.generic'
+    to  './bin  fails")  which  can  be ignored.  Sites should leave the
+    symbolic link 'bin'  in  the  package  root  directory  pointing  to
+    'bin.generic'  but can delete any of the bin.<arch> directories that
+    won't be used.  If there is no binary directory for the  system  you
+    are  installing  it  will  be  created  when the package is compiled
+    later or when the binaries are installed.
+    
+    If the binary executables have been obtained these are now extracted
+    into the appropriate bin.<arch> directory.
+    
+        # Example of redhat installation.
+        % cd nfextern
+        % tar -xvf nfextern-bin.sparc      # Creates bin.sparc directory
+    
+    The   various   tar  files  can  be  deleted  once  they  have  been 
+    successfully installed.
+
+[5] For a  source  installation  you  now  have  to  build  the  package
+    executable(s).  First go to the package root directory with
+    
+        cl> cd nfextern
+    
+    If  you  are  updating  to a newer version and you earlier built the
+    libraries  and  executables  it  is  necessary  to   delete   these. 
+    Otherwise,  depending  on  the dates of files in the new version and
+    the locally built libraries, it may cause  the  new  version  to  be
+    ignored.   To do this the package is configured "generic" which puts
+    all the binary files in one binary directory, the files are  deleted
+    and  then  you  continue  in  the  same  way  as  a  completely  new 
+    installation.
+    
+        % mkpkg generic
+        % delete bin.<arch>/*      # Substitute redhat, macox, ssun, etc.
+    
+    Configure the package for the particular architecture to be built.
+    
+        % mkpkg <arch>            # Substitute sparc, ssun, alpha, etc.
+    
+    This will change the bin link from bin.generic to  bin.<arch>.   The
+    binary  directory  will  be  created  if  not  present.  If an error
+    occurs in setting the architecture then  you  may  need  to  add  an
+    entry to the file "mkpkg".  Just follow the examples in the file.
+    
+    To create the executables and move them to the binary directory
+    
+        % mkpkg -p nfextern       # build executables
+        % mkpkg generic           # optionally restore generic setting
+    
+    Check  for  errors.   If the executables are not moved to the binary
+    directory then step [1] to define the path for the package  was  not
+    done  correctly.   The  last  step restores the package to a generic
+    configuration.  This is not necessary if  you  will  only  have  one
+    architecture for the package.
+
+This  should  complete  the  installation.  You can now load the package
+and begin testing and use.

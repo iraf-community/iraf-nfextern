@@ -1,0 +1,19 @@
+# STARFOCUS.
+
+#$checkout libpkg.a ..
+#$update   libpkg.a
+#$checkin  libpkg.a ..
+#$exit
+
+update:
+	$update	libpkg.a
+	;
+
+libpkg.a:
+	rngranges.x	<ctype.h> <mach.h>
+	stfgraph.x	<error.h> <gset.h> <mach.h> starfocus.h
+	stfprofile.x	<imhdr.h> <mach.h> <math.h> <math/iminterp.h>\
+			<math/nlfit.h> starfocus.h
+	t_starfocus.x	<error.h> <imhdr.h> <mach.h> ../mosgeom.h\
+			../mosim.h ../mosproc.h starfocus.h
+	;

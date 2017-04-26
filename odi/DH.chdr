@@ -1,0 +1,44 @@
+EXTNAME = 'xy00    '           / extension name & cell location identifier                                 
+INHERIT =                    T / inherit keywords                               
+FILTER  = 'SDSS g (ODI g #4)'  / Filter configuration name in beam
+FILTERID=                    4 / comma separated list of filter barcode IDs
+EXPTIME =                120.1 / Exposure time in seconds
+
+IMNPIX2 =                    0 / IFA OTA image coordinate of amp/cell origin    
+IMNPIX1 =                 3556 / IFA OTA image coordinate of amp/cell origin    
+IMNAXIS2=                 4031 / IFA image size keyword                         
+IMNAXIS1=                 4036 / IFA image size keyword                         
+IMTM2_1 =                  0.0 / IFA image transformation matrix                
+IMTM1_2 =                  0.0 / IFA image transformation matrix                
+IMTM2_2 =                  1.0 / IFA image transformation matrix                
+IMTM1_1 =                  1.0 / IFA image transformation matrix                
+ATM2_1  =                  0.0 / Iraf amplifier transformation matrix           
+ATM1_2  =                  0.0 / Iraf amplifier transformation matrix           
+ATM2_2  =                  1.0 / Iraf amplifier transformation matrix           
+ATM1_1  =                  1.0 / Iraf amplifier transformation matrix           
+ATV2    =                  0.0 / Iraf amplifier offset vector                   
+ATV1    =              -3556.0 / Iraf amplifier offset vector                   
+LTM2_1  =                  0.0 / Iraf image transformation matrix               
+LTM1_2  =                  0.0 / Iraf image transformation matrix               
+LTM2_2  =                  1.0 / Iraf image transformation matrix               
+LTM1_1  =                  1.0 / Iraf image transformation matrix               
+LTV2    =                 -0.5 / Iraf image transformation vector               
+LTV1    =              -3556.5 / Iraf image transformation vector               
+DETSEC  = '[3557:4036,1:496]'  / Iraf mosaic area of the detector               
+DETSIZE = '[1:4036,1:4031]'    / Iraf total image pixels in full mosaic         
+BIASSEC = '[481:490,497:506]'  / Overscan (bias) area                           
+DATASEC = '[1:480,1:496]'      / Imaging area in image file
+CNPIX2  =                    0 / IFA amplifier offset vector                    
+CNPIX1  =                    0 / IFA amplifier offset vector                    
+DRKTIME =                9.276 / Total elapsed time since clean in secs
+GAIN    =                  1.3 / gain (e-/ADU)
+RDNOISE =                  8.4 / read noise (e-)
+OVLEVEL =                 2500 / post-process: Overscan level of this cell
+OVNOISE =                  7.8 / post-process: Variance of overscan level
+SATLEVEL=                65536 / Saturation level in this cell in [DN]
+				according to binning. 
+IMGLEVEL=                 4500 / post-process: Average level in imaging area
+COMMENT ------ WCS Offsets
+CRPIX1  =            2084.8624 / Coordinate reference pixel
+CRPIX2  =            2064.5312 / Coordinate reference pixel
+

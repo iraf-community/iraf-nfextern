@@ -1,0 +1,146 @@
+   FP - Francesco Pierfederici
+   FV - Frank Valdes
+   GC - Greg Chisholm
+   MM - Michelle Miller
+   RS - Rob Swaters
+
+   AE - Astronomer Environment
+  DHS - Data Handling System
+  GUI - Graphical User Interface
+  ICD - Interface Control Document
+   NF - NEWFIRM
+  OCS - Observation Contol System
+   PL - Pipeline
+   QL - Quick-Look
+   QR - Quick-Reduce
+QR/PL - Quick-Reduce Pipeline
+   UI - User Interface
+
+                      +---------+-> AE/QL <- AE Toolkit
+                      +-> QRPL -+
+  Monsoon/OCS -> DHS -+-> Pipeline -> Archive
+                      +-> Archive
+
+================================================================================
+
+This is for beta level software.  The task efforts assume uninterrupted
+8 hr days.  This is person time.  For instance tests may take more time.
+Interuptions and multitasking overhead is probably ~30%.  Having multiple
+people per task does not decrease the task time by a similar factor.
+
+Major dependencies:
+
+Pipeline Modules depend on IR Toolkit
+
+                                            DAY
+Data Handling System                    |MM| 56|205|
+    DHS Design                          |MM| 15| 66|
+        Monsoon/OCS ICD                 |MM|  1|  1|
+        Pipeline/QR ICD                 |MM|  1|  8|
+        Archive ICD                     |MM|  1| 15|
+        AE/QL ICD                       |MM|  1| 12|
+        DHS User Interface Spec.        |MM|  1| 10|
+        *DHS High-level Design          |MM|  2| 10|
+        *DHS Low-level Design           |MM|  6| 10|
+    DHS Implementation                  |MM| 35|115|
+        **DHS Simulator                 |MM|  5| 15|
+        **DHS Infrastructure            |MM| 20| 75|
+           Agent/master                 |MM|  5| 15|
+           FITS format                  |MM|  3| 10|
+           Monsoon/OCS Interface        |MM|  5| 10|
+           Archive Interface            |MM|  3| 10|
+           Pipeline/QR Interface        |MM|  2| 10|
+           AE/QL Interface              |MM|  2| 10|
+        DHS UI development              |MM|  5| 15|
+        DHS Build/Config. Tools         |MM|  5| 10|
+    DHS Testing                         |MM|   | 24|
+        ***DHS Unit Test                |MM|  7|  0|
+        DHS Test Plan                   |MM|  2|  9|
+        ****DHS Systems Test            |MM|  5| 15|
+    DHS Delivery                        |MM|   |  0|
+Pipeline                                |FP|130|>315|
+     PL Design                          |FP|   |145|
+         Data Products Spec.            |FP|  1|  5|
+         Meta-data Spec.                |FP|  1| 10|
+         Algorithm Spec.                |FP|  4| 15|
+         Calibration Product Spec.      |FP|  1| 10|
+         Archive ICD                    |FP|  1| 10|
+         Quick-Reduce Spec.             |FP|  3| 10|
+         QR/AE ICD                      |FP|  1| 10|
+         Develop DQA metrics            |FP|  5| 10|
+         Database Design                |FP|   | 10|
+             E-R Diagram                |FP|  1|  5|
+             Schema                     |FP|  1|  5|
+         PL UI Spec.                    |FP|   | 40|
+             PL GUI Functional Desc.    |FP|  1| 10|
+             PL GUI Prototype           |FP|  5| 10|
+             QR GUI Functional Desc.    |FP|  1| 10|
+             QR GUI Prototype           |FP|  2| 10|
+         Exception Handling Spec.       |FP|  1| 10|
+     PL Implementation                  |FP|   |>115|
+         Data Simulator                 |RS|  5|???|
+         Processing Modules             |FP| 10| 40|
+         PL Infrastructure              |FP| 10| 10|
+         Calibration Database           |FP|  5| 10|
+         Monitor/Control GUIs           |FP| 10| 20|
+         Calibration File PL            |FP|  3| 10|
+         Processing Reports             |FP|  1| 10|
+         DQA Utilities Development      |RS|  5|???|
+         Quick-Reduce Configurator      |FP|  2|  5|
+         PL Build/Config Tools          |FP|  2| 10|
+     PL Testing                         |FP|  7| 50|
+         Develop Test Data              |FP|  1| 15|
+         PL Unit Testing                |FP|  5| 15|
+         PL Throughput Testing          |FP|  1| 20|
+     PL Delivery                        |FP|  -|  -|
+Astronomer Environment                  |FV| 80|
+    AE Design                           |FV| 20|
+        AE Requirements                 |FV|  5|
+        AE/IR Toolkit Spec.             |FV|  5|
+        AE User Interface Spec          |FV| 10|
+            AE GUI Functional Descr.    |FV|  1|
+            AE GUI Prototype            |FV|  9|
+    AE Implementation                   |FV| 55|
+        AE/IR Toolkit                   |FV| 30|
+        Quick-Look Functionality        |FV| 10|
+        AE/QL interface                 |FV|  4|
+        Enhancements to Display Server  |FV| 10|
+        Environment Initialization Tool |FV|  1|
+    AE Testing                          |FV|  5|
+        Astronomer Feedback Tests       |FV|  3|
+    AE Delivery                         |FV|  0|
+Hardware                                |MM|  5| 11|
+    Plan/Order Development H/W          |MM|  1|  3|
+    Configure Development H/W           |MM|  1|  3|
+    Order Operations Cluster            |MM|  1|  2|
+    Config Operations Cluster           |MM|  2|  3|
+Calibration                             |RS|  8|
+    Calibration Protocol Spec.          |RS|  2|
+    Internal Ref File Generation        |RS|  3|
+    External Ref File Generation        |RS|  3|
+User Documentation                      |FV| 15|
+    AE/Mtn User Guide                   |FV|  3|
+    AE Toolkit Cookbook                 |FV|  4|
+    NEWFIRM Data Handbook               |FV|  3|
+    Instrument Manual contrib.          |FV|  2|
+    PL Operator Guide                   |FP|  3|
+System Testing                          |FV| 12|
+    Test Plan Document                  |FV|  1|
+    Operations Plan Document            |FV|  1|
+    System Integration                  |FV|  5|
+        S/W Deployment                  |FV|  1|
+        Integration Testing             |FV|  4|
+        Alpha Release                   |FV|  0|
+    Verification/Validation             |FV|  5|
+        V&V testing                     |FV|  5|
+        Beta Release                    |FV|  0|
+NEWFIRM First Light                     |FV|  0|
+
+
+
+
+* Added new categories and eliminated DHS Static & Dynamic Model
+** Removed sub-categories as too low level
+*** Unit test will be performed as part of implementation
+**** Includes DHS performance testing
+

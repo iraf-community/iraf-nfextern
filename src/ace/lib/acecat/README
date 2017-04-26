@@ -1,0 +1,10 @@
+	    ACECAT: Catalog Library for ACE and Related Packages
+
+The purpose of the ACECAT library is to provided an interface to the
+catalogs produced by the ACE package.
+
+Currently the library is layered on the TABLES package.  To provided
+customization a copy of the TABLES source is included in the tbtables
+directory.  Other than modifying the mkpkg files and excluding the cfitsio
+subdirectory the directory is direct copy.  Changes to routines in that
+library are made in the parent directory.

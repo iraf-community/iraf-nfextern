@@ -1,0 +1,98 @@
+# Database of imexpr function information for NEWFIRM linearity correction
+# Version 1.4, MED, 2008 October 23
+#
+# Apply linearity corrections to any NEWFIRM detector.  This version
+# uses four functions, 'lc?', which are operate on the four NEWFIRM
+# detectors.  It also includes the evaluation of the tcds and tr0
+# functions within the imexpr database.  This simplifies the call and
+# keeps various constants and array-dependent timing calculations
+# within the database, rather than hardwiring them in the calling
+# routine, but comes at the cost of slowing down execution somewhat.
+#
+# For the four NEWFIRM detectors (in extensions 1,2,3,4), the format
+# of the imexpr call is (e.g.):
+# imexpr "lc1(a,b)" out1.fits  a=image.fits[1] b=lincoeff.fits[1]
+#     exprdb=newfirm_linearity_v1.2.db
+# imexpr "lc2(a,b)" out2.fits  a=image.fits[2] b=lincoeff.fits[2]
+#     exprdb=newfirm_linearity_v1.2.db
+# imexpr "lc3(a,b)" out3.fits  a=image.fits[3] b=lincoeff.fits[3]
+#     exprdb=newfirm_linearity_v1.2.db
+# imexpr "lc4(a,b)" out4.fits  a=image.fits[4] b=lincoeff.fits[4]
+#     exprdb=newfirm_linearity_v1.2.db
+#
+
+# where (e.g.) out1.fits is the result of the operation, a linearized
+# version of the image, i.e., where the original signal level has
+# been corrected for nonlinearity.  a = image.fits[1] is the image
+# being corrected (in this example, one extension of an MEF) b =
+# lincoeff.fits[1] is either an array of linearity coefficients
+# (again, in this example, one extension of an MEF), or a single
+# constant coefficient to be used for all pixels in the array
+
+# To deal with coadds, the image value is divided by the number of
+# coadds. Also, expcoad is used rather than exptime to define the
+# exposure time, because expcoad gives the exposure time per coadd,
+# whereas exptime gives the product of expcoad and ncoad.
+
+# Scaling for the Fowler sampling is also taken into account.
+
+# The output is not scaled back up by NFS and NCA, i.e., it is normalized
+# to NFS=1 and NCA=1. The data are also normalized to exptime=1s.
+
+# Timing constants:
+
+# Interval (seconds) between detector reset and first pixel readout
+TR0=		0.0346
+# Minimum interval (seconds) between end of 1 CDS readout and start of
+# another
+TR1=		0.0568
+# Requested exposure time (from image header EXPTIME keyword)
+TX=		a.exptime
+# Number of Fowler Samples (from image header FSAMPLE keyword)
+NFS=		a.fsample
+# Number of Digital Averages (from image header DIGAVGS keyword)
+NDA=		a.digavgs
+# Number of coadds (from image header NCOADD keyword)
+NCA=		a.ncoadd
+# Requested exposure time per read (from image header EXPCOADD keyword)
+TX1=		a.expcoadd
+
+# Reset-to-1st-read time functions for four NEWFIRM detectors.  
+
+# Time for a single readout of the detector in correlated double
+# sampling (CDS) mode.  This is a function of the number of digital
+# averages (NDA).
+tcds		((NDA==1) ? 0.56 : 0.564+0.148*NDA)
+
+# Baseline time constant for reset-to-1st-read, as a function of the
+# single CDS read time (tcds) and the number of Fowler Samples (NFS):
+tr0		(TR0+(tcds+TR1)*(NFS-1)/2)
+
+# Functions to compute the reset-to-1st-readout time interval as a
+# function of pixel position.  The four functions 'tr?' are used for
+# the four NEWFIRM arrays, and take the detector readout orientations
+# into account, based on the array configuration and FITS format used
+# in 2008A.  Note that this will be different for 2007B data, where
+# the arrangement of the detectors in the FITS images was different.
+
+# For SN019 = im1, SE quadrant
+tr1		(tr0+tcds*(J/2048.))
+# For SN022 = im2, SW quadrant
+tr2		(tr0+tcds*(2049.-I)/2048.)
+# For SN013 = im3, NE quadrant
+tr3		(tr0+tcds*(I/2048.))
+# For SN011 = im4, NW quadrant
+tr4		(tr0+tcds*(2049.-J)/2048.)
+
+# Counts per read per Fowler sample
+a1=		(a/(NCA*NFS))
+
+# Linearity correction functions for the four NEWFIRM detectors.  The
+# calling imexpr routine would call one of these four functions (which
+# in turn call the appropriate 'tr?' function) depending on the array
+# being processed.
+
+lc1(a,b)	(sqrt(TX1**2+4.*a1*b*((TX1+tr1)**2-tr1**2))-TX1)/(2.*b*((TX1+tr1)**2-tr1**2))
+lc2(a,b)	(sqrt(TX1**2+4.*a1*b*((TX1+tr2)**2-tr2**2))-TX1)/(2.*b*((TX1+tr2)**2-tr2**2))
+lc3(a,b)	(sqrt(TX1**2+4.*a1*b*((TX1+tr3)**2-tr3**2))-TX1)/(2.*b*((TX1+tr3)**2-tr3**2))
+lc4(a,b)	(sqrt(TX1**2+4.*a1*b*((TX1+tr4)**2-tr4**2))-TX1)/(2.*b*((TX1+tr4)**2-tr4**2))

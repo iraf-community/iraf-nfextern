@@ -1,0 +1,130 @@
+Hola Alonso,
+
+Thanks for the bugfix.  I did not investigate closely but your fix, I did a variant as below,
+
+if (pnum==0 || IS_INDEFI(pnum))
+    ...
+
+seems sensible.
+
+Your question is an interesting one.  ACE has the ability to work only with an object mask.  An object mask can be complicated since it uses high order bits in the number to set flags.  But a basic object mask is simply regions with a number from 11 on (numbers less than 11 are used for bad pixel identifications).  There is a task "mskregions" which seems useful.  So to test out an answer I did the following.
+
+1. I created and image, test, with a star at (100,100) and mag=13 (magzero=25).
+
+2. I made a mask with mskregions with parameters
+
+ace> lpar mskreg
+      regions = "mskreg.dat"    The list of region specifications
+        masks = "obj.pl"        The list of output mask images
+    refimages = "test"          The list of input reference images
+        (dims = "512,512")      The default output mask dimensions
+       (depth = 0)              The default output mask depth in bits
+   (regnumber = "number")       The region numbering scheme
+      (regval = 11)             The default starting mask region value
+      (exprdb = "none")         The optional expression database
+      (append = no)             Append new regions to an existing mask ?
+     (verbose = yes)            Print task status messages ?
+        (mode = "ql")           
+
+where
+
+ace> type mskreg.dat
+circle 100 100 5
+
+Note the use of regnum=number and regval=11.
+
+3. I then used aceevaluate as follows:
+
+ace> aceeval test "" objmask=obj.pl
+ACE: NOAO/IRAF V2.16 valdes@pipefs Tue 14:51:48 11-Sep-2012
+  Create catalog from object mask
+  Image: test - 
+  Set sky and sigma:
+    Determine sky and sigma by surface fits:
+      start line = 51, end line = 462, step = 41.1
+      xorder = 1, yorder = 1, xterms = half
+      hclip = 2., lclip = 3.
+    Determine sky and sigma by block statistics:
+      Number of blocks: 5 5
+      Number of pixels per block: 100 100
+      Number of subblocks: 10 10
+      Number of pixels per subblock: 50 50
+  Evaluate objects:
+    magzero = 25.
+  Write catalog: catalog = test_cat.txt
+ace> type test_cat.txt
+#c NUM i %11d 
+#c NPIX i %11d pixels
+#c FLAGS ch*8 %-8s 
+#c X d %.3f pixels
+#c Y d %.3f pixels
+#c RA d %13.3h hr
+#c DEC d %13.2h deg
+#c MAG d %8.3f mag
+#c GWMAG d %8.3f mag
+#k CRMIN1   = 1          
+#k CRMAX1   = 512        
+#k CRMIN2   = 1          
+#k CRMAX2   = 512        
+#k DATE-OBS = '1990-01-01T00:00:00'
+#k RA       = '00:00:00'
+#k DEC      = '00:00:00'
+#k EPOCH    = 1990.                    
+#k UT       = '00:00:00'
+#k ST       = '00:00:00'
+#k ZT       = 0.                       
+#k AIRMASS  = 1.                       
+#k EXPTIME  = 1.                       
+#k INSTRUME = 'IRAF/ARTDATA'
+#k GAIN     = 1.                       
+#k RDNOISE  = 1.                       
+#k CATALOG  = 'test_cat.txt'
+#k OBJMASK  = 'obj.pl'
+#k AVSKY    = 1000.805                 
+#k AVSIG    = 34.21745000000002        
+#k IMAGE    = 'test'
+#k MAGZERO  = 25.                      
+#k GWTSIG   = 0.9724734000000006       
+#k GWTNSIG  = 2.                       
+#k FWHM     = 2.33                     
+#k WCSDIM   = 2          
+#k LTM1_1   = 1.                       
+#k LTM2_2   = 1.                       
+#k WAT0_001 = 'system=physical'
+#k WAT1_001 = 'wtype=linear'
+#k WAT2_001 = 'wtype=linear'
+         11          83 S-E--R   99.998 100.007         INDEF         INDEF   13.040   15.387
+
+So I think it works.  You could write a script to turn (x,y) or (ra,dec) from some list into the region definitions required by mskregion.
+
+Buenas Suerte,
+Frank
+
+
+On Sep 5, 2012, at 4:39 PM, ALONSO HERNAN ESCOBAR wrote:
+
+Hi Frank!,
+
+Many months have passed since I wrote you for the last time. I'm still playing with your ACE package. 
+
+1.- ----- Bugfix -----
+
+I`m using the latest build of nfextern ("make nfextern") with 64bit IRAF on a multicore AMD x64. I found a segfault that happens with 'aceevaluate' in the 'EVAPPORTION' subroutine (which "Computes apportioned fluxes after the object isophotal  fluxes have been computed") of 'evaluate.x', but doesn't happen with 'acecatalog'.
+
+The segfault happens because 'pnum', which is set equal to OBJ_PNUM(obj), is INDEF when running aceevaluate (it doesn't happen with 'acecatalog' because in that case they are set to zero). 
+
+I don't know why it's set to INDEF in one case and to 0 in the other, but a quick fix or bypass for this, is to add the line "if (pnum == INDEFI) pnum = 0". after the lines with "pnum = OBJ_PNUM(obj)" (lines 1041, 1058).
+
+2. ----- Source Evaluation Question -----
+
+Is there any way to manually supply the positions of the sources (like "phot", and perhaps some information about their geometry, like "xgphot") to an ACE Task?
+I thought that by modifying the positions in the reference catalog (generated by "acecat") to "aceevaluate" it would be possible to do this, but it seems that the only relevant field in the reference catalog is the original index number of the source, thus, the positional information is given by the positions in the associated "object mask" of the image, generated by other ACE Task (correct me if I'm wrong). 
+
+Is there any practical way to add / delate / modify this positions (or other properties) in these masks?
+
+Best wishes,
+
+-- 
+Alonso Escobar S.
+Estudiante de Licenciatura en AstronomíPontificia Universidad Catóa de Chile
+

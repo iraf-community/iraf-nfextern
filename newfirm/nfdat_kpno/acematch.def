@@ -1,0 +1,8 @@
+RA(X,Y)      RA
+DEC(X,Y)     DEC
+MAG(FLUX%)   MAG%
+X
+Y
+A
+B
+FLAGS

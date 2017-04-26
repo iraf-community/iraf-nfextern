@@ -1,0 +1,17 @@
+# COUTPUT -- List output of combine.
+
+input,s,a,,,,List of input files to combine
+output,s,a,,,,Output rootname
+logfile,s,h,"STDOUT",,,Log output
+headers,s,h,"",,,Header rootname (optional)
+bpmasks,s,h,"",,,Bad pixel mask rootname (optional)
+rejmasks,s,h,"",,,Rejection mask rootname (optional)
+nrejmasks,s,h,"",,,Number rejected mask rootname (optional)
+expmasks,s,h,"",,,Exposure mask rootname (optional)
+sigmas,s,h,"",,,"Sigma image rootname (optional)
+"
+select,s,h,"",,,Selection expression
+group,s,h,"mkid(filter,1,1)",,,Group expression
+seqval,s,h,"",,,Sequence value expression
+seqgap,r,h,INDEF,,,Maximum gap in sequence value
+extension,s,h,"mkid(extname,1,1)",,,Extension expression

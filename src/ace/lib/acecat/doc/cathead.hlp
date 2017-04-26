@@ -1,0 +1,34 @@
+.help cathead Jun03 acecat
+.ih
+NAME
+cathead -- get the first defined record
+.ih
+SYNOPSIS
+rec = cathead (cat)
+
+.ih
+ARGUMENTS
+.ls cat (I)
+Catalog pointer.  If NULL a NULL record pointer is returned.
+.le
+.ls rec (function value)
+First non-Null record.  If there are no defined records then NULL is
+returned.
+.le
+.ih
+DESCRIPTION
+This procedure finds the first defined (non-NULL) record in the array
+of records.  This procedure is usually used in combination with CATNEXT
+as shown in the example.
+.ih
+EXAMPLE
+
+To go through the non-NULL records in index order the following construct
+might be used.
+
+.nf
+    while (rec=cathead(cat); rec!=NULL; rec=catnext(cat,rec))
+.fi
+.ih
+SEE ALSO
+acecat, catnext

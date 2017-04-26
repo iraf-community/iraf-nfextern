@@ -1,0 +1,58 @@
+.help biaspars Mar05 irred
+.ih
+NAME
+biaspars -- Bias vector fitting parameters
+.ih
+PARAMETERS
+.ls function = "legendre" (legendre|chebyshev|spline1|spline3)
+Fitting function taken from the following list.
+.nf
+     legendre - legendre polynomial
+    chebyshev - chebyshev polynomial
+      spline1 - linear spline
+      spline3 - cubic spline
+.fi
+.le
+.ls order = 1
+Number of polynomial terms or spline pieces in the fit.  Note that an
+order of 1 is a constant when using a polynomial function.
+.le
+.ls sample = "*"
+Sample lines to use in the fit.  The string "*" specifies all
+lines otherwise an \fBicfit\fR range string is used.
+.le
+.ls naverage = 1
+Number of points to average or median to form fitting points.  Positive
+numbers specify averages and negative numbers specify medians.
+.le
+.ls niterate = 1
+Number of rejection interations to remove deviant points from the overscan fit.
+If 0 then no points are rejected.
+.le
+.ls low_reject = 3., high_reject = 3.
+Low and high sigma rejection factors for rejecting deviant points from the
+overscan fit.
+.le
+.ls grow = 0.
+One dimensional growing radius for rejection of neighbors to deviant points.
+.le
+.ls device = "stdgraph"
+Graphics device for interactive fitting.  The string "stdgraph" selects
+the standard interactive grpahics device which is usually the graphics
+terminal.
+.le
+.ls cursor = ""
+Graphics cursor for interactive fitting.  The value "" selects the
+standard graphics cursor.
+.le
+.ih
+DESCRIPTION
+The fitting of a bias vector obtained from a strip of bias pixels
+uses the \fBicfit\fR routines.  The fitting function is generally either a
+constant (polynomial of 1 term) or a high order function which fits the
+large scale shape of the bias vector as a function of image line.  Bad
+pixel rejection is also available to eliminate cosmic ray events.
+.ih
+SEE ALSO
+icfit
+.endhelp

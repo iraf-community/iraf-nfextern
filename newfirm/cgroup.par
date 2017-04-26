@@ -1,0 +1,9 @@
+# CGROUP -- List output of combine.
+
+input,s,a,,,,List of input files to combine
+output,s,a,,,,Output rootname
+select,s,h,"",,,Selection expression
+group,s,h,"mkid(filter,1,1)",,,Group expression
+seqval,s,h,"",,,Sequence value expression
+seqgap,r,h,INDEF,,,Maximum gap in sequence value
+extension,s,h,"imageid",,,Extension expression

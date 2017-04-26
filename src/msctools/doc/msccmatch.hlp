@@ -1,0 +1,354 @@
+.help msccmatch Aug07
+.ih
+NAME
+msccmatch -- match coordinates and adjust the WCS in image data
+.ih
+SYNOPSIS
+A list of reference celestial coordinates, either from an astrometry catalog
+or measured from a reference exposures, for sources in the field is matched
+against sources in image data (either simple images or multiextension format
+files) having initial world coordinate systems (WCS).  A low order
+correction to the WCS is determined.  The correction may include a zero
+point shift, scale change, and axis rotation for both coordinate axes.  The
+removes pointing errors, rotation errors, and atmospheric refraction
+effects.  The fit is used to update the image world coordinate system(s).
+.ih
+USAGE	
+msccmatch input coords
+.ih
+PARAMETERS
+.ls input
+List of input images or multiextension format (MEF) files to be calibrated.
+.le
+.ls coords
+Coordinate filename or command to execute to produce a coordinate file.  The
+file must contain the right ascension (in hours) and declination (in
+degrees) in the first two columns and an optional, though desirable,
+magnitude in the third column.  Any other columns are ignored.  The set of
+coordinates should include sources, primarily stars, over the field of the
+input data and may contain sources outside the field to allow for a
+WCS zero point offset.
+
+When a file is specified it used for all input exposures.  A command to
+execute is specified by beginning the parameter string with "!".  The
+special arguments $I will be replaced by the input filename and $C by the
+filename for the coordinate file to be used.  A typical command is
+
+.nf
+    !mscgetcatalog $I $C
+.fi
+
+Note that any hidden parameters either need to be set first or be given
+explicitly as part of the command.
+.le
+.ls outcoords = ""
+Optional list of updated coordinate files to output.  The list is matched
+with the input list.  If the output list is shorter than the input list then
+no output files are created for the remaining exposures.  The output
+coordinate file consists of those lines in the input coordinate file which
+were used; i.e. were found to be in the field, were not rejected due to bad
+pixels, and which were centered without error.
+.le
+.ls usebpm = yes
+Use bad pixel masks given by the BPM header keywords to reject sources
+that contain bad pixels?  During the offset search only pixel mask values
+of 2 are used while during the final centroiding any non-zero mask value
+is used.
+.le
+.ls verbose = yes
+Verbose output?  This determines whether various terminal output is produced.
+.le
+
+The following parameters are for to determine an initial zero point offset.
+
+.ls nsearch = 50
+Maximum number of candidate input sources to use for finding the initial
+offset.  Any input magnitudes are used to select the brightest sources that
+do not have a bad pixel value of 2 within the search box centered on the
+position of the source using the initial WCS.  If this parameter is zero
+then the offset search is skipped and the coordinates are assumed to be
+close enough to centroid directly on the images.  If the offset search is
+selected then this number should not be too large, otherwise the execution
+time will become long.
+.le
+.ls search = 0.
+Offset search radius in arcseconds.  If this is zero then the offset
+search is skipped and the coordinates are assumed to be close enough to
+centroid directly.  This defines how far from the initial coordinates to
+search using the \fInsearch\fR objects.  It should be large enough to
+include the expected error in the initial coordinates.
+.le
+.ls rsearch = 0.
+Rotation search radius in degrees.  This defines a range of rotations about
+the current tangent point that might be needed to find the correlation match.
+The correlation algorithm only works with small rotations on the order of a
+degree.
+.le
+
+The following parameters are fine centroiding sources in the image data.
+
+.ls cbox = 11
+The width, in pixels, of the subraster used for centering.  This must
+be large enought to include a reasonable number of pixels but not so
+large as to include a lot of noise.  Recommended values are 3 to 4 times
+the FWHM of the PSF.
+.le
+.ls maxshift = 5
+Maximum centering shift in arcseconds when centroiding.  Sources that produce
+centroids (from the \fBcenter\fR task) that differ from the initial
+position by more than this amount are considered to have failed the
+centroiding.
+.le
+.ls csig = 0.1
+Maximum centering uncertainty, in pixels, to accept for sources to be
+included in the WCS solution.
+.le
+.ls cfrac = 0.5
+The minimum fraction of candidate sources, those expected to be in the
+image data based on the offset determination and initial WCS, that must
+be successfully centroided to define a WCS correction.  This criteria
+is intended to reject incorrect matches.
+.le
+.ls listcoords = yes
+List centroiding results for all sources.  This is only output in verbose mode?
+.le
+
+The following parameters control the WCS correction determination.
+
+.ls nfit = 4
+The minimum number of sources which must be found and centroided for an
+acceptable coordinate fit.  If the value is negative then this is the
+maximum number of objects which failed to be found for an acceptable
+solution.
+.le
+.ls rms = 2.
+The maximum RMS, in arcseconds, for an acceptable solution. 
+.le
+.ls fitgeometry = "general" (shift|xyscale|rotate|rscale|rxyscale|general)
+Fitting geometry for the coordinate adjustment.  This should normally be
+"general" to all allow for all effects of atmospheric refraction.  The
+other options are only used when looking for specific effects.
+.le
+.ls reject = 3.
+Iterative rejection sigma for fitting the position residuals as a function
+of arcseconds from the field tangent point.
+.le
+.ls update = yes
+Update the coordinate system in the input exposures?  If the value is no
+then the input data is not modified.  This option might be used to check the
+coordinate system or output the corrections.  If the the value is yes and
+the fit satisfies the parameters defining an acceptable solution the
+coordinate system will be updated if \fIinteractive\fR=no, otherwise there
+is a query whether to accept the solution and update the input data.
+.le
+.ls interactive = yes
+Is this task run interactively?  If yes then the \fIfit\fR parameter selects
+whether to fit the WCS correction function interactively.  Also if the
+\fIupdate\fR parameter is selected the WCS correction solution will be
+printed followed by a query to accept it and update the image WCS(s).
+.le
+.ls fit = yes
+Do the coordinate fitting interactively?  This requires the \fIinteractive\fR
+parameter to be yes.  If the fitting is done interactively the \fBgeomap\fR
+task used to do the fitting will be executed interactively.  The graphical
+fitting is exited using the 'q' key.  See the help for \fBgeomap\fR
+for more on the interactive fitting.
+.le
+.ls graphics = "stdgraph"
+Graphics device for the interactive fitting.
+.le
+.ls cursor = ""
+Graphics cursor input for the interactive fitting.  The default null
+string value selects the graphics window cursor.
+.le
+
+.ls accept = yes
+This is a query parameter when \fIupdate\fR and \fIinteractive\fR are yes.
+You are queried after printing the statistics of the coordinate fit whether
+to accept the solution and update the coordinate system of the mosaic
+exposure.
+.le
+.ih
+DESCRIPTION
+A list of reference celestial coordinates, either from an astrometry
+catalog or measured from a reference image, for stars in the field is
+matched against objects in the input data.  A linear relation between the
+observed positions and the reference coordinates is fit.  The relation may
+include a zero point shift, scale change, and axis rotation for both
+coordinate axes.  The removes pointing errors, rotation errors, and
+atmospheric refraction effects.  The fit is used to update the image world
+coordinate system to register the WCS to the input coordinate system.
+
+INPUT IMAGES AND MOSAIC DATA
+
+This task may be used with simple images and with multiextension format
+(MEF) files containing multiple images with separate world coordinate
+systems.  The input may be a list of files in which case each is processed
+in turn.  Because a common usage is calibration of a set of exposures taken
+at roughly the same time with the same instrument, an initial guess for the
+pointing offsets for files after the first in the list will be that of the
+previous file.
+
+Though the MEF images will have separate WCS systems this this task expects
+all the images to share the same tangent point, that is WCS uses the same
+same celestial reference point.  MEF files with this characteristic are the
+preferred format for data from mosaic cameras.  Each image extension is a
+piece of a detector in the camera and all images form the field of view of
+an exposure.  The separate WCS then map the distortions and the geometry of
+the different detector elements of the camera.  The common tangent point
+defines an optical axis and reference point for the camera as a whole.  The
+reason MEF files must have a common tangent point for this task is that it
+determines a global correction across the field of view of the exposure
+which is applied to each WCS.  This global correction consists of a
+correction to the celestial reference point, a rotation about this reference
+point, and axes skew relative to the reference point.
+
+INPUT COORDINATES
+
+The input coordinates are supplied in a text file.  The first two columns
+must be the right ascension (in hours) and declination (in degrees) of
+sources overlapping the exposure being calibrated.  The format of the
+coordinates may be sexigesimal (XX:XX:XX.X...) or decimal (XX.XXX...).
+An optional third column may provide magnitudes used to select a
+smaller set of brighter sources for the large offset determination.
+The sources should be stars though the centroiding used does not depend
+of a uniform PSF.
+
+The sources should cover the field of view of the exposure with some extra
+to account for any offset error in the WCS.  When a file is given it is used
+for all of the input files so for a list of input exposures from a dither
+set the file should contain sources over the dither field.  The only cost
+for out of bounds sources is the little time needed to read and check a
+larger list of objects.
+
+A temporary file of coordinates may be generated "on-the-fly" by specifying
+a command that will produce a file given the input image data file.  A
+command is specified by using '!' as the first character.  The command
+should use the input data file WCS to set the area to be covered; again
+with some extra for WCS offset errors.  Since the command is executed for
+each input file the fields need not be of the same part of the sky.
+
+OFFSET SEARCH
+
+A simple algorithm for finding relatively large initial offset errors may be
+selected.  There are two assumptions in this algorithm.  The first is that
+the initial WCS, which may include distortions, is relatively good except
+for the value of the tangent point and possibly a small, of the order of a
+degree, rotation error.  This assumption means that there is a pixel offset
+along the two image axes and small rotations about the initial tangent point
+that will bring the WCS close to correct one.  The second assumption is that
+the differential distortions are small enough that offsets of sources from
+their expected positions due to the field offset correspond to the same
+pixel offset to within a few pixels.  Note that the goal of the offset
+search is just to find the offset to within a few pixels.  The fine tuning
+is then performed in a subsequent step.
+
+If positive values for the \fInsearch\fR and \fRsearch\fR parameter are
+specified the initial WCS is used to predict positions of the input sources
+in the image.  The search value is used as a half-box dimension within which
+the sources are expected to lie.  The input sources are sorted by magnitude
+and boxes centered on the predicted image positions of the brightest
+\fInsearch\fR sources are extracted.  If bad pixel masks are provided and
+the \fIusebpm\fR option is selected then there must be no bad pixel flags
+with a value of 2 in the box.  When a source is rejected because of a bad
+pixel in the box the next fainter source is included until the desired
+number of search boxes is obtained.  If more than half of the sources
+contain bad pixels within their box then bad pixels are ignored.
+
+The algorithm based on the assumptions is that when the boxes extracted
+about the predicted source positions are compared, the sources will be
+offset from the box centers by the same amount.  Rather than segment the boxes
+(detect and join pixels from the same source) the algorithm
+simply counts the number of pixels with significant signal at each point
+in the boxes and looks for a point of maximum correlation.
+The offset from the box centers of this point then corresponds to the
+offset of the tangent point.
+
+The definition of pixels with significant signal is the 10% highest pixel
+values in each box.  The point of maximum correlation must have more that
+half of the boxes contributing.  If no offset is found satisfying the
+criteria for a correlation the task will report a failure and go on
+to the next input image.  
+
+The algorithm finds small rotations by including predicted box centers over
+a range of rotations about the tangent point.   The means the camera is
+assumed to rotate about the tangent point and therefore the initial and
+final WCS is defined with the tangent point at point in the image field
+corresponding to the rotation axis.  In this case the point of maximum
+correlation of pixels with positive signal is a point in three dimensional
+space, two for offsets and one for rotation.
+
+If the offset found is greater than 80% of the specified search
+distance then the algorithm is iterated with the offset applied to
+the predicted positions for the boxes.
+
+CENTROIDING
+
+The fine centering is performed by the task \fBapphot.center\fR.  The
+sources are assumed to lie within a distance given by the \fImaxshift\fR
+parameter of the initial WCS after possible correction for a large offset
+and a small rotation.
+
+A centering box about each predicted position is used to
+determine a centroid and errors (based on Poisson statistics) for
+the sources.  Before centroiding all pixels within a box with a
+half size of \fImaxshift\fR centered on the predicted source position
+will be checked for bad pixels.  In this case any non-zero bad pixel
+value will cause the source to be excluded from the centroiding.
+
+The error estimates along the columns and rows determined by
+\fBapphot.center\fR are used to eliminate spurious source positions because
+centroiding on pure noise returns larger errors.  The two error estimates
+are combined in quadrature and values greater than that specified by
+\fIcsig\fR are rejected as source detections.
+
+A minimum fraction of the sources to be centroided must return acceptable
+positions.  The fraction is specified by the \fIcfrac\fR parameter.  If
+this fails the task will report a failure in determining a new WCS and
+go on to the next input file.
+
+WCS SOLUTION
+
+Provided there is a minimum number of centroided sources (set by the
+\fInfit\fR parameter) a new WCS is determined by fitting for a low order
+correction to the initial WCS.  The parameter \fIfitgeometry\fR provides
+constraints on the final correction.  However, except in rare circumstances
+the "general" geometry should be used which includes a tangent point offset,
+a scale change along each celestial axes, and a a rotation of each celestial
+axis about the final tangent point.  Note that skewed (non-orthogonal)
+celestial axes are possible due to atmospheric refraction.
+
+The fitting is done in astrometric coordinates (distances in arcseconds from
+a tangent point origin along the two celestial axes) using the task
+\fIgeomap\fR.  The fitting may be performed interactively (\fIfit\fR and
+\fIinteractive\fR) to view the distribution of sources and reject bad
+positions.  The fitting includes a sigma clipping rejection of outliers
+(\fIreject\fR) in both interactive and non-interactive modes.
+
+The last check prior to accepting the WCS correction is the RMS of the fit
+along each axes.  In interactive mode the user is provided with an
+opportunity to accept or reject a solution.  In non-interactive mode the RMS
+threshold defines whether the solution is accepted or not.  The maximum RMS
+for the axes must be less than a specified amount.  Note that the RMS may
+still be relatively small for an incorrect solution since outliers are
+rejected at various stages of identifying sources and fitting the WCS
+correction.  So one should understand the RMS of incorrect solutions and
+chose a threshold below that.
+
+OUTPUT
+
+The task provides verbose of output to help understand why solutions
+fail and to report the final WCS correction applied.  Additional optional
+verbose output includes a list of the centered source coordinates.
+Since the input source coordinates should typically include a larger
+area than the fields of images and then sources are eliminated for various
+reasons, the \fIoutcoords\fR parameter allows recording the final sources
+found in the exposure.  This file might be useful for various purposes
+after the WCS calibration.
+
+.ih
+EXAMPLES
+.ih
+SEE ALSO
+msczero, mscgetcatalog, geomap, center
+.endhelp

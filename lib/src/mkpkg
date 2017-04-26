@@ -1,0 +1,51 @@
+# Library routines.
+
+lnfe:
+	$checkout	libnfe.a nfebin$
+	$update		libnfe.a
+	$checkin	libnfe.a nfebin$
+	;
+
+zztest:
+	$omake	zztest.x
+	$linke	zztest.x -lnfe -lxtools -o zztest.e
+	;
+
+txtcompile:
+	$omake	t_txtcompile.x
+	$link	t_txtcompile.o -lnfe -o xx_txtcompile.e
+	$move	xx_txtcompile.e nfebin$x_txtcompile.e
+	$copy	txtcompile nfebin$txtcompile
+	;
+
+libnfe.a:
+	ccdsection.x	<ctype.h>
+	hdmflag.x	
+	hdrmap.x	<error.h> hdrmap.com
+	$ifnfile (xtools$fixpix/setfp.x)
+	    setfp.x	<imhdr.h> <imset.h> <pmset.h>
+	$endif
+	$ifnfile (xtools$syshost.x)
+	    syshost.x	<clset.h> <ctotok.h>
+	$endif
+	yrmmed.x	"yrmsorted.h" <mach.h>
+	yrmsorted.x	"yrmsorted.h"
+	$ifnfile (xtools$xtbitarray.x)
+	    xtbitarray.x	<mach.h>
+	$endif
+	$ifnfile (xtools$xtextns.x)
+	    xtextns.x	<ctype.h> <error.h> <mach.h>
+	$else $ifnewer (xtextns.x, xtools$xtextns.x)
+	    xtextns.x	<ctype.h> <error.h> <mach.h>
+	$endif $endif
+	$ifnfile (xtools$xttxtfio.x)
+	    xttxtfio.x
+	$endif
+	$ifnfile (xtools$fixpix/ytfixpix.x)
+	    ytfixpix.x	<imhdr.h> <imset.h> <pmset.h> xtfixpix.h
+	$endif
+	$ifnfile (xtools$fixpix/ytpmmap.x)
+	    ytpmmap.x	<ctype.h> <error.h> <imhdr.h> <imset.h> <mach.h>\
+			<mwset.h> <plio.h> <plset.h> <pmset.h>
+	$endif
+	;

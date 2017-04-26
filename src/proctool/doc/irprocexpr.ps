@@ -1,0 +1,1652 @@
+%!PS-Adobe-1.0
+%%Creator: IRAF PostScript Translator
+%%CreationDate: Fri 10:01:13 25-Mar-2005
+%%Pages: (atend)
+%%DocumentFonts: (atend)
+%%EndComments
+%%BeginProlog
+/inch	{ 72 mul 	} def			% 72 points per inch
+/PL 	{ 792  		} def			% set page height
+/FtrY	{ 20  		} def			% footer Y position
+/HdrY	{ PL 40 sub  	} def			% header Y position
+/xOrg	720 	   def				% left margin (inches)
+/yOrg	900 	   def				% top margin (inches)
+/Page	0 	   def				% page number
+/pnum	4 string def				% sizeof pnum cvs buffer
+/res	10.0	def				% pixel resolution factor
+
+/FS 	{ findfont exch scalefont } bind def 	% find and scale a font
+/Fonts [					% create an array of fonts
+	10 /Times-Roman FS
+	10 /Times-Bold FS
+	10 /Times-Italic FS
+	9 /Courier FS
+	11 /Times-Bold FS
+] def
+/SF { setfont       	} bind def
+/R  { Fonts 0 get SF	} bind def		% roman font
+/B  { Fonts 1 get SF	} bind def		% bold font
+/I  { Fonts 2 get SF	} bind def		% italic font
+/T  { Fonts 3 get SF	} bind def		% teletype font
+/HD { Fonts 4 get SF	} bind def		% header font
+/H  { res div
+	currentpoint exch pop
+	moveto 		} def			% horizontal position
+/V  { res div
+	currentpoint pop exch
+	moveto 		} def			% vertical position
+/S  { exch H show	} bind def		% show
+/BP {						% Begin page (header).
+	xOrg 10 div HdrY moveto B (irprocexpr (Mar05)) show
+	2966 10 div HdrY moveto B (irred) show
+	4623 10 div HdrY moveto B (irprocexpr (Mar05)) show
+	xOrg yOrg moveto
+} bind def
+/EP {						% End page (footer).
+	/Page Page 1 add def			% increment page number
+	xOrg 10 div FtrY moveto R (NOAO/IRAF V2.12.2a-EXPORT) show
+	2379 10 div FtrY moveto R ( ) show
+	5350 10 div FtrY moveto R Page pnum cvs show
+	showpage				% show the page
+} bind def
+%%EndProlog
+%%Page: 1 1
+%----------
+initgraphics
+R
+BP
+6900 V
+B 2121 (IRPROC) S
+R 2515 ( Keyword and Linearity Expressions) S
+6780 V
+6700 V
+R
+720 (The) S
+B 910 (irproc) S
+R 1211 (task) S
+1407 (makes) S
+1697 (use) S
+1865 (of) S
+1983 (expressions) S
+2484 (which) S
+2763 (treat) S
+2975 (the) S
+3132 (values) S
+3422 (of) S
+3540 (keywords) S
+3963 (and) S
+4142 (pixel) S
+4377 (values) S
+4667 (as) S
+4785 (operands.) S
+5245 (The) S
+6580 V
+R
+720 (expressions) S
+1243 (are) S
+1421 (used) S
+1661 (to) S
+1796 (select) S
+2080 (and) S
+2281 (group) S
+2571 (images,) S
+2936 (provide) S
+3298 (sort) S
+3505 (keys,) S
+3770 (evaluate) S
+4159 (exposure) S
+4576 (times,) S
+4875 (and) S
+5076 (apply) S
+5356 (a) S
+6460 V
+R
+720 (non-linearity) S
+1275 (corrections.) S
+1821 (The) S
+2015 (expressions) S
+2520 (provide) S
+2864 (a) S
+2947 (great) S
+3185 (deal) S
+3390 (of) S
+3512 (flexiblity) S
+3918 (and) S
+4101 (accomodate) S
+4616 (data) S
+4821 (from) S
+5057 (different) S
+6340 V
+R
+720 (instruments) S
+1223 (within) S
+1515 (and) S
+1695 (between) S
+2063 (observatories.) S
+2692 (While) S
+2972 (the) S
+3130 (expression) S
+3593 (mechanism) S
+4084 (provides) S
+4464 (great) S
+4699 (flexibility,) S
+5156 (which) S
+6220 V
+R
+720 (means) S
+1006 (increased) S
+1413 (complexity,) S
+1919 (in) S
+2028 (most) S
+2254 (cases) S
+2495 (the) S
+2648 (simplest) S
+3013 (expressions,) S
+3535 (such) S
+3749 (as) S
+3863 (the) S
+4016 (name) S
+4263 (of) S
+4377 (the) S
+4530 (keyword,) S
+4966 (are) S
+5118 (all) S
+5250 (that) S
+6100 V
+R
+720 (is) S
+817 (required.) S
+5980 V
+5900 V
+R
+720 (The) S
+907 (expression) S
+1366 (syntax) S
+1659 (follows) S
+1991 (common) S
+2373 (algebraic) S
+2770 (and) S
+2946 (programming) S
+3522 (rules.) S
+3805 (For) S
+3976 (instance) S
+4335 (it) S
+4423 (is) S
+4522 (the) S
+4676 (same) S
+4913 (as) S
+5040 (available) S
+5780 V
+R
+720 (in) S
+829 (the) S
+982 (CL.) S
+1197 (The) S
+1383 (main) S
+1614 (things) S
+1890 (to) S
+1999 (understand) S
+2468 (are) S
+2620 (what) S
+2845 (constitutes) S
+3304 (a) S
+3379 (operand,) S
+3756 (what) S
+3981 (type) S
+4184 (of) S
+4298 (final) S
+4512 (value) S
+4759 (is) S
+4857 (required,) S
+5256 (and) S
+5660 V
+R
+720 (what) S
+946 (functions) S
+1350 (are) S
+1503 (provided.) S
+1947 (Except) S
+2256 (for) S
+2404 (the) S
+2558 (linearity) S
+2923 (correction) S
+3359 (expression) S
+3818 (the) S
+3972 (only) S
+4182 (operands) S
+4574 (are) S
+4727 (keyword) S
+5120 (names.) S
+5540 V
+R
+720 (This) S
+940 (means) S
+1237 (a) S
+1323 (operand) S
+1686 (is) S
+1795 (anything) S
+2187 (that) S
+2379 (is) S
+2488 (allowed) S
+2846 (for) S
+3004 (a) S
+3090 (keyword) S
+3481 (name) S
+3739 (and) S
+3925 (which) S
+4211 (is) S
+4362 (quoted) S
+4676 (in) S
+4796 (the) S
+4948 (expression.) S
+5420 V
+R
+720 (Quotes) S
+1039 (define) S
+1324 (a) S
+1404 (string) S
+1668 (literal.) S
+1998 (There) S
+2266 (is) S
+2369 (one) S
+2549 (exception) S
+2973 (for) S
+3125 (keywords) S
+3549 (that) S
+3735 (include) S
+4065 (the) S
+4223 (characters) S
+4662 (that) S
+4848 (correspond) S
+5322 (to) S
+5300 V
+R
+720 (the) S
+879 (operators) S
+1287 (in) S
+1402 (expressions.) S
+1967 (In) S
+2087 (this) S
+2269 (case) S
+2477 (the) S
+2636 (keyword) S
+3022 (is) S
+3126 (quoted) S
+3435 (as) S
+3555 (a) S
+3673 (and) S
+3854 (then) S
+4063 (referenced) S
+4519 (as) S
+4639 (a) S
+4720 (keyword) S
+5106 (using) S
+5356 (a) S
+5180 V
+720 (leading @ character; e.g. @) S
+T 1854 ("date-obs") S
+R 2394 (.) S
+5060 V
+4980 V
+R
+720 (In) S
+837 (the) S
+993 (linearity) S
+1360 (expression) S
+1821 (the) S
+1977 (values) S
+2266 (of) S
+2383 (pixels) S
+2656 (in) S
+2768 (the) S
+2924 (image) S
+3202 (being) S
+3458 (processed) S
+3885 (and) S
+4063 (the) S
+4219 (values) S
+4508 (of) S
+4625 (pixels) S
+4907 (representing) S
+4860 V
+R
+720 (coefficients) S
+1220 (in) S
+1333 (a) S
+1412 (linearity) S
+1780 (coefficient) S
+2241 (image) S
+2520 (are) S
+2676 (operands.) S
+3131 (The) S
+3321 (pixels) S
+3595 (in) S
+3708 (the) S
+3865 (image) S
+4144 (being) S
+4401 (processed) S
+4829 (are) S
+4981 (referenced) S
+4740 V
+R
+720 (by) S
+855 (the) S
+1012 (operand) S
+1368 ($I.) S
+1546 (The) S
+1736 (pixels) S
+2010 (in) S
+2123 (the) S
+2280 (coefficient) S
+2741 (image) S
+3020 (are) S
+3176 (reference) S
+3580 (by) S
+3715 ($C1,) S
+3942 ($C2,) S
+4169 (etc.) S
+4380 (The) S
+4570 (number) S
+4910 (refers) S
+5171 (to) S
+5278 (the) S
+4620 V
+R
+720 (element) S
+1066 (of) S
+1179 (the) S
+1331 (third) S
+1550 (dimension) S
+1997 (of) S
+2110 (the) S
+2262 (coefficient) S
+2718 (image.) S
+4500 V
+4420 V
+4340 V
+R
+720 (Expressions) S
+1235 (consist) S
+1545 (of) S
+1660 (operands,) S
+2077 (numeric) S
+2436 (and) S
+2612 (string) S
+2872 (constants,) S
+3301 (operators,) S
+3729 (and) S
+3905 (functions.) S
+4366 (Parentheses) S
+4869 (are) S
+5022 (also) S
+5217 (used) S
+4220 V
+R
+720 (to) S
+829 (control) S
+1143 (the) S
+1296 (evaluation) S
+1743 (order) S
+1984 (as) S
+2098 (is) S
+2196 (done) S
+2421 (in) S
+2530 (standard) S
+2899 (algebraic) S
+3295 (expression.) S
+3809 (String) S
+4085 (constants) S
+4488 (are) S
+4640 (quoted) S
+4943 (strings) S
+5256 (and) S
+4100 V
+R
+720 (numeric) S
+1113 (constants) S
+1551 (are) S
+1738 (just) S
+1949 (unquoted) S
+2387 (numbers.) S
+2888 (Numbers) S
+3320 (may) S
+3558 (be) S
+3718 (given) S
+4006 (in) S
+4150 (sexagesimal) S
+4704 (notation) S
+5098 (and) S
+5279 (are) S
+3980 V
+R
+720 (automatically) S
+1294 (converted) S
+1717 (to) S
+1825 (decimal) S
+2171 (numbers.) S
+2600 (The) S
+2785 (operators) S
+3186 (are) S
+3337 (arithmetic,) S
+3797 (logical,) S
+4124 (and) S
+4298 (string.) S
+3860 V
+3780 V
+R
+720 (The) S
+910 (following) S
+1334 (operators) S
+1740 (are) S
+1896 (recognized) S
+2368 (in) S
+2481 (expressions.) S
+3042 (With) S
+3277 (the) S
+3434 (exception) S
+3857 (of) S
+3975 (the) S
+4132 (operators) S
+T 4538 ("?") S
+R 4700 (,) S
+T 4760 ("?=") S
+R 4976 (,) S
+5036 (and) S
+T 5213 ("@") S
+R 5375 (,) S
+3660 V
+R
+720 (the) S
+872 (operator) S
+1234 (set) S
+1375 (is) S
+1472 (equivalent) S
+1918 (to) S
+2026 (that) S
+2206 (available) S
+2596 (in) S
+2704 (the) S
+2856 (CL.) S
+3540 V
+3460 V
+T T
+1152 (+) S
+1314 (-) S
+1476 (*) S
+1638 (/) S
+2448 (arithmetic) S
+3042 (operators) S
+3360 V
+T
+1152 (**) S
+2448 (exponentiation) S
+3260 V
+T
+1152 (//) S
+2448 (string) S
+2826 (concatenation) S
+3160 V
+T
+1152 (!) S
+1314 (-) S
+2448 (boolean) S
+2880 (not,) S
+3150 (unary) S
+3474 (negation) S
+3060 V
+T
+1152 (<) S
+1314 (<=) S
+1476 (>) S
+1638 (>=) S
+2448 (order) S
+2772 (comparision) S
+3420 (\(works) S
+3798 (for) S
+4014 (strings\)) S
+2960 V
+T
+1152 (==) S
+1314 (!=) S
+1476 (&&) S
+1638 (||) S
+2448 (equals,) S
+2880 (not) S
+3096 (equals,) S
+3528 (and,) S
+3798 (or) S
+2860 V
+T
+1152 (?=) S
+2448 (string) S
+2826 (equals) S
+3204 (pattern) S
+2760 V
+T
+1152 (?) S
+1260 (:) S
+2448 (conditional) S
+3096 (expression) S
+3690 (\(ternary) S
+4176 (operator\)) S
+2660 V
+T
+1152 (@) S
+2448 (reference) S
+2988 (a) S
+3096 (operand) S
+2560 V
+R 2480 V
+R
+720 (The) S
+920 (operators) S
+T 1336 ("==") S
+R 1552 (,) S
+T 1622 ("&&") S
+R 1838 (,) S
+1908 (and) S
+T 2097 ("||") S
+R 2358 (may) S
+2575 (be) S
+2714 (abbreviated) S
+3224 (as) S
+T 3352 ("=") S
+R 3514 (,) S
+T 3584 ("&") S
+R 3746 (,) S
+3816 (and) S
+T 4005 ("|") S
+R 4212 (if) S
+4318 (desired.) S
+4721 (The) S
+4921 (?=) S
+5068 (operator) S
+2360 V
+R
+720 (performs) S
+1132 (pattern) S
+1461 (matching) S
+1885 (upon) S
+2137 (strings.) S
+2481 (The) S
+2688 (@) S
+2832 (operator) S
+3216 (is) S
+3335 (required) S
+3719 (to) S
+3849 (reference) S
+4270 (keywords) S
+4710 (with) S
+4940 (one) S
+5136 (of) S
+5278 (the) S
+2240 V
+R
+720 (operator) S
+1082 (characters.) S
+1570 (This) S
+1778 (is) S
+1875 (most) S
+2100 (like) S
+2280 (to) S
+2388 (be) S
+2512 (used) S
+2725 (as:) S
+2120 V
+2040 V
+720 (@) S
+T 812 ("date-obs") S
+R 1920 V
+1840 V
+R
+720 (A) S
+824 (point) S
+1062 (to) S
+1172 (be) S
+1298 (aware) S
+1567 (of) S
+1682 (is) S
+1781 (that) S
+1963 (in) S
+2073 (the) S
+2227 (?:) S
+2331 (conditional) S
+2813 (expression) S
+3272 (both) S
+3482 (possible) S
+3842 (result) S
+4096 (values) S
+4383 (are) S
+4536 (evaluated) S
+4950 (though) S
+5278 (the) S
+1720 V
+R
+720 (result) S
+972 (of) S
+1085 (the) S
+1237 (expression) S
+1694 (is) S
+1791 (only) S
+1999 (one) S
+2173 (of) S
+2286 (them.) S
+1600 V
+1520 V
+R
+720 (A) S
+827 (number) S
+1167 (of) S
+1285 (standard) S
+1658 (intrinsic) S
+2021 (functions) S
+2428 (are) S
+2584 (recognized) S
+3056 (within) S
+3347 (expressions.) S
+3908 (Many) S
+4176 (of) S
+4294 (these) S
+4534 (may) S
+4741 (not) S
+4904 (be) S
+5033 (useful) S
+5322 (in) S
+1400 V
+R
+720 (the) S
+884 (context) S
+1220 (of) S
+1345 (the) S
+B 1509 (irproc) S
+R 1817 (expressions) S
+2325 (but) S
+2495 (are) S
+2658 (part) S
+2855 (of) S
+2980 (the) S
+3144 (language.) S
+3613 (The) S
+3810 (set) S
+3963 (of) S
+4088 (functions) S
+4502 (currently) S
+4904 (supported) S
+5333 (is) S
+1280 V
+R
+720 (shown) S
+1011 (below.) S
+1160 V
+1080 V
+T T
+1098 (abs) S
+1530 (atan2) S
+1962 (deg) S
+2394 (log) S
+2826 (min) S
+3258 (real) S
+3690 (sqrt) S
+980 V
+T
+1098 (acos) S
+1530 (bool) S
+1962 (double) S
+2394 (log10) S
+2826 (mod) S
+3258 (short) S
+3690 (str) S
+880 V
+T
+1098 (asin) S
+1530 (cos) S
+1962 (exp) S
+2394 (long) S
+2826 (nint) S
+3258 (sin) S
+3690 (tan) S
+780 V
+T
+1098 (atan) S
+1530 (cosh) S
+1962 (int) S
+2394 (max) S
+2826 (rad) S
+3258 (sinh) S
+3690 (tanh) S
+EP
+%%Page: 2 2
+BP
+7020 V
+R 6940 V
+R
+720 (The) S
+920 (trigonometric) S
+1509 (functions) S
+1926 (operate) S
+2264 (in) S
+2387 (units) S
+2627 (of) S
+2755 (radians.) S
+3113 (The) S
+I 3313 (min) S
+R 3508 (and) S
+I 3697 (max) S
+R 3908 (functions) S
+4325 (may) S
+4542 (have) S
+4775 (any) S
+4964 (number) S
+5317 (of) S
+6820 V
+R
+720 (arguments) S
+1166 (up) S
+1296 (to) S
+1404 (a) S
+1478 (maximum) S
+1914 (of) S
+2027 (sixteen) S
+2340 (or) S
+2453 (so) S
+2572 (\(configurable\).) S
+3227 (The) S
+3412 (arguments) S
+3858 (need) S
+4076 (not) S
+4234 (all) S
+4364 (be) S
+4488 (of) S
+4601 (the) S
+4753 (same) S
+4988 (datatype.) S
+6700 V
+6620 V
+R
+720 (A) S
+822 (function) S
+1185 (call) S
+1359 (may) S
+1561 (take) S
+1757 (either) S
+2014 (of) S
+2127 (the) S
+2279 (following) S
+2698 (forms:) S
+6500 V
+6420 V
+T T
+1152 (<identifier>) S
+1854 ('\(') S
+2070 (arglist) S
+2502 ('\)') S
+6320 V
+T
+720 (or) S
+6220 V
+T
+1152 (<string_expr>) S
+1908 ('\(') S
+2124 (arglist) S
+2556 ('\)') S
+6120 V
+R 6040 V
+R
+720 (The) S
+906 (first) S
+1098 (form) S
+1323 (is) S
+1421 (the) S
+1574 (conventional) S
+2121 (form) S
+2346 (found) S
+2610 (in) S
+2719 (all) S
+2850 (programming) S
+3425 (languages.) S
+3880 (The) S
+4066 (second) S
+4374 (permits) S
+4705 (the) S
+4858 (generation) S
+5317 (of) S
+5920 V
+R
+720 (function) S
+1083 (names) S
+1368 (by) S
+1498 (string) S
+1756 (valued) S
+2052 (expressions) S
+2548 (and) S
+2722 (might) S
+2986 (be) S
+3110 (useful) S
+3384 (on) S
+3514 (rare) S
+3698 (occasions.) S
+5800 V
+5720 V
+R
+720 (In) S
+834 (addition) S
+1193 (to) S
+1302 (the) S
+1455 (above) S
+1724 (intrinsic) S
+2083 (functions) S
+2486 (there) S
+2716 (are) S
+2868 (a) S
+2974 (astronomical) S
+3521 (functions.) S
+3949 (More) S
+4196 (will) S
+4383 (be) S
+4508 (added) S
+4777 (in) S
+4886 (time.) S
+5162 (These) S
+5600 V
+R
+720 (are:) S
+5480 V
+5400 V
+T T
+990 (sexstr) S
+1368 (-) S
+1476 (convert) S
+1908 (a) S
+2016 (number) S
+2394 (to) S
+2556 (a) S
+2664 (sexagesimal) S
+3312 (string) S
+3690 (\(xx:mm:ss.ss\)) S
+5300 V
+T
+1044 (epoch) S
+1368 (-) S
+1476 (compute) S
+1908 (an) S
+2070 (epoch) S
+2394 (given) S
+2718 (a) S
+2826 (date) S
+3096 (and) S
+3312 (time) S
+5200 V
+T
+990 (julday) S
+1368 (-) S
+1476 (compute) S
+1908 (a) S
+2016 (Julian) S
+2394 (day) S
+2610 (given) S
+2934 (a) S
+3042 (date) S
+3312 (and) S
+3528 (time) S
+5100 V
+T
+1152 (mst) S
+1368 (-) S
+1476 (compute) S
+1908 (a) S
+2016 (mean) S
+2286 (siderial) S
+2772 (time) S
+3042 (given) S
+3366 (a) S
+3474 (date,) S
+3798 (time,) S
+4122 (and) S
+4338 (longitude) S
+5000 V
+T
+936 (precess) S
+1368 (-) S
+1476 (precess) S
+1908 (a) S
+2016 (coordinate) S
+2610 (pair) S
+2880 (from) S
+3150 (one) S
+3366 (epoch) S
+3690 (to) S
+3852 (another) S
+4900 V
+T
+774 (ra_precess) S
+1368 (-) S
+1476 (precess) S
+1908 (ra) S
+2070 (from) S
+2340 (one) S
+2556 (epoch) S
+2880 (to) S
+3042 (another) S
+4800 V
+T
+720 (dec_precess) S
+1368 (-) S
+1476 (precess) S
+1908 (dec) S
+2124 (from) S
+2394 (one) S
+2610 (epoch) S
+2934 (to) S
+3096 (another) S
+4700 V
+T
+990 (arcsep) S
+1368 (-) S
+1476 (separation) S
+2070 (of) S
+2232 (two) S
+2448 (coordinates) S
+3096 (in) S
+3258 (arc) S
+3474 (seconds) S
+4600 V
+T
+936 (airmass) S
+1368 (-) S
+1476 (compute) S
+1908 (airmass) S
+2340 (given) S
+2664 (ra,) S
+2880 (dec,) S
+3150 (siderial) S
+3636 (time,) S
+3960 (and) S
+4176 (latitude) S
+4500 V
+T
+882 (eairmass) S
+1368 (-) S
+1476 (compute) S
+1908 (effective) S
+2448 (airmass) S
+2880 (given) S
+4400 V
+T
+1530 (ra,) S
+1746 (dec,) S
+2016 (siderial) S
+2502 (time,) S
+2826 (exposure) S
+3312 (time,) S
+3636 (and) S
+3852 (latitude) S
+4300 V
+R 4220 V
+4100 V
+B B
+720 (sexstr) S
+983 (\(number\),) S
+1409 (sexstr) S
+1672 (\(number,) S
+2065 (digits\)) S
+3980 V
+R R R
+990 (Convert) S
+1367 (a) S
+1466 (number) S
+1826 (to) S
+1959 (a) S
+2058 (sexagesimal) S
+2601 (string) S
+2884 (in) S
+3017 (the) S
+3194 (format) S
+3515 (X:MM:SS.SS.) S
+4205 (There) S
+4492 (is) S
+4614 (an) S
+4763 (optional) S
+5123 (second) S
+3860 V
+R
+990 (argument) S
+1397 (\(the) S
+1582 (default) S
+1889 (is) S
+1986 (0\)) S
+2099 (which) S
+2373 (is) S
+2470 (the) S
+2622 (number) S
+2957 (of) S
+3070 (decimal) S
+3416 (digits) S
+3669 (in) S
+3777 (the) S
+3929 (seconds) S
+4275 (field.) S
+3740 V
+3620 V
+B B
+720 (epoch) S
+988 (\(date[,) S
+1275 (ut]\)) S
+3500 V
+R R R
+990 (Compute) S
+1413 (an) S
+1563 (epoch) S
+1857 (given) S
+2135 (a) S
+2235 (date) S
+2457 (and) S
+2657 (time.) S
+2972 (The) S
+3183 (date) S
+3405 (is) S
+3528 (a) S
+3684 (format) S
+4006 (DD/MM/YY,) S
+4609 (YYYY-MM-DD,) S
+5317 (or) S
+3380 V
+R
+990 (YYYY-MM-DDTHH:MM:SS.) S
+2288 (Typically) S
+2717 (this) S
+2908 (argument) S
+3331 (will) S
+3533 (be) S
+3673 (the) S
+3841 (standard) S
+4225 (FITS) S
+4477 (keyword) S
+4881 (DATE-OBS.) S
+3260 V
+R
+990 (Because) S
+1384 (of) S
+1529 (possible) S
+1919 (confusion) S
+2375 (of) S
+2520 (the) S
+2704 (hyphen) S
+3060 (with) S
+3300 (subtraction) S
+3806 (this) S
+4013 (keyword) S
+4424 (would) S
+4736 (be) S
+4892 (specified) S
+5317 (as) S
+3140 V
+R
+990 (@) S
+T 1082 ("date-obs") S
+R 1622 (.) S
+1707 (The) S
+1892 (time) S
+2100 (argument) S
+2507 (is) S
+2604 (optional.) S
+3017 (If) S
+3113 (it) S
+3199 (is) S
+3296 (not) S
+3454 (given) S
+3706 (the) S
+3858 (time) S
+4066 (from) S
+4290 (the) S
+4442 (date) S
+4638 (string) S
+4896 (will) S
+5082 (be) S
+5217 (used) S
+3020 V
+R
+990 (and) S
+1164 (if) S
+1255 (absent) S
+1540 (a) S
+1614 (time) S
+1822 (of) S
+1935 (0h) S
+2065 (is) S
+2162 (used.) S
+2900 V
+2780 V
+B B
+720 (julday) S
+1000 (\(date[,) S
+1287 (ut]\)) S
+2660 V
+R R R
+990 (Compute) S
+1387 (a) S
+1461 (Julian) S
+1730 (day) S
+1904 (given) S
+2156 (a) S
+2230 (date) S
+2426 (and) S
+2600 (time.) S
+2863 (The) S
+3048 (date) S
+3244 (and) S
+3418 (time) S
+3626 (are) S
+3777 (specified) S
+4167 (as) S
+4280 (described) S
+4692 (previously.) S
+2540 V
+2420 V
+B B
+720 (mst) S
+895 (\(date[,) S
+1182 (ut],) S
+1348 (longitude\)) S
+2300 V
+R R R
+990 (Compute) S
+1395 (a) S
+1477 (mean) S
+1731 (siderial) S
+2063 (time) S
+2279 (given) S
+2539 (a) S
+2621 (date,) S
+2850 (time,) S
+3091 (and) S
+3273 (longitude) S
+3689 (in) S
+3805 (degrees.) S
+4210 (The) S
+4403 (date) S
+4607 (and) S
+4789 (\(optional\)) S
+5222 (time) S
+2180 V
+R
+990 (are) S
+1149 (specified) S
+1547 (as) S
+1668 (described) S
+2088 (previously.) S
+2611 (The) S
+2804 (longitude) S
+3220 (may) S
+3430 (be) S
+3562 (given) S
+3822 (as) S
+3943 (a) S
+4025 (constant) S
+4396 (or) S
+4517 (using) S
+4772 (the) S
+4929 (observatory) S
+2060 V
+R
+990 (database) S
+1380 (function) S
+1760 (as) S
+1890 (shown) S
+2198 (in) S
+2323 (the) S
+2492 (examples.) S
+2988 (The) S
+3190 (returned) S
+3569 (value) S
+3832 (is) S
+3946 (a) S
+4084 (string) S
+4359 (with) S
+4584 (two) S
+4781 (decimals) S
+5183 (in) S
+5278 (the) S
+1940 V
+R
+990 (seconds.) S
+1820 V
+1700 V
+B B
+720 (precess) S
+1043 (\(ra,) S
+1208 (dec,) S
+1401 (epoch1,) S
+1744 (epoch2\)) S
+1580 V
+R R R
+990 (Precess) S
+1336 (coordinates) S
+1843 (from) S
+2084 (one) S
+2275 (epoch) S
+2560 (to) S
+2685 (another.) S
+3103 (The) S
+3305 (ra) S
+3429 (is) S
+3543 (the) S
+3712 (right) S
+3948 (ascension) S
+4383 (in) S
+4508 (hours,) S
+4802 (the) S
+4971 (dec) S
+5156 (in) S
+5278 (the) S
+1460 V
+R
+990 (declination) S
+1470 (in) S
+1584 (degrees,) S
+1949 (and) S
+2129 (the) S
+2287 (epochs) S
+2600 (are) S
+2757 (in) S
+2871 (years.) S
+3178 (This) S
+3392 (function) S
+3761 (returns) S
+4074 (a) S
+4190 (the) S
+4348 (precessed) S
+4771 (right) S
+4987 (ascension,) S
+1340 V
+R
+990 (declination,) S
+1506 (and) S
+1697 (epoch.) S
+2054 (Numerical) S
+2522 (values) S
+2824 (for) S
+2987 (the) S
+3156 (right) S
+3392 (ascension) S
+3827 (and) S
+4018 (declination) S
+4509 (are) S
+4677 (obtained) S
+5068 (with) S
+5278 (the) S
+1220 V
+R
+990 (functions) S
+1392 (ra_precess) S
+1842 (and) S
+2016 (dec_precess.) S
+1100 V
+980 V
+B B
+720 (ra_precess) S
+1170 (\(ra,) S
+1335 (dec,) S
+1528 (epoch1,) S
+1871 (epoch2\)) S
+860 V
+R R R
+990 (Precess) S
+1320 (a) S
+1395 (right) S
+1615 (ascension) S
+2034 (from) S
+2259 (one) S
+2434 (epoch) S
+2703 (to) S
+2812 (another.) S
+3198 (The) S
+3384 (ra) S
+3492 (is) S
+3590 (the) S
+3743 (input) S
+3980 (right) S
+4200 (ascension) S
+4619 (in) S
+4728 (hours,) S
+5006 (the) S
+5159 (dec) S
+5333 (is) S
+740 V
+R
+990 (the) S
+1145 (declination) S
+1622 (in) S
+1733 (degrees,) S
+2095 (and) S
+2272 (the) S
+2427 (epochs) S
+2737 (are) S
+2891 (in) S
+3002 (years.) S
+3303 (Because) S
+3668 (a) S
+3745 (function) S
+4111 (can) S
+4282 (return) S
+4553 (only) S
+4764 (one) S
+4941 (value) S
+5201 (there) S
+EP
+%%Page: 3 3
+BP
+7020 V
+R
+990 (is) S
+1088 (a) S
+1163 (second) S
+1471 (function) S
+1835 (to) S
+1944 (return) S
+2213 (the) S
+2366 (precessed) S
+2784 (declination.) S
+3284 (The) S
+3470 (returned) S
+3833 (value) S
+4080 (is) S
+4178 (a) S
+4253 (sexagesimal) S
+4772 (string) S
+5031 (with) S
+5250 (two) S
+6900 V
+R
+990 (decimals) S
+1375 (in) S
+1483 (the) S
+1635 (seconds.) S
+6780 V
+6660 V
+B B
+720 (dec_precess) S
+1231 (\(ra1,) S
+1446 (dec1,) S
+1689 (epoch1,) S
+2032 (epoch2\)) S
+6540 V
+R R R
+990 (Precess) S
+1320 (a) S
+1395 (declination) S
+1870 (from) S
+2095 (one) S
+2270 (epoch) S
+2539 (to) S
+2648 (another.) S
+3034 (The) S
+3220 (ra) S
+3328 (is) S
+3426 (the) S
+3579 (input) S
+3816 (right) S
+4036 (ascension) S
+4455 (in) S
+4564 (hours,) S
+4842 (the) S
+4995 (dec) S
+5164 (is) S
+5278 (the) S
+6420 V
+R
+990 (declination) S
+1466 (in) S
+1576 (degrees,) S
+1937 (and) S
+2113 (the) S
+2267 (epochs) S
+2576 (are) S
+2729 (in) S
+2839 (years.) S
+3138 (Because) S
+3502 (a) S
+3578 (function) S
+3943 (can) S
+4113 (return) S
+4383 (only) S
+4593 (one) S
+4769 (value) S
+5017 (there) S
+5248 (is) S
+5356 (a) S
+6300 V
+R
+990 (second) S
+1299 (function) S
+1664 (to) S
+1774 (return) S
+2044 (the) S
+2198 (precessed) S
+2617 (right) S
+2838 (ascension.) S
+3283 (The) S
+3470 (returned) S
+3834 (value) S
+4082 (is) S
+4181 (a) S
+4257 (sexagesimal) S
+4777 (string) S
+5037 (with) S
+5250 (two) S
+6180 V
+R
+990 (decimals) S
+1375 (in) S
+1483 (the) S
+1635 (seconds.) S
+6060 V
+5940 V
+B B
+720 (arcsep) S
+1004 (\(ra1,) S
+1219 (dec1,) S
+1462 (ra2,) S
+1644 (dec2\)) S
+5820 V
+R R R
+990 (Compute) S
+1393 (the) S
+1551 (separation) S
+1997 (between) S
+2365 (two) S
+2551 (spherical) S
+2947 (coordinates.) S
+3504 (The) S
+3695 (parameters) S
+4168 (ra1) S
+4331 (and) S
+4511 (ra2) S
+4674 (are) S
+4831 (coordinates) S
+5322 (in) S
+5700 V
+R
+990 (hours) S
+1268 (\(right) S
+1546 (ascension,) S
+2015 (longitude,) S
+2474 (etc.\)) S
+2704 (and) S
+2904 (the) S
+3082 (dec1) S
+3326 (and) S
+3526 (dec2) S
+3770 (parameters) S
+4263 (are) S
+4440 (coordinates) S
+4956 (in) S
+5096 (degrees) S
+5580 V
+R
+990 (\(declination,) S
+1522 (latitude,) S
+1877 (etc.\).) S
+2136 (The) S
+2321 (computed) S
+2745 (value) S
+2991 (is) S
+3088 (returned) S
+3450 (in) S
+3558 (seconds) S
+3904 (of) S
+4017 (arc.) S
+5460 V
+5340 V
+B B
+720 (airmass) S
+1055 (\(ra,) S
+1220 (dec,) S
+1413 (st,) S
+1535 (latitude\)) S
+5220 V
+R R R
+990 (Compute) S
+1407 (an) S
+1551 (airmass) S
+1906 (given) S
+2178 (right) S
+2417 (ascension) S
+2855 (in) S
+2983 (hours,) S
+3280 (declination) S
+3774 (in) S
+3902 (degrees,) S
+4281 (sideral) S
+4597 (time) S
+4825 (in) S
+4953 (hours,) S
+5256 (and) S
+5100 V
+R
+990 (latitude) S
+1324 (in) S
+1436 (degrees.) S
+1833 (The) S
+2022 (latitude) S
+2356 (is) S
+2457 (often) S
+2696 (specified) S
+3090 (using) S
+3341 (the) S
+3497 (observatory) S
+4002 (database) S
+4379 (function) S
+4746 (as) S
+4863 (shown) S
+5158 (in) S
+5278 (the) S
+4980 V
+R
+990 (examples.) S
+4860 V
+4740 V
+B B
+720 (eairmass) S
+1099 (\(ra,) S
+1264 (dec,) S
+1457 (st,) S
+1579 (exptime,) S
+1956 (latitude\)) S
+4620 V
+R R R
+990 (Compute) S
+1388 (an) S
+T 1513 ("effective") S
+R 2138 (airmass) S
+2474 (given) S
+2727 (right) S
+2947 (ascension) S
+3366 (in) S
+3475 (hours,) S
+3753 (declination) S
+4228 (in) S
+4337 (degrees,) S
+4697 (beginning) S
+5134 (sideral) S
+4500 V
+R
+990 (time) S
+1203 (in) S
+1316 (hours,) S
+1598 (exposure) S
+1993 (time) S
+2206 (in) S
+2319 (seconds,) S
+2695 (and) S
+2874 (latitude) S
+3209 (in) S
+3322 (degrees.) S
+3721 (The) S
+3911 (The) S
+4101 (latitude) S
+4436 (is) S
+4538 (often) S
+4778 (specified) S
+5183 (using) S
+4380 V
+R
+990 (the) S
+1143 (observatory) S
+1645 (database) S
+2019 (function) S
+2383 (as) S
+2497 (shown) S
+2789 (in) S
+2898 (the) S
+3051 (examples.) S
+3515 (The) S
+3701 (effective) S
+4080 (airmass) S
+4416 (is) S
+4514 (based) S
+4772 (on) S
+4903 (a) S
+4977 (Simpson's) S
+4260 V
+R
+990 (rule) S
+1179 (weighting) S
+1613 (of) S
+1730 (the) S
+1886 (beginning,) S
+2345 (middle,) S
+2682 (and) S
+2860 (ending) S
+3166 (airmass) S
+3505 (\(with) S
+3750 (no) S
+3884 (provision) S
+4296 (for) S
+4446 (paused) S
+4757 (exposure\).) S
+5245 (The) S
+4140 V
+R
+990 (weights) S
+1331 (are:) S
+4020 V
+3940 V
+T T
+1206 (effective) S
+1746 (=) S
+1854 (beginning) S
+2394 (+) S
+2502 (4) S
+2610 (*) S
+2718 (middle) S
+3096 (+) S
+3204 (ending) S
+3840 V
+R 3720 V
+3640 V
+3520 V
+EP
+% end of document
+%%Trailer
+%%DocumentFonts: Times-Roman Times-Bold Times-Italic Courier
+%%Pages: 3

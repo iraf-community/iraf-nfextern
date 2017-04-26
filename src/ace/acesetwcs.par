@@ -1,0 +1,27 @@
+# Parameters for the ACESETWCS task
+
+# Input and output files and catalogs
+input,f,a,,,,List of input catalogs
+output,f,a,,,,List of output catalogs (optional)
+database,f,a,,,,The input database file
+solutions,f,a,"",,,The input plate solutions
+catdef,f,h,"",,,Catalog definition file
+
+# The celestial coordinate system parameters
+xref,r,h,INDEF,,,The x reference pixel
+yref,r,h,INDEF,,,The y reference pixel
+xmag,r,h,INDEF,,,The x axis scale in arcsec / pixel
+ymag,r,h,INDEF,,,The y axis scale in arcsec / pixel
+xrotation,r,h,INDEF,,,The x axis rotation angle in degrees
+yrotation,r,h,INDEF,,,The y axis rotation angle in degrees
+lngref,r,h,INDEF,,,The ra / longitude reference coordinate in lngunits
+latref,r,h,INDEF,,,The dec / latitude reference coordinate in latunits
+lngunits,s,h,"",,,The ra / longitude reference coordinate units
+latunits,s,h,"",,,The dec / latitude reference coordinate units
+transpose,b,h,no,,,Transpose the computed image wcs ?
+projection,s,h,"tan",,,The sky projection geometry
+coosystem,s,h,"j2000",,,The celestial coordinate system
+
+# Output and graphics mode parameters
+pixsystem,s,h,"logical","|logical|physical|",,The input pixel coordinate system
+verbose,b,h,yes,,,Print messages about actions taken by the task?

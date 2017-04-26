@@ -1,0 +1,8 @@
+# Root task entry for the package help tree.  Defines <package> as both a
+# task and a package in the help database.
+
+nfextern	men  = nfextern$nfextern.men,
+		hlp  = nfextern$nfextern.men,
+		sys  = nfextern$nfextern.hlp,
+		pkg  = nfextern$nfextern.hd,
+		src  = nfextern$nfextern.cl

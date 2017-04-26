@@ -1,0 +1,27 @@
+# Parameters for ACEPALIGN
+
+icats,s,a,,,,List of input catalogs
+ocats,s,a,,,,List of output single source catalogs
+pcats,s,a,,,,List of output pair catalogs
+bcats,s,a,,,,List of output single aligned pairs catalogs
+acats,s,a,,,,List of output aligned pairs catalogs
+icatdef,s,h,"",,,Input catalog definitions
+ocatdef,s,h,"",,,Output catalog definitions
+pcatdef,s,h,"",,,Output catalog definitions
+bcatdef,s,h,"",,,Output catalog definitions
+acatdef,s,h,"",,,Output catalog definitions
+filter,s,h,"SIG>20&&W>1.2*$FWHM",,,Input catalog filter
+iwindow,i,h,4,,,Image pairing window
+minsep,r,h,10.,,,Min sep or rate
+maxsep,r,h,50.,,,Max sep or rate
+minrate,r,h,10.,,,Min sep or rate
+maxrate,r,h,50.,,,Max sep or rate
+maxdm,r,h,0.5,0.,,Max mag difference (deg)
+maxdw,r,h,1.,0.,,Max FWHM difference
+maxde,r,h,0.15,0.,,Max ellip difference
+maxdp,r,h,5.,,,Max PA difference (deg)
+maxdpp,r,h,5.,,,Max alignment of pair PA difference (deg)
+maxdr,r,h,1.,,,Max rate difference
+align,r,h,0.,,,Pair alignment angle (deg)
+type,s,h,"general","general|image|moving",,Pairing type?
+wempty,b,h,no,,,Write empty catalogs?

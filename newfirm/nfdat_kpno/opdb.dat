@@ -1,0 +1,13 @@
+# NEWFIRM expression database.
+# Copy and modify this if desired.
+
+B	"bias correction"	"($I-$B)"
+D	"dark calibration"	"($I-$D)"
+F	"flat calibration"	"($I/max(0.1,$F))"
+G	"flat calibration"	"($I/max(0.1,$G))"
+L	"linearity correction"	""
+N	"normalize"		"(max(0.1,$I/max(1.0,real(procmean))))"
+P	"persistence"		"%(per(L\I,0.8*S\I,1))"
+R	"replace"		""
+S	"sky subtraction" 	"($I-$S)"
+U	"user" 			"(($I-$D)/max(0.1,$F))"

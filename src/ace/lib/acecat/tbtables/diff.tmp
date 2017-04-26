@@ -1,0 +1,2215 @@
+diff -rbB ./selector/omniread.x /iraf/iraf/pkg/tbtables/selector/omniread.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./selector/rdselect.x /iraf/iraf/pkg/tbtables/selector/rdselect.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+21c19
+< string	badtype  "Unrecognized selector (%s)\n"
+---
+> string	badtype  "Unrecognized selector (%s)"
+diff -rbB ./selector/rst.x /iraf/iraf/pkg/tbtables/selector/rst.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./selector/selrows.x /iraf/iraf/pkg/tbtables/selector/selrows.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./selector/tbcga.x /iraf/iraf/pkg/tbtables/selector/tbcga.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./selector/tbcnel.x /iraf/iraf/pkg/tbtables/selector/tbcnel.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./selector/tcsaddcol.x /iraf/iraf/pkg/tbtables/selector/tcsaddcol.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./selector/tcsclose.x /iraf/iraf/pkg/tbtables/selector/tcsclose.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./selector/tcscolumn.x /iraf/iraf/pkg/tbtables/selector/tcscolumn.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./selector/tcsintinfo.x /iraf/iraf/pkg/tbtables/selector/tcsintinfo.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./selector/tcslinesize.x /iraf/iraf/pkg/tbtables/selector/tcslinesize.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./selector/tcsopen.x /iraf/iraf/pkg/tbtables/selector/tcsopen.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./selector/tcsshape.x /iraf/iraf/pkg/tbtables/selector/tcsshape.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./selector/tcstotsize.x /iraf/iraf/pkg/tbtables/selector/tcstotsize.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./selector/tcstxtinfo.x /iraf/iraf/pkg/tbtables/selector/tcstxtinfo.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./selector/trsclose.x /iraf/iraf/pkg/tbtables/selector/trsclose.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./selector/trseval.x /iraf/iraf/pkg/tbtables/selector/trseval.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./selector/trsgencode.x /iraf/iraf/pkg/tbtables/selector/trsgencode.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./selector/trsopen.x /iraf/iraf/pkg/tbtables/selector/trsopen.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+7a6,7
+> #  Phil Hodge	12-Jul-2005	In trsopen, declare 'debug' to be bool rather
+> #				than int, and add 'int trslex()'
+45c45,46
+< int	fd, debug, jtop
+---
+> int	fd, jtop
+> bool	debug
+49c50
+< data	debug	/ NO /
+---
+> data	debug	/ false /
+53a55
+> int	trslex()
+191c193
+< string	errfmt  "Error in table row selector, %s. Last read: %s\n"
+---
+> string	errfmt  "Error in table row selector, %s. Last read: %s"
+diff -rbB ./selector/trsopen.y /iraf/iraf/pkg/tbtables/selector/trsopen.y
+143c143,144
+< int	fd, debug, jtop
+---
+> int	fd, jtop
+> bool	debug
+147c148
+< data	debug	/ NO /
+---
+> data	debug	/ false /
+151a153
+> int	trslex()
+diff -rbB ./selector/trsrows.x /iraf/iraf/pkg/tbtables/selector/trsrows.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./selector/trstree.x /iraf/iraf/pkg/tbtables/selector/trstree.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./selector/trstrim.x /iraf/iraf/pkg/tbtables/selector/trstrim.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./selector/whatfile.x /iraf/iraf/pkg/tbtables/selector/whatfile.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+6a5,9
+> #
+> # B. Simon,                Original.
+> # Phil Hodge, 22-Feb-2002  Use tbtacc instead of tbtopn to test for a table.
+> # Phil Hodge, 19-Sep-2002  Simplify is_image(), just use tbtacc or imaccess.
+> 
+33a37,45
+> #
+> # Note that a function value of NO does not just mean that the file is not
+> # an image, it means that it _is_ a table.  Note also that while a FITS
+> # primary header or IMAGE extension can be opened as a table (for access
+> # to the header), tbtacc will return NO for such an extension.
+> #
+> # The 'file' argument to this function should be the complete image or
+> # table name, i.e. including FITS extension number or name, or STF group
+> # number.
+39,46c51,52
+< int	image, gindex, gsize
+< pointer	sp, tp, im, fname, root, ext
+< pointer	ksection, section, rowselect, colselect
+< 
+< int	tbtacc(), imaccess(), access(), fnextn()
+< pointer	tbtopn(), immap()
+< 
+< errchk	rdselect
+---
+> int	image
+> int	imaccess(), tbtacc()
+49,87c55
+< 	call smark (sp)
+< 	call salloc (fname, SZ_PATHNAME, TY_CHAR)
+< 	call salloc (root, SZ_PATHNAME, TY_CHAR)
+< 	call salloc (ext, SZ_FNAME, TY_CHAR)
+< 	call salloc (ksection, SZ_FNAME, TY_CHAR)
+< 	call salloc (section, SZ_FNAME, TY_CHAR)
+< 	call salloc (rowselect, SZ_PATHNAME, TY_CHAR)
+< 	call salloc (colselect, SZ_PATHNAME, TY_CHAR)
+< 
+< 	# Remove row and column selectors from file name
+< 
+< 	call rdselect (file, Memc[fname], Memc[rowselect], Memc[colselect], 
+< 		       SZ_PATHNAME)
+< 
+< 	# Remove extension specifier
+< 
+< 	call imparse (Memc[fname], Memc[root], SZ_PATHNAME, Memc[ksection],
+< 		      SZ_FNAME, Memc[section], SZ_FNAME, gindex, gsize)
+< 
+< 	# Check to see if file exists
+< 
+< 	if (access (Memc[root], 0, 0) == NO) {
+< 	    # File does not exist under current name
+< 
+< 	    if (fnextn (Memc[root], Memc[ext], SZ_FNAME) == 0) {
+< 		# The file name does not have an extension, so use
+< 		# tests which add default extensions
+< 
+< 		if (imaccess (Memc[root], READ_ONLY) == YES) {
+< 		    image = YES
+< 		} else {
+< 		    image = ERR
+< 		}
+< 
+< 		call tbtext (Memc[root], Memc[root], SZ_PATHNAME)
+< 		if (tbtacc (Memc[root]) == YES) {
+< 		    if (image == YES) {
+< 			image = ERR
+< 		    } else {
+---
+> 	if (tbtacc (file) == YES)
+89,103c57
+< 		    }
+< 		}
+< 
+< 	    } else {
+< 		# Standard test for image when file does not exist
+< 		# Any name of a non-existent file might be a table
+< 
+< 		image = imaccess (Memc[root], NEW_FILE)
+< 	    }
+< 
+< 	} else if (gindex == 0) {
+< 	    # If the primary header is explicitly specified, open
+< 	    # the file as an image if it maps successfully
+< 
+< 	    ifnoerr (im = immap (Memc[fname], READ_ONLY, NULL)) {
+---
+> 	else if (imaccess (file, READ_ONLY) == YES)
+105,136c59
+< 		call imunmap (im)
+< 
+< 	    } else {
+< 		image = ERR
+< 	    }
+< 
+< 	} else if (gindex == -1) {
+< 	    # The test for images without extensions and images with
+< 	    # explicit extensions is the same except an extra check
+< 	    # is done to see if the primary image contains data
+< 
+< 	    ifnoerr (im = immap (Memc[fname], READ_ONLY, NULL)) {
+< 		image = YES
+< 		call imunmap (im)
+< 
+< 	    } else ifnoerr (tp = tbtopn (Memc[fname], READ_ONLY, NULL)) {
+< 		image = NO
+< 		call tbtclo (tp)
+< 
+< 	    } else {
+< 		image = ERR
+< 	    }
+< 
+< 	    # If a table has a bona fide primary image, it is really
+< 	    # an image written by stwfits with gftoxdim = yes
+< 
+< 	    if (image == NO) {
+< 		call sprintf (Memc[fname], SZ_PATHNAME, "%s[0]")
+< 		call pargstr (Memc[root])
+< 
+< 		ifnoerr (im = immap (Memc[fname], READ_ONLY, NULL)) {
+< 		    if (IM_NDIM(im) > 0)
+---
+> 	else
+139,160c62
+< 		    call imunmap (im)
+< 		}
+< 	    }
+< 
+< 	} else {
+< 	    # If no extension is specified try to open the file both ways
+< 
+< 	    ifnoerr (im = immap (Memc[fname], READ_ONLY, NULL)) {
+< 		image = YES
+< 		call imunmap (im)
+< 
+< 	    } else ifnoerr (tp = tbtopn (Memc[fname], READ_ONLY, NULL)) {
+< 		image = NO
+< 		call tbtclo (tp)
+< 
+< 	    } else {
+< 		image = ERR
+< 	    }
+< 	}
+< 
+< 	call sfree (sp)
+< 	return (image)
+---
+> 	return image
+diff -rbB ./tbagt.x /iraf/iraf/pkg/tbtables/tbagt.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbapt.x /iraf/iraf/pkg/tbtables/tbapt.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbbadf.x /iraf/iraf/pkg/tbtables/tbbadf.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbbaln.x /iraf/iraf/pkg/tbtables/tbbaln.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+48c46
+< 		dlen = SZ_INT
+---
+> 		dlen = SZ_INT32
+diff -rbB ./tbbcmt.x /iraf/iraf/pkg/tbtables/tbbcmt.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbbftp.x /iraf/iraf/pkg/tbtables/tbbftp.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+21c19
+< #	i12.     %012d     integer padded with '0' on the left
+---
+> #	i12.12   %012d     integer padded with '0' on the left
+31a30,31
+> # Phil Hodge, 19-Mar-2003  Check for '.' in Z format, and zero fill at
+> #			left if '.' is found.
+69c69
+<  	if (ftnfmt[1] == 'i' && index > 0) {
+---
+>  	if ((ftnfmt[1] == 'i' || ftnfmt[1] == 'z') && index > 0) {
+diff -rbB ./tbbnll.x /iraf/iraf/pkg/tbtables/tbbnll.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+40c38
+< 	    do k = locn, locn+nchar-SZ_INT, SZ_INT
+---
+> 	    do k = locn, locn+nchar-SZ_INT32, SZ_INT32
+112c110
+< char	cbuf[SZ_INT]		# will be copied to output
+---
+> char	cbuf[SZ_INT32]		# will be copied to output
+118c116
+< 	do i = 1, SZ_INT
+---
+> 	do i = 1, SZ_INT32
+diff -rbB ./tbbptf.x /iraf/iraf/pkg/tbtables/tbbptf.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbbtyp.x /iraf/iraf/pkg/tbtables/tbbtyp.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbbwrd.x /iraf/iraf/pkg/tbtables/tbbwrd.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbcadd.x /iraf/iraf/pkg/tbtables/tbcadd.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+25a24
+> # Phil Hodge, 29-Mar-2001  Set TB_COLUSED equal to TB_ROWLEN for text table.
+95c94
+< 		    TB_COLUSED(tp) = 0		# not useful for text table
+---
+> 		    TB_COLUSED(tp) = TB_ROWLEN(tp)
+diff -rbB ./tbcchg.x /iraf/iraf/pkg/tbtables/tbcchg.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbcdef.x /iraf/iraf/pkg/tbtables/tbcdef.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+38a37
+> # Phil Hodge, 12-Sep-2000  Initialize TB_INDEF_IS_CURRENT to false.
+161a161
+> 	TB_INDEF_IS_CURRENT(tp) = false
+diff -rbB ./tbcdef1.x /iraf/iraf/pkg/tbtables/tbcdef1.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbcdes.x /iraf/iraf/pkg/tbtables/tbcdes.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbcfmt.x /iraf/iraf/pkg/tbtables/tbcfmt.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbcfnd.x /iraf/iraf/pkg/tbtables/tbcfnd.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbcfnd1.x /iraf/iraf/pkg/tbtables/tbcfnd1.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbcftl.x /iraf/iraf/pkg/tbtables/tbcftl.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbcgt.x /iraf/iraf/pkg/tbtables/tbcgt.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+16a15
+> # Phil Hodge, 28-Aug-2002  Use strsearch to check for INDEF in tbcgtt.
+246c245
+< bool	streq()
+---
+> int	strsearch()
+266,267c265,266
+< 		nullflag[i] =
+< 			(buffer[1,i] == EOS || streq (buffer[1,i], "INDEF"))
+---
+> 		nullflag[i] = (buffer[1,i] == EOS ||
+> 			(strsearch (buffer[1,i], "INDEF") > 0))
+diff -rbB ./tbciga.x /iraf/iraf/pkg/tbtables/tbciga.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbcigi.x /iraf/iraf/pkg/tbtables/tbcigi.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbcigt.x /iraf/iraf/pkg/tbtables/tbcigt.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbcinf.x /iraf/iraf/pkg/tbtables/tbcinf.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbcnam.x /iraf/iraf/pkg/tbtables/tbcnam.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbcnit.x /iraf/iraf/pkg/tbtables/tbcnit.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbcnum.x /iraf/iraf/pkg/tbtables/tbcnum.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbcpt.x /iraf/iraf/pkg/tbtables/tbcpt.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbcrcd.x /iraf/iraf/pkg/tbtables/tbcrcd.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+32a31
+> pointer temp			# scratch 
+46a46
+> 	call salloc (temp, SZ_COLNAME, TY_CHAR)
+51a52,54
+> 
+> 	if (SZ_INT == SZ_INT32) {
+> 
+64c68
+< 	# COL_TDTYPE, COL_TSCAL, COL_TZERO are only relevant for FITS tables.
+---
+> 	    # COL_TDTYPE, COL_TSCAL, COL_TZERO are only relevant for FITS tables
+87a92,133
+> 	} else {
+> 	    # Read the first four int values.
+> 	    stat = read (TB_FILE(tp), Memi[coldef], 4 * SZ_INT32)
+> 	    call iupk32 (Memi[coldef], Memi[coldef], 4 * SZ_INT32)
+> 
+> 	    # Copy the column definition that we just read from the file into
+> 	    # the column descriptor in memory.
+> 	    COL_NUMBER(cp) = CD_COL_NUMBER(coldef)
+> 	    COL_OFFSET(cp) = CD_COL_OFFSET(coldef)
+> 	    COL_LEN(cp)    = CD_COL_LEN(coldef)
+> 	    COL_DTYPE(cp)  = CD_COL_DTYPE(coldef)
+> 
+> 	    COL_NELEM(cp)  = tbalen (cp)
+> 	    COL_TDTYPE(cp) = COL_DTYPE(cp)
+> 	    COL_TSCAL(cp)  = 1.d0
+> 	    COL_TZERO(cp)  = 0.d0
+> 
+> 	    # Check for and correct data type TY_CHAR.
+> 	    if (COL_DTYPE(cp) == TBL_TY_CHAR)
+> 	        COL_DTYPE(cp) = -COL_LEN(cp) * SZB_CHAR
+> 
+> 	    call aclrc (Memc[temp], SZ_COLNAME)
+> 	    call aclrc (COL_NAME(cp), SZ_COLNAME)
+> 	    stat = read (TB_FILE(tp), Memc[temp], SZ_CD_COLNAME/SZB_CHAR)
+> 	    call strupk (Memc[temp], COL_NAME(cp), SZ_COLNAME)
+> 
+> 	    call aclrc (Memc[temp], SZ_COLUNITS)
+> 	    call aclrc (COL_UNITS(cp), SZ_COLUNITS)
+> 	    stat = read (TB_FILE(tp), Memc[temp], SZ_CD_COLUNITS/SZB_CHAR)
+> 	    call strupk (Memc[temp], COL_UNITS(cp), SZ_COLUNITS)
+> 
+> 	    call aclrc (Memc[temp], SZ_COLFMT)
+> 	    call aclrc (Memc[pformat], SZ_COLFMT)
+> 	    call aclrc (COL_FMT(cp), SZ_COLFMT)
+> 	    # include a leading '%' in the print format
+> 	    Memc[pformat] = '%'
+> 	    stat = read (TB_FILE(tp), Memc[temp], SZ_CD_COLFMT/SZB_CHAR)
+> 	    call strupk (Memc[temp], Memc[temp], SZ_COLFMT)
+> 	    call strcpy ("%", COL_FMT(cp), SZ_COLFMT)
+> 	    call strcat (Memc[temp], COL_FMT(cp), SZ_COLFMT)
+> 	}
+> 
+143,144c189,190
+< 	    if (clen > SZ_INT)
+< 		value = clen / SZ_INT
+---
+> 	    if (clen > SZ_INT32)
+> 		value = clen / SZ_INT32
+diff -rbB ./tbcscal.x /iraf/iraf/pkg/tbtables/tbcscal.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbctpe.x /iraf/iraf/pkg/tbtables/tbctpe.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbcwcd.x /iraf/iraf/pkg/tbtables/tbcwcd.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+55a54,58
+> 	colnum = COL_NUMBER(cp)
+> 	offset = SZ_SIZINFO +
+> 		TB_MAXPAR(tp) * SZ_PACKED_REC +
+> 		(colnum-1) * SZ_COLDEF + 1
+> 
+67,70c71
+< 	colnum = COL_NUMBER(cp)
+< 	offset = SZ_SIZINFO +
+< 		TB_MAXPAR(tp) * SZ_PACKED_REC +
+< 		(colnum-1) * SZ_COLDEF + 1
+---
+> 	if (SZ_INT == SZ_INT32) {
+73a75,93
+> 	} else {
+> 	    # Write first four members of the struct.
+> 	    call ipak32 (Memi[coldef], Memi[coldef], 4 * SZ_INT)
+> 	    call write (TB_FILE(tp), Memi[coldef], 4 * SZ_INT32)
+> 
+> 	    call aclrc (Memc[temp], SZ_COLNAME)
+> 	    call strpak (COL_NAME(cp), Memc[temp], SZ_CD_COLNAME)
+> 	    call write (TB_FILE(tp), Memc[temp],   SZ_CD_COLNAME/SZB_CHAR)
+> 
+> 	    call aclrc (Memc[temp], SZ_COLNAME)
+> 	    call strpak (COL_UNITS(cp), Memc[temp], SZ_CD_COLUNITS)
+> 	    call write (TB_FILE(tp), Memc[temp], SZ_CD_COLUNITS/SZB_CHAR)
+> 
+> 	    call aclrc (Memc[temp], SZ_COLNAME)
+> 	    call strcpy (COL_FMT(cp), Memc[temp], SZ_COLNAME)
+> 	    call strpak (Memc[temp+1], Memc[temp+1], SZ_CD_COLFMT)
+> 	    call write (TB_FILE(tp), Memc[temp+1], SZ_CD_COLFMT/SZB_CHAR)
+> 	}
+> 
+diff -rbB ./tbdsav.x /iraf/iraf/pkg/tbtables/tbdsav.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbegp.x /iraf/iraf/pkg/tbtables/tbegp.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+79c77
+< 	if (read (TB_FILE(tp), buffer, SZ_INT) < SZ_INT)
+---
+> 	if (read (TB_FILE(tp), buffer, SZ_INT32) < SZ_INT32)
+80a79,80
+> 	if (SZ_INT != SZ_INT32)
+> 	    call iupk32 (buffer, buffer, 1)
+diff -rbB ./tbegt.x /iraf/iraf/pkg/tbtables/tbegt.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbeoff.x /iraf/iraf/pkg/tbtables/tbeoff.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+49c47
+< 		sz_element = SZ_INT
+---
+> 		sz_element = SZ_INT32
+diff -rbB ./tbepp.x /iraf/iraf/pkg/tbtables/tbepp.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+73c71,73
+< 	call write (TB_FILE(tp), buffer, SZ_INT)
+---
+>         if (SZ_INT != SZ_INT32)
+>             call ipak32 (buffer, buffer, 1)
+> 	call write (TB_FILE(tp), buffer, SZ_INT32)
+diff -rbB ./tbept.x /iraf/iraf/pkg/tbtables/tbept.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbeszt.x /iraf/iraf/pkg/tbtables/tbeszt.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbfag.x /iraf/iraf/pkg/tbtables/tbfag.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbfanp.x /iraf/iraf/pkg/tbtables/tbfanp.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbfap.x /iraf/iraf/pkg/tbtables/tbfap.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+12a11,12
+> # Phil Hodge, 27-Aug-2002  In tbfapt, include an explicit test for INDEF,
+> #			rather than relying on 'nscan() < 1'.
+487c487
+< 		    if (nscan() < 1) {
+---
+> 		    if (nscan() < 1 || IS_INDEF(rbuf)) {
+500c500
+< 		    if (nscan() < 1) {
+---
+> 		    if (nscan() < 1 || IS_INDEFD(dbuf)) {
+513c513
+< 		    if (nscan() < 1) {
+---
+> 		    if (nscan() < 1 || IS_INDEFI(ibuf)) {
+526c526
+< 		    if (nscan() < 1) {
+---
+> 		    if (nscan() < 1 || IS_INDEFS(sbuf)) {
+diff -rbB ./tbfcal.x /iraf/iraf/pkg/tbtables/tbfcal.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbfchp.x /iraf/iraf/pkg/tbtables/tbfchp.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbfckn.x /iraf/iraf/pkg/tbtables/tbfckn.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbfclo.x /iraf/iraf/pkg/tbtables/tbfclo.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbfdef.x /iraf/iraf/pkg/tbtables/tbfdef.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbfdel.x /iraf/iraf/pkg/tbtables/tbfdel.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbferr.x /iraf/iraf/pkg/tbtables/tbferr.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbffkw.x /iraf/iraf/pkg/tbtables/tbffkw.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbffmt.x /iraf/iraf/pkg/tbtables/tbffmt.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbffnd.x /iraf/iraf/pkg/tbtables/tbffnd.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+18a17
+> # Phil Hodge, 26-Apr-2002  Allow opening any type of extension.
+79,85d77
+< 	    if (t_hdutype != 1 && t_hdutype != 2) {
+< 		call sprintf (Memc[comment], SZ_LINE, 
+< 			"extension %d in %s is not a table")
+< 		    call pargi (hdu)	# user-interface numbering convention
+< 		    call pargstr (TB_NAME(tp))
+< 		call error (status, Memc[comment])
+< 	    }
+133,136c125
+< 	    if (status == 0) {
+< 		if (t_hdutype != 1 && t_hdutype != 2)
+< 		    next			# no, it's not a table
+< 	    } else if (status == FITS_END_OF_FILE) {
+---
+> 	    if (status == FITS_END_OF_FILE) {
+141c130
+< 	    } else {			# some other error
+---
+> 	    } else if (status != 0) {		# some other error
+diff -rbB ./tbfgcm.x /iraf/iraf/pkg/tbtables/tbfgcm.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbfgnp.x /iraf/iraf/pkg/tbtables/tbfgnp.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbfhdl.x /iraf/iraf/pkg/tbtables/tbfhdl.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbfhg.x /iraf/iraf/pkg/tbtables/tbfhg.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbfhp.x /iraf/iraf/pkg/tbtables/tbfhp.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+7a6,10
+> # These specify the precision to be used for writing floating-point keywords.
+> # The fact that they're negative is a flag to CFITSIO to use g format.
+> define	NDECIMALS_SINGLE	(-7)
+> define	NDECIMALS_DOUBLE	(-15)
+> 
+17a21,24
+> # Phil Hodge, 29-Aug-2000  Change 14 and 6 in tbfhpd and tbfhpr respectively
+> #			to -15 and -7, so cfitsio will use g format.
+> # Phil Hodge, 29-Jan-2002  In tbfhpt, for keyword = blank, sprintf only eight
+> #			spaces before the value, to agree with cfitsio.
+58,59c65,66
+< 		call fsmkyd (TB_FILE(tp), keyword, value, 14, Memc[comment],
+< 			status)
+---
+> 		call fsmkyd (TB_FILE(tp), keyword, value, NDECIMALS_DOUBLE,
+> 			Memc[comment], status)
+66c73,74
+< 	    call fspkyd (TB_FILE(tp), keyword, value, 14, "", status)
+---
+> 	    call fspkyd (TB_FILE(tp), keyword, value, NDECIMALS_DOUBLE,
+> 			"", status)
+115,116c123,124
+< 		call fsmkye (TB_FILE(tp), keyword, value, 6, Memc[comment],
+< 			status)
+---
+> 		call fsmkye (TB_FILE(tp), keyword, value, NDECIMALS_SINGLE,
+> 			Memc[comment], status)
+123c131,132
+< 	    call fspkye (TB_FILE(tp), keyword, value, 6, "", status)
+---
+> 	    call fspkye (TB_FILE(tp), keyword, value, NDECIMALS_SINGLE,
+> 			"", status)
+diff -rbB ./tbfiga.x /iraf/iraf/pkg/tbtables/tbfiga.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbfnam.x /iraf/iraf/pkg/tbtables/tbfnam.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbfnew.x /iraf/iraf/pkg/tbtables/tbfnew.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbfnit.x /iraf/iraf/pkg/tbtables/tbfnit.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbfnll.x /iraf/iraf/pkg/tbtables/tbfnll.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbfopn.x /iraf/iraf/pkg/tbtables/tbfopn.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbfpcm.x /iraf/iraf/pkg/tbtables/tbfpcm.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbfpnp.x /iraf/iraf/pkg/tbtables/tbfpnp.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbfpri.x /iraf/iraf/pkg/tbtables/tbfpri.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbfptf.x /iraf/iraf/pkg/tbtables/tbfptf.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbfrcd.x /iraf/iraf/pkg/tbtables/tbfrcd.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbfres.x /iraf/iraf/pkg/tbtables/tbfres.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbfrsi.x /iraf/iraf/pkg/tbtables/tbfrsi.x
+1,2c1
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+---
+> include <mach.h>	# for SZB_CHAR
+12a12
+> # Phil Hodge, 29-Mar-2001  Assign NAXIS1 / 2 to TB_ROWLEN and TB_COLUSED.
+22a23
+> int	naxis1		# row length in bytes
+33a35,39
+> 	    call fsgkyj (TB_FILE(tp), "NAXIS1",
+> 		    naxis1, Memc[comment], status)
+> 	    if (status != 0)
+> 		call tbferr (status)
+> 
+46a53
+> 	    naxis1 = 0
+54a62,63
+> 	TB_ROWLEN(tp) = (naxis1 + SZB_CHAR-1) / SZB_CHAR
+> 	TB_COLUSED(tp) = TB_ROWLEN(tp)
+56d64
+< 	TB_COLUSED(tp) = 0			# meaningless
+diff -rbB ./tbfscal.x /iraf/iraf/pkg/tbtables/tbfscal.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbfsft.x /iraf/iraf/pkg/tbtables/tbfsft.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbfsiz.x /iraf/iraf/pkg/tbtables/tbfsiz.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbftya.x /iraf/iraf/pkg/tbtables/tbftya.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+59c57
+< 	    len = SZ_INT
+---
+> 	    len = SZ_INT32
+diff -rbB ./tbftyb.x /iraf/iraf/pkg/tbtables/tbftyb.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+76c74
+< 	    len = nelem * SZ_INT
+---
+> 	    len = nelem * SZ_INT32
+diff -rbB ./tbfudf.x /iraf/iraf/pkg/tbtables/tbfudf.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbfwcd.x /iraf/iraf/pkg/tbtables/tbfwcd.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbfwer.x /iraf/iraf/pkg/tbtables/tbfwer.x
+1,2c1
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+---
+> include <mach.h>		# for SZB_CHAR
+13a13,14
+> # Phil Hodge, 25-Aug-2000  Delete the call to fsirow.
+> # Phil Hodge, 12-Sep-2000  Use TB_INDEF for a row of undefined values.
+28a30,34
+> #
+> pointer comment		# for getting NAXIS1
+> int	nbytes		# value of NAXIS1 (length of a row, in bytes)
+> int	nchar		# number of char elements in nbytes
+> #
+33a40,42
+> 	if (new_nrows <= nrows)
+> 	    return			# nothing to do
+> 
+39,42c48,54
+< 	# Create new rows and update NAXIS2.
+< 	if (new_nrows - nrows > 0) {
+< 	    call fsirow (TB_FILE(tp), nrows, new_nrows-nrows, status)
+< 	    if (status > 0)
+---
+> 	if (TB_INDEF_IS_CURRENT(tp)) {
+> 
+> 	    # Write the INDEF record to all the new rows.
+> 	    do row = nrows+1, new_nrows {
+> 		call fsptbb (TB_FILE(tp), row, 1, TB_ROWLEN(tp),
+> 			Memc[TB_INDEF(tp)], status)
+> 		if (status != 0)
+46,47c58,61
+< 	# Set all elements in new rows to INDEF.
+< 	do row = nrows+1, new_nrows {
+---
+> 	} else {
+> 
+> 	    # We don't have a valid INDEF record yet, so explictly write
+> 	    # the undefined values for one row, then read that into TB_INDEF.
+49,50c63,64
+< 	    # Loop over columns
+< 	    do col = 1, TB_NCOLS(tp) {
+---
+> 	    row = nrows + 1
+> 	    do col = 1, TB_NCOLS(tp) {		# loop over columns
+91a106,135
+> 
+> 	    # Allocate memory for TB_INDEF, and read the record that we just
+> 	    # wrote, reading into TB_INDEF.
+> 
+> 	    call salloc (comment, SZ_FNAME, TY_CHAR)
+> 	    call fsrdef (TB_FILE(tp), status)
+> 	    call fsgkyj (TB_FILE(tp), "NAXIS1", nbytes, Memc[comment], status)
+> 	    if (status != 0)
+> 		call tbferr (status)
+> 
+> 	    TB_ROWLEN(tp) = nbytes	# note:  this is the number of BYTES
+> 
+> 	    # round up
+> 	    nchar = (nbytes + SZB_CHAR-1) / (SZB_CHAR)
+> 	    call realloc (TB_INDEF(tp), nchar, TY_CHAR)
+> 	    call fsgtbb (TB_FILE(tp), row, 1, TB_ROWLEN(tp),
+> 			Memc[TB_INDEF(tp)), status)
+> 	    if (status != 0)
+> 		call tbferr (status)
+> 
+> 	    TB_INDEF_IS_CURRENT(tp) = true
+> 
+> 	    # Now that we have the INDEF record in TB_INDEF, write it to
+> 	    # all the other new rows.
+> 	    do row = nrows+2, new_nrows {
+> 		call fsptbb (TB_FILE(tp), row, 1, TB_ROWLEN(tp),
+> 			Memc[TB_INDEF(tp)], status)
+> 		if (status != 0)
+> 		    call tbferr (status)
+> 	    }
+diff -rbB ./tbfwsi.x /iraf/iraf/pkg/tbtables/tbfwsi.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbfxff.c /iraf/iraf/pkg/tbtables/tbfxff.c
+1,2d0
+< /* 	Copyright restrictions apply - see tables$copyright.tables 
+< */ 
+4c2
+< # include <fitsio.h>		/* CFITSIO include file */
+---
+> # include "cfitsio/fitsio.h"	/* CFITSIO include file */
+30c28
+<    NO_UNDERSCORE has been defined (see stsdas$lib/mkpkg.inc).
+---
+>    NO_UNDERSCORE has been defined (see tables$lib/mkpkg.inc).
+36a35
+>    Phil Hodge, 12-Sep-2000  Add fsgtbb and fsptbb.
+82a82,97
+> /* read bytes */
+> void FSGTBB_U (fitsfile **fptr, int *frow, int *felem, int *nbytes,
+> 		short array[], int *status) {
+> 
+> 	ffgtbb (*fptr, (long)*frow, (long)*felem, (long)*nbytes,
+> 		(unsigned char *)array, status);
+> }
+> 
+> /* write bytes */
+> void FSPTBB_U (fitsfile **fptr, int *frow, int *felem, int *nbytes,
+> 		short array[], int *status) {
+> 
+> 	ffptbb (*fptr, (long)*frow, (long)*felem, (long)*nbytes,
+> 		(unsigned char *)array, status);
+> }
+> 
+diff -rbB ./tbhad.x /iraf/iraf/pkg/tbtables/tbhad.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbhanp.x /iraf/iraf/pkg/tbtables/tbhanp.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbhcal.x /iraf/iraf/pkg/tbtables/tbhcal.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbhckn.x /iraf/iraf/pkg/tbtables/tbhckn.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbhdel.x /iraf/iraf/pkg/tbtables/tbhdel.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbhfcm.x /iraf/iraf/pkg/tbtables/tbhfcm.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbhfkr.x /iraf/iraf/pkg/tbtables/tbhfkr.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbhfkw.x /iraf/iraf/pkg/tbtables/tbhfkw.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbhgcm.x /iraf/iraf/pkg/tbtables/tbhgcm.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbhgnp.x /iraf/iraf/pkg/tbtables/tbhgnp.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbhgt.x /iraf/iraf/pkg/tbtables/tbhgt.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbhisc.x /iraf/iraf/pkg/tbtables/tbhisc.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbhkeq.x /iraf/iraf/pkg/tbtables/tbhkeq.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbhpcm.x /iraf/iraf/pkg/tbtables/tbhpcm.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbhpnp.x /iraf/iraf/pkg/tbtables/tbhpnp.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbhpt.x /iraf/iraf/pkg/tbtables/tbhpt.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbhrpr.x /iraf/iraf/pkg/tbtables/tbhrpr.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbhwpr.x /iraf/iraf/pkg/tbtables/tbhwpr.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+100a99
+> 	    call flush (TB_FILE(tp))
+diff -rbB ./tblerr.h /iraf/iraf/pkg/tbtables/tblerr.h
+3,4c3,5
+< # Phil Hodge, 30-Sep-87  Change numbers and reorganize.
+< # Phil Hodge,  2-Jun-89  Remove 4867 from error numbers.
+---
+> # Phil Hodge, 30-Sep-1987  Change numbers and reorganize.
+> # Phil Hodge,  2-Jun-1989  Remove 4867 from error numbers.
+> # Phil Hodge, 22-Oct-2004  Add ER_BYTESWAPPED.
+27a29
+> define	ER_BYTESWAPPED  	85	# table appears to be byte-swapped
+diff -rbB ./tblfits.h /iraf/iraf/pkg/tbtables/tblfits.h
+5c5
+< define	FITS_ORIGIN_CMT	"Tables version 1999-09-07"
+---
+> define	FITS_ORIGIN_CMT	"Tables version 2002-02-22"
+diff -rbB ./tbnopen.x /iraf/iraf/pkg/tbtables/tbnopen.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbnparse.x /iraf/iraf/pkg/tbtables/tbnparse.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbparse.x /iraf/iraf/pkg/tbtables/tbparse.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbpset.x /iraf/iraf/pkg/tbtables/tbpset.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+18a17,18
+> # Phil Hodge, 11-Jul-2003  Return without doing anything when called to
+> #		change the table type of STDOUT or STDERR.
+26a27
+> bool	streq()
+68a70,73
+> 	    # Can't change the type of STDOUT or STDERR.
+> 	    if (streq (TB_NAME(tp), "STDOUT") || streq (TB_NAME(tp), "STDERR"))
+> 		return
+> 	    
+diff -rbB ./tbpsta.x /iraf/iraf/pkg/tbtables/tbpsta.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbrchg.x /iraf/iraf/pkg/tbtables/tbrchg.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbrcmp.x /iraf/iraf/pkg/tbtables/tbrcmp.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbrcpy.x /iraf/iraf/pkg/tbtables/tbrcpy.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbrcsc.x /iraf/iraf/pkg/tbtables/tbrcsc.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbrdel.x /iraf/iraf/pkg/tbtables/tbrdel.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbrgt.x /iraf/iraf/pkg/tbtables/tbrgt.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+15a14
+> # Phil Hodge, 28-Aug-2002  Use strsearch to check for INDEF in tbrgtt.
+241c240
+< bool	streq()
+---
+> int	strsearch()
+256,257c255,256
+< 		nullflag[k] =
+< 			(buffer[1,k] == EOS || streq (buffer[1,k], "INDEF"))
+---
+> 		nullflag[k] = (buffer[1,k] == EOS ||
+> 			(strsearch (buffer[1,k], "INDEF") > 0))
+262,263c261,262
+< 		nullflag[k] =
+< 			(buffer[1,k] == EOS || streq (buffer[1,k], "INDEF"))
+---
+> 		nullflag[k] = (buffer[1,k] == EOS ||
+> 			(strsearch (buffer[1,k], "INDEF") > 0))
+diff -rbB ./tbrnll.x /iraf/iraf/pkg/tbtables/tbrnll.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbrpt.x /iraf/iraf/pkg/tbtables/tbrpt.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbrsft.x /iraf/iraf/pkg/tbtables/tbrsft.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbrswp.x /iraf/iraf/pkg/tbtables/tbrswp.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbrudf.x /iraf/iraf/pkg/tbtables/tbrudf.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbscol.x /iraf/iraf/pkg/tbtables/tbscol.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbsirow.x /iraf/iraf/pkg/tbtables/tbsirow.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbsopn.x /iraf/iraf/pkg/tbtables/tbsopn.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbsrow.x /iraf/iraf/pkg/tbtables/tbsrow.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbswer.x /iraf/iraf/pkg/tbtables/tbswer.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbswer1.x /iraf/iraf/pkg/tbtables/tbswer1.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbtables.h /iraf/iraf/pkg/tbtables/tbtables.h
+30,31c30,31
+< define	LEN_SIZINFO		12		# unit = SZ_INT
+< define	SZ_SIZINFO		(LEN_SIZINFO * SZ_INT)
+---
+> define	LEN_SIZINFO		12		# unit = SZ_INT32
+> define	SZ_SIZINFO		(LEN_SIZINFO * SZ_INT32)
+44c44
+< define	LEN_TBLSTRUCT		(37)
+---
+> define	LEN_TBLSTRUCT		(38)
+61c61,63
+< # tables, while (C) means relevant only for column-ordered tables.
+---
+> # tables, (C) is for column-ordered tables, and (F) is for FITS tables.
+> # For row-ordered tables, TB_ROWLEN is the allocated row length in SPP chars,
+> # while for FITS tables, TB_ROWLEN is the value of NAXIS1, the length in bytes.
+71c73
+< define	TB_ROWLEN		Memi[$1+13]	# (R) row length = chars alloc
+---
+> define	TB_ROWLEN		Memi[$1+13]	# (R,F) row length
+78,83c80,86
+< define	TB_READONLY		Memb[$1+18]	# Readonly?
+< define	TB_MODIFIED		Memb[$1+19]	# Actually been changed?
+< 
+< # Pointers.  TB_INDEF is only used for row-ordered tables.
+< define	TB_INDEF		Memi[$1+20]	# Pointer to indef record buffer
+< define	TB_COLPTR		Memi[$1+21]	# Ptr to array of column ptrs
+---
+> define	TB_READONLY		Memb[$1+18]	# I/O mode is read-only?
+> define	TB_MODIFIED		Memb[$1+19]	# Has table been changed?
+> define	TB_INDEF_IS_CURRENT	Memb[$1+20]	# (F) TB_INDEF is up-to-date?
+> 
+> # Pointers.  TB_INDEF is used for row-ordered tables and FITS tables.
+> define	TB_INDEF		Memi[$1+21]	# Pointer to indef record buffer
+> define	TB_COLPTR		Memi[$1+22]	# Ptr to array of column ptrs
+86,90c89,93
+< define	TB_HDU			Memi[$1+22]	# number of HDU in FITS file
+< define	TB_EXTVER		Memi[$1+23]	# version number
+< define	TB_OVERWRITE		Memi[$1+24]	# +1 --> yes, 0 --> no
+< define	TB_CD			Memi[$1+25]	# returned by cd_open()
+< define	TB_EXTNAME_PTR		Memi[$1+26]	# pointer to EXTNAME
+---
+> define	TB_HDU			Memi[$1+23]	# number of HDU in FITS file
+> define	TB_EXTVER		Memi[$1+24]	# version number
+> define	TB_OVERWRITE		Memi[$1+25]	# +1 --> yes, 0 --> no
+> define	TB_CD			Memi[$1+26]	# returned by cd_open()
+> define	TB_EXTNAME_PTR		Memi[$1+27]	# pointer to EXTNAME
+102,109c105,112
+< define	TB_ROW_SELECT		Memi[$1+27]	# row selection turned on?
+< define	TB_NSEL_ROWS		Memi[$1+28]	# number of selected rows
+< define	TB_ROWSET		Memi[$1+29]	# pointer to row set
+< 
+< define	TB_COLUMN_SELECT	Memi[$1+30]	# column selection turned on?
+< define	TB_NSEL_COLS		Memi[$1+31]	# number of selected columns
+< define	TB_MAX_SELCOLS		Memi[$1+32]	# size of TB_SELCOL_PTR array
+< define	TB_SELCOL_PTR		Memi[$1+33]
+---
+> define	TB_ROW_SELECT		Memi[$1+28]	# row selection turned on?
+> define	TB_NSEL_ROWS		Memi[$1+29]	# number of selected rows
+> define	TB_ROWSET		Memi[$1+30]	# pointer to row set
+> 
+> define	TB_COLUMN_SELECT	Memi[$1+31]	# column selection turned on?
+> define	TB_NSEL_COLS		Memi[$1+32]	# number of selected columns
+> define	TB_MAX_SELCOLS		Memi[$1+33]	# size of TB_SELCOL_PTR array
+> define	TB_SELCOL_PTR		Memi[$1+34]
+113,115c116,118
+< define	TB_COMMENT		Memi[$1+34]	# pointer to comment string
+< define	TB_SZ_COMMENT		Memi[$1+35]	# size of comment string
+< define	TB_KEYLIST_PTR		Memi[$1+36]	# pointer to list of keywords
+---
+> define	TB_COMMENT		Memi[$1+35]	# pointer to comment string
+> define	TB_SZ_COMMENT		Memi[$1+36]	# size of comment string
+> define	TB_KEYLIST_PTR		Memi[$1+37]	# pointer to list of keywords
+164c167
+< define	SZ_COLDEF		(LEN_COLDEF * SZ_STRUCT)
+---
+> define	SZ_COLDEF		(LEN_COLDEF * SZ_STRUCT32)
+diff -rbB ./tbtacc.x /iraf/iraf/pkg/tbtables/tbtacc.x
+1,2c1,2
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+---
+> include <tbset.h>
+> 
+8,9c8,11
+< # function value.  If the open is successful, the table is closed, and YES
+< # is returned.
+---
+> # function value.  If the open is successful, it exists but still might not
+> # be a table (it could be a FITS primary header or IMAGE extension).  We
+> # therefore get the table subtype to check for this.  If the subtype is
+> # image, we return NO; otherwise, we return YES.
+15a18
+> # Phil Hodge, 22-Feb-2002  If tbtopn succeeds, test if subtype is image.
+22a26
+> int	subtype, tbpsta()
+29c33,34
+< 	} else {
+---
+> 	}
+> 	subtype = tbpsta (tp, TBL_SUBTYPE)
+30a36,38
+> 	if (subtype == TBL_SUBTYPE_IMAGE)
+> 	    return (NO)
+> 	else
+32d39
+< 	}
+diff -rbB ./tbtbod.x /iraf/iraf/pkg/tbtables/tbtbod.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbtchs.x /iraf/iraf/pkg/tbtables/tbtchs.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbtclo.x /iraf/iraf/pkg/tbtables/tbtclo.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbtcpy.x /iraf/iraf/pkg/tbtables/tbtcpy.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbtcre.x /iraf/iraf/pkg/tbtables/tbtcre.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbtdel.x /iraf/iraf/pkg/tbtables/tbtdel.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbtext.x /iraf/iraf/pkg/tbtables/tbtext.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbtflu.x /iraf/iraf/pkg/tbtables/tbtflu.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbtfst.x /iraf/iraf/pkg/tbtables/tbtfst.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbtnam.x /iraf/iraf/pkg/tbtables/tbtnam.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbtopn.x /iraf/iraf/pkg/tbtables/tbtopn.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+40a39,41
+> # Phil Hodge, 12-Sep-2000  Initialize TB_INDEF_IS_CURRENT.
+> # Phil Hodge, 13-Nov-2001  Add file name to error message when the file
+> #			cannot be opened; increase buffer size of errmess.
+63c64
+< 	call salloc (errmess, SZ_FNAME, TY_CHAR)
+---
+> 	call salloc (errmess, SZ_LINE, TY_CHAR)
+85c86
+< 			Memc[errmess], SZ_FNAME)
+---
+> 			Memc[errmess], SZ_LINE)
+104c105
+< 			Memc[errmess], SZ_FNAME)
+---
+> 			Memc[errmess], SZ_LINE)
+134a136
+> 	TB_INDEF_IS_CURRENT(tp) = false
+147a150,152
+> 		call sprintf (Memc[errmess], SZ_LINE,
+> 			"Table `%s' does not exist or cannot be opened.")
+> 		    call pargstr (TB_OS_FILENAME(tp))
+152,153c157
+< 		call error (1,
+< 		"tbtopn:  Table file does not exist or cannot be opened.")
+---
+> 		call error (1, Memc[errmess])
+diff -rbB ./tbtopns.x /iraf/iraf/pkg/tbtables/tbtopns.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+35a34
+> # Phil Hodge, 12-Sep-2000  Initialize TB_INDEF_IS_CURRENT.
+126a126
+> 	TB_INDEF_IS_CURRENT(tp) = false
+198a199,200
+>         if (SZ_INT != SZ_INT32)
+>             call iupk32 (sizinfo, sizinfo, SZ_SIZINFO)
+256a259,260
+> 	if (SZ_INT != SZ_INT32)
+> 	    call iupk32 (Memi[coldef], Memi[coldef], SZ_COLDEF)
+259c263
+< 	call bswap4 (Memi[coldef], 1, Memi[coldef], 1, 4*SZ_INT*SZB_CHAR)
+---
+> 	call bswap4 (Memi[coldef], 1, Memi[coldef], 1, 4*SZ_INT32*SZB_CHAR)
+diff -rbB ./tbtren.x /iraf/iraf/pkg/tbtables/tbtren.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbtrsi.x /iraf/iraf/pkg/tbtables/tbtrsi.x
+1,2c1
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+---
+> include <mach.h>
+19a19,20
+> # Phil Hodge, 22-Oct-2004  Check for byte-swapped size information record,
+> #		in order to give a more informative error message.
+44a46,47
+>         if (SZ_INT != SZ_INT32)
+>             call iupk32 (sizinfo, sizinfo, SZ_SIZINFO)
+48c51,58
+< 	    (TB_TYPE(tp) != TBL_TYPE_S_COL))
+---
+> 	    (TB_TYPE(tp) != TBL_TYPE_S_COL)) {
+> 	    # Check whether sizinfo is just byte swapped.
+> 	    call bswap4 (sizinfo, 1, sizinfo, 1, SZ_SIZINFO*SZB_CHAR)
+> 	    if ((S_TYPE(sizinfo) == TBL_TYPE_S_ROW) ||
+> 		(S_TYPE(sizinfo) == TBL_TYPE_S_COL)) {
+> 		call error (ER_BYTESWAPPED,
+> 			"can't open table, it appears to be byte-swapped")
+> 	    } else {
+49a60,61
+> 	    }
+> 	}
+diff -rbB ./tbtscd.x /iraf/iraf/pkg/tbtables/tbtscd.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbtscu.x /iraf/iraf/pkg/tbtables/tbtscu.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbtsrt.x /iraf/iraf/pkg/tbtables/tbtsrt.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbttyp.x /iraf/iraf/pkg/tbtables/tbttyp.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+39c37,43
+< # column-ordered.  The software version number is also checked.
+---
+> # column-ordered.  If that element is neither 11 nor 12, the size-info
+> # record will be byte-swapped (into a scratch array) to check for the
+> # possibility that the table is STSDAS format but was created on a
+> # machine with different byte order.  If the byte-swapped value is either
+> # 11 or 12, the table type will be set accordingly; that is, the fact that
+> # the table is byte swapped is not taken to be an error (this can be
+> # handled later by e.g. tbtrsi).
+52a57
+> # Phil Hodge, 22-Oct-2004  Check for byte-swapped size information record.
+86a92
+> int	b_sizinfo[LEN_SIZINFO]	# byte-swapped size information record
+191c197,199
+< 		if (S_TYPE(i_sizinfo) == TBL_TYPE_S_ROW)
+---
+> 		if (SZ_INT != SZ_INT32)
+> 		    call iupk32 (i_sizinfo, i_sizinfo, LEN_SIZINFO)
+> 		if (S_TYPE(i_sizinfo) == TBL_TYPE_S_ROW) {
+193c201
+< 		else if (S_TYPE(i_sizinfo) == TBL_TYPE_S_COL)
+---
+> 		} else if (S_TYPE(i_sizinfo) == TBL_TYPE_S_COL) {
+194a203,213
+> 		} else {
+> 		    # Check whether i_sizinfo is byte swapped.  If so, set
+> 		    # the table type if it matches row or column.  Note that
+> 		    # this is not considered an error (at this point).
+> 		    call bswap4 (i_sizinfo, 1, b_sizinfo, 1,
+> 					SZ_SIZINFO*SZB_CHAR)
+> 		    if (S_TYPE(b_sizinfo) == TBL_TYPE_S_ROW)
+> 			ttype = TBL_TYPE_S_ROW
+> 		    if (S_TYPE(b_sizinfo) == TBL_TYPE_S_COL)
+> 			ttype = TBL_TYPE_S_COL
+> 		}
+diff -rbB ./tbtwer.x /iraf/iraf/pkg/tbtables/tbtwer.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbtwsi.x /iraf/iraf/pkg/tbtables/tbtwsi.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+53a52,53
+>         if (SZ_INT != SZ_INT32)
+>             call ipak32 (sizinfo, sizinfo, SZ_SIZINFO)
+diff -rbB ./tbuopn.x /iraf/iraf/pkg/tbtables/tbuopn.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbxag.x /iraf/iraf/pkg/tbtables/tbxag.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+71c69
+< 		    if (read (TB_FILE(tp), ibuf, SZ_INT) < SZ_INT)
+---
+> 		    if (read (TB_FILE(tp), ibuf, SZ_INT32) < SZ_INT32)
+72a71,72
+> 		    if (SZ_INT != SZ_INT32)
+> 			call iupk32 (ibuf, ibuf, 1)
+169c169
+< 		    if (read (TB_FILE(tp), ibuf, SZ_INT) < SZ_INT)
+---
+> 		    if (read (TB_FILE(tp), ibuf, SZ_INT32) < SZ_INT32)
+170a171,172
+>                     if (SZ_INT != SZ_INT32)
+>                         call iupk32 (ibuf, ibuf, 1)
+253c255
+< 	    nchar = nret * SZ_INT
+---
+> 	    nchar = nret * SZ_INT32
+380c382
+< 		    if (read (TB_FILE(tp), ibuf, SZ_INT) < SZ_INT)
+---
+> 		    if (read (TB_FILE(tp), ibuf, SZ_INT32) < SZ_INT32)
+381a384,385
+>                     if (SZ_INT != SZ_INT32)
+>                         call iupk32 (ibuf, ibuf, 1)
+480c484
+< 		    if (read (TB_FILE(tp), ibuf, SZ_INT) < SZ_INT)
+---
+> 		    if (read (TB_FILE(tp), ibuf, SZ_INT32) < SZ_INT32)
+481a486,487
+>                     if (SZ_INT != SZ_INT32)
+>                         call iupk32 (ibuf, ibuf, 1)
+580c586
+< 		    if (read (TB_FILE(tp), ibuf, SZ_INT) < SZ_INT)
+---
+> 		    if (read (TB_FILE(tp), ibuf, SZ_INT32) < SZ_INT32)
+581a588,589
+>                     if (SZ_INT != SZ_INT32)
+>                         call iupk32 (ibuf, ibuf, 1)
+diff -rbB ./tbxap.x /iraf/iraf/pkg/tbtables/tbxap.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+151c149,151
+< 		    call write (TB_FILE(tp), ibuf, SZ_INT)
+---
+> 		    if (SZ_INT != SZ_INT32)
+> 			call ipak32 (ibuf, ibuf, 1)
+> 		    call write (TB_FILE(tp), ibuf, SZ_INT32)
+271c271,273
+< 		    call write (TB_FILE(tp), ibuf, SZ_INT)
+---
+> 		    if (SZ_INT != SZ_INT32)
+> 			call ipak32 (ibuf, ibuf, 1)
+> 		    call write (TB_FILE(tp), ibuf, SZ_INT32)
+324c326
+< int	nchar		# number of char to write (= nelem * SZ_INT)
+---
+> int	nchar		# number of char to write (= nelem * SZ_INT32)
+339c341
+< 	nchar = nelem * SZ_INT
+---
+> 	nchar = nelem * SZ_INT32
+392c394
+< 		call write (TB_FILE(tp), buffer, nelem * SZ_INT)
+---
+> 		call write (TB_FILE(tp), buffer, nelem * SZ_INT32)
+517c519,521
+< 		    call write (TB_FILE(tp), ibuf, SZ_INT)
+---
+> 		    if (SZ_INT != SZ_INT32)
+> 			call ipak32 (ibuf, ibuf, 1)
+> 		    call write (TB_FILE(tp), ibuf, SZ_INT32)
+637c641,643
+< 		    call write (TB_FILE(tp), ibuf, SZ_INT)
+---
+> 		    if (SZ_INT != SZ_INT32)
+> 			call ipak32 (ibuf, ibuf, 1)
+> 		    call write (TB_FILE(tp), ibuf, SZ_INT32)
+744c750,752
+< 		    call write (TB_FILE(tp), ibuf, SZ_INT)
+---
+> 		    if (SZ_INT != SZ_INT32)
+> 			call ipak32 (ibuf, ibuf, 1)
+> 		    call write (TB_FILE(tp), ibuf, SZ_INT32)
+diff -rbB ./tbxcg.x /iraf/iraf/pkg/tbtables/tbxcg.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+21a20,21
+> # Phil Hodge, 27-Aug-2002  In tbxcgi and tbxcgs, include an explicit test
+> #	for INDEF, rather than relying on a test on abs (dblbuf).
+83c83,85
+< 		stat = read (TB_FILE(tp), intbuf, SZ_INT)
+---
+> 		stat = read (TB_FILE(tp), intbuf, SZ_INT32)
+>                 if (SZ_INT != SZ_INT32)
+>                     call iupk32 (intbuf, intbuf, 1)
+205c207,209
+< 		stat = read (TB_FILE(tp), intbuf, SZ_INT)
+---
+> 		stat = read (TB_FILE(tp), intbuf, SZ_INT32)
+>                 if (SZ_INT != SZ_INT32)
+>                     call iupk32 (intbuf, intbuf, 1)
+318c322,324
+< 		stat = read (TB_FILE(tp), intbuf, SZ_INT)
+---
+> 		stat = read (TB_FILE(tp), intbuf, SZ_INT32)
+>                 if (SZ_INT != SZ_INT32)
+>                     call iupk32 (intbuf, intbuf, 1)
+437c443,445
+< 		stat = read (TB_FILE(tp), buffer[k], SZ_INT)
+---
+> 		stat = read (TB_FILE(tp), buffer[k], SZ_INT32)
+>                 if (SZ_INT != SZ_INT32)
+>                     call iupk32 (buffer[k], buffer[k], 1)
+474c482,483
+< 		    if (nscan() < 1 || abs (dblbuf) > MAX_INT) {
+---
+> 		    if (nscan() < 1 || IS_INDEFD(dblbuf) ||
+> 				abs (dblbuf) > MAX_INT) {
+553c562,564
+< 		stat = read (TB_FILE(tp), intbuf, SZ_INT)
+---
+> 		stat = read (TB_FILE(tp), intbuf, SZ_INT32)
+>                 if (SZ_INT != SZ_INT32)
+>                     call iupk32 (intbuf, intbuf, 1)
+590c601,602
+< 		    if (nscan() < 1 || abs (dblbuf) > MAX_SHORT) {
+---
+> 		    if (nscan() < 1 || IS_INDEFD(dblbuf) ||
+> 				abs (dblbuf) > MAX_SHORT) {
+670c682,684
+< 		stat = read (TB_FILE(tp), intbuf, SZ_INT)
+---
+> 		stat = read (TB_FILE(tp), intbuf, SZ_INT32)
+>                 if (SZ_INT != SZ_INT32)
+>                     call iupk32 (intbuf, intbuf, 1)
+diff -rbB ./tbxcp.x /iraf/iraf/pkg/tbtables/tbxcp.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+18a17,18
+> # Phil Hodge, 27-Aug-2002  In tbxcpi and tbxcps, include an explicit test
+> #	for INDEF, rather than relying on a test on abs (dblbuf).
+75c75,77
+< 		call write (TB_FILE(tp), intbuf, SZ_INT)
+---
+> 		if (SZ_INT != SZ_INT32)
+> 		    call ipak32 (intbuf, intbuf, 1)
+> 		call write (TB_FILE(tp), intbuf, SZ_INT32)
+172c174,176
+< 		call write (TB_FILE(tp), intbuf, SZ_INT)
+---
+> 		if (SZ_INT != SZ_INT32)
+> 		    call ipak32 (intbuf, intbuf, 1)
+> 		call write (TB_FILE(tp), intbuf, SZ_INT32)
+268c272,274
+< 		call write (TB_FILE(tp), intbuf, SZ_INT)
+---
+> 		if (SZ_INT != SZ_INT32)
+> 		    call ipak32 (intbuf, intbuf, 1)
+> 		call write (TB_FILE(tp), intbuf, SZ_INT32)
+364c370,372
+< 		call write (TB_FILE(tp), buffer[k], SZ_INT)
+---
+> 		if (SZ_INT != SZ_INT32)
+> 		    call ipak32 (buffer[k], buffer[k], 1)
+> 		call write (TB_FILE(tp), buffer[k], SZ_INT32)
+464c472,474
+< 		call write (TB_FILE(tp), intbuf, SZ_INT)
+---
+> 		if (SZ_INT != SZ_INT32)
+> 		    call ipak32 (intbuf, intbuf, 1)
+> 		call write (TB_FILE(tp), intbuf, SZ_INT32)
+563c573,574
+< 		if (nscan() < 1 || abs (dblbuf) > MAX_INT)
+---
+> 		if (nscan() < 1 || IS_INDEFD(dblbuf) ||
+> 				abs (dblbuf) > MAX_INT) {
+565c576
+< 		else
+---
+> 		} else {
+567c578,581
+< 		call write (TB_FILE(tp), intbuf, SZ_INT)
+---
+> 		}
+> 		if (SZ_INT != SZ_INT32)
+> 		    call ipak32 (intbuf, intbuf, 1)
+> 		call write (TB_FILE(tp), intbuf, SZ_INT32)
+575c589,590
+< 		if (nscan() < 1 || abs (dblbuf) > MAX_SHORT)
+---
+> 		if (nscan() < 1 || IS_INDEFD(dblbuf) ||
+> 				abs (dblbuf) > MAX_SHORT) {
+577c592
+< 		else
+---
+> 		} else {
+578a594
+> 		}
+diff -rbB ./tbxncn.x /iraf/iraf/pkg/tbtables/tbxncn.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbxnew.x /iraf/iraf/pkg/tbtables/tbxnew.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbxnll.x /iraf/iraf/pkg/tbtables/tbxnll.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbxoff.x /iraf/iraf/pkg/tbtables/tbxoff.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbxrg.x /iraf/iraf/pkg/tbtables/tbxrg.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+22a21,22
+> # Phil Hodge, 27-Aug-2002  In tbxrgi and tbxrgs, include an explicit test
+> #	for INDEF, rather than relying on a test on abs (dblbuf).
+76c76,78
+< 		stat = read (TB_FILE(tp), intbuf, SZ_INT)
+---
+> 		stat = read (TB_FILE(tp), intbuf, SZ_INT32)
+>                 if (SZ_INT != SZ_INT32)
+>                     call iupk32 (intbuf, intbuf, 1)
+178c180,182
+< 		stat = read (TB_FILE(tp), intbuf, SZ_INT)
+---
+> 		stat = read (TB_FILE(tp), intbuf, SZ_INT32)
+>                 if (SZ_INT != SZ_INT32)
+>                     call iupk32 (intbuf, intbuf, 1)
+269c273,275
+< 		stat = read (TB_FILE(tp), intbuf, SZ_INT)
+---
+> 		stat = read (TB_FILE(tp), intbuf, SZ_INT32)
+>                 if (SZ_INT != SZ_INT32)
+>                     call iupk32 (intbuf, intbuf, 1)
+368c374,376
+< 		stat = read (TB_FILE(tp), buffer[k], SZ_INT)
+---
+> 		stat = read (TB_FILE(tp), buffer[k], SZ_INT32)
+>                 if (SZ_INT != SZ_INT32)
+>                     call iupk32 (buffer[k], buffer[k], 1)
+392c400,401
+< 		    if (nscan() < 1 || abs (dblbuf) > MAX_INT) {
+---
+> 		    if (nscan() < 1 || IS_INDEFD(dblbuf) ||
+> 				abs (dblbuf) > MAX_INT) {
+465c474,476
+< 		stat = read (TB_FILE(tp), intbuf, SZ_INT)
+---
+> 		stat = read (TB_FILE(tp), intbuf, SZ_INT32)
+>                 if (SZ_INT != SZ_INT32)
+>                     call iupk32 (intbuf, intbuf, 1)
+489c500,501
+< 		    if (nscan() < 1 || abs (dblbuf) > MAX_SHORT) {
+---
+> 		    if (nscan() < 1 || IS_INDEFD(dblbuf) ||
+> 				abs (dblbuf) > MAX_SHORT) {
+561c573,575
+< 		stat = read (TB_FILE(tp), intbuf, SZ_INT)
+---
+> 		stat = read (TB_FILE(tp), intbuf, SZ_INT32)
+>                 if (SZ_INT != SZ_INT32)
+>                     call iupk32 (intbuf, intbuf, 1)
+diff -rbB ./tbxrp.x /iraf/iraf/pkg/tbtables/tbxrp.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+22a21,22
+> # Phil Hodge, 27-Aug-2002  In tbxrpi and tbxrps, include an explicit test
+> #	for INDEF, rather than relying on a test on abs (dblbuf).
+142c142,144
+< 		    call write (TB_FILE(tp), intbuf, SZ_INT)
+---
+>                     if (SZ_INT != SZ_INT32)
+>                         call ipak32 (intbuf, intbuf, 1)
+> 		    call write (TB_FILE(tp), intbuf, SZ_INT32)
+293c295,297
+< 		    call write (TB_FILE(tp), intbuf, SZ_INT)
+---
+>                     if (SZ_INT != SZ_INT32)
+>                         call ipak32 (intbuf, intbuf, 1)
+> 		    call write (TB_FILE(tp), intbuf, SZ_INT32)
+439c443,445
+< 		    call write (TB_FILE(tp), intbuf, SZ_INT)
+---
+>                     if (SZ_INT != SZ_INT32)
+>                         call ipak32 (intbuf, intbuf, 1)
+> 		    call write (TB_FILE(tp), intbuf, SZ_INT32)
+585c591,593
+< 		    call write (TB_FILE(tp), buffer[k], SZ_INT)
+---
+>                     if (SZ_INT != SZ_INT32)
+>                         call ipak32 (buffer[k], buffer[k], 1)
+> 		    call write (TB_FILE(tp), buffer[k], SZ_INT32)
+735c743,745
+< 		    call write (TB_FILE(tp), intbuf, SZ_INT)
+---
+>                     if (SZ_INT != SZ_INT32)
+>                         call ipak32 (intbuf, intbuf, 1)
+> 		    call write (TB_FILE(tp), intbuf, SZ_INT32)
+823c833,834
+< 		    if (nscan() < 1 || abs (dblbuf) > MAX_INT)
+---
+> 		    if (nscan() < 1 || IS_INDEFD(dblbuf) ||
+> 				abs (dblbuf) > MAX_INT) {
+825c836
+< 		    else
+---
+> 		    } else {
+826a838
+> 		    }
+831c843,844
+< 		    if (nscan() < 1 || abs (dblbuf) > MAX_SHORT)
+---
+> 		    if (nscan() < 1 || IS_INDEFD(dblbuf) ||
+> 				abs (dblbuf) > MAX_SHORT) {
+833c846
+< 		    else
+---
+> 		    } else {
+834a848
+> 		    }
+893c907,908
+< 		    if (nscan() < 1 || abs (dblbuf) > MAX_INT)
+---
+> 		    if (nscan() < 1 || IS_INDEFD(dblbuf) ||
+> 				abs (dblbuf) > MAX_INT) {
+895c910
+< 		    else
+---
+> 		    } else {
+897c912,915
+< 		    call write (TB_FILE(tp), intbuf, SZ_INT)
+---
+> 		    }
+>                     if (SZ_INT != SZ_INT32)
+>                         call ipak32 (intbuf, intbuf, 1)
+> 		    call write (TB_FILE(tp), intbuf, SZ_INT32)
+901c919,920
+< 		    if (nscan() < 1 || abs (dblbuf) > MAX_SHORT)
+---
+> 		    if (nscan() < 1 || IS_INDEFD(dblbuf) ||
+> 				abs (dblbuf) > MAX_SHORT) {
+903c922
+< 		    else
+---
+> 		    } else {
+904a924
+> 		    }
+diff -rbB ./tbxscp.x /iraf/iraf/pkg/tbtables/tbxscp.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbxsft.x /iraf/iraf/pkg/tbtables/tbxsft.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbxsiz.x /iraf/iraf/pkg/tbtables/tbxsiz.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbxudf.x /iraf/iraf/pkg/tbtables/tbxudf.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbxwer.x /iraf/iraf/pkg/tbtables/tbxwer.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbxwnc.x /iraf/iraf/pkg/tbtables/tbxwnc.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbycg.x /iraf/iraf/pkg/tbtables/tbycg.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+18a17,18
+> # Phil Hodge, 27-Aug-2002  In tbycgi and tbycgs, include an explicit test
+> #	for INDEF, rather than relying on a test on abs (dblbuf).
+81c81,83
+< 		stat = read (TB_FILE(tp), intbuf, SZ_INT)
+---
+> 		stat = read (TB_FILE(tp), intbuf, SZ_INT32)
+>                 if (SZ_INT != SZ_INT32)
+>                     call iupk32 (intbuf, intbuf, 1)
+200c202,204
+< 		stat = read (TB_FILE(tp), intbuf, SZ_INT)
+---
+> 		stat = read (TB_FILE(tp), intbuf, SZ_INT32)
+>                 if (SZ_INT != SZ_INT32)
+>                     call iupk32 (intbuf, intbuf, 1)
+315c319,321
+< 		stat = read (TB_FILE(tp), intbuf, SZ_INT)
+---
+> 		stat = read (TB_FILE(tp), intbuf, SZ_INT32)
+>                 if (SZ_INT != SZ_INT32)
+>                     call iupk32 (intbuf, intbuf, 1)
+436c442,444
+< 	    stat = read (TB_FILE(tp), buffer, nrows*SZ_INT)
+---
+> 	    stat = read (TB_FILE(tp), buffer, nrows*SZ_INT32)
+>             if (SZ_INT != SZ_INT32)
+>                 call iupk32 (buffer, buffer, nrows)
+472c480,481
+< 		    if (nscan() < 1 || abs (dblbuf) > MAX_INT) {
+---
+> 		    if (nscan() < 1 || IS_INDEFD(dblbuf) ||
+> 				abs (dblbuf) > MAX_INT) {
+553c562,564
+< 		stat = read (TB_FILE(tp), intbuf, SZ_INT)
+---
+> 		stat = read (TB_FILE(tp), intbuf, SZ_INT32)
+>                 if (SZ_INT != SZ_INT32)
+>                     call iupk32 (intbuf, intbuf, 1)
+589c600,601
+< 		    if (nscan() < 1 || abs (dblbuf) > MAX_SHORT) {
+---
+> 		    if (nscan() < 1 || IS_INDEFD(dblbuf) ||
+> 				abs (dblbuf) > MAX_SHORT) {
+676c688,690
+< 		stat = read (TB_FILE(tp), intbuf, SZ_INT)
+---
+> 		stat = read (TB_FILE(tp), intbuf, SZ_INT32)
+>                 if (SZ_INT != SZ_INT32)
+>                     call iupk32 (intbuf, intbuf, 1)
+diff -rbB ./tbycp.x /iraf/iraf/pkg/tbtables/tbycp.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+75c73,75
+< 		call write (TB_FILE(tp), intbuf, SZ_INT)
+---
+>                 if (SZ_INT != SZ_INT32)
+>                     call ipak32 (intbuf, intbuf, 1)
+> 		call write (TB_FILE(tp), intbuf, SZ_INT32)
+167c167,169
+< 		call write (TB_FILE(tp), intbuf, SZ_INT)
+---
+>                 if (SZ_INT != SZ_INT32)
+>                     call ipak32 (intbuf, intbuf, 1)
+> 		call write (TB_FILE(tp), intbuf, SZ_INT32)
+260c262,264
+< 		call write (TB_FILE(tp), intbuf, SZ_INT)
+---
+>                 if (SZ_INT != SZ_INT32)
+>                     call ipak32 (intbuf, intbuf, 1)
+> 		call write (TB_FILE(tp), intbuf, SZ_INT32)
+355c359,361
+< 	    call write (TB_FILE(tp), buffer, nrows*SZ_INT)
+---
+>             if (SZ_INT != SZ_INT32)
+>                 call ipak32 (buffer, buffer, nrows)
+> 	    call write (TB_FILE(tp), buffer, nrows*SZ_INT32)
+453c459,461
+< 		call write (TB_FILE(tp), intbuf, SZ_INT)
+---
+>                 if (SZ_INT != SZ_INT32)
+>                     call ipak32 (intbuf, intbuf, 1)
+> 		call write (TB_FILE(tp), intbuf, SZ_INT32)
+549c557,559
+< 		call write (TB_FILE(tp), intbuf, SZ_INT)
+---
+>                 if (SZ_INT != SZ_INT32)
+>                     call ipak32 (intbuf, intbuf, 1)
+> 		call write (TB_FILE(tp), intbuf, SZ_INT32)
+diff -rbB ./tbyncn.x /iraf/iraf/pkg/tbtables/tbyncn.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbynew.x /iraf/iraf/pkg/tbtables/tbynew.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbynll.x /iraf/iraf/pkg/tbtables/tbynll.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbyoff.x /iraf/iraf/pkg/tbtables/tbyoff.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbyrg.x /iraf/iraf/pkg/tbtables/tbyrg.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+20a19,20
+> # Phil Hodge, 27-Aug-2002  In tbyrgi and tbyrgs, include an explicit test
+> #	for INDEF, rather than relying on a test on abs (dblbuf).
+70c70,72
+< 		stat = read (TB_FILE(tp), intbuf, SZ_INT)
+---
+> 		stat = read (TB_FILE(tp), intbuf, SZ_INT32)
+>                 if (SZ_INT != SZ_INT32)
+>                     call iupk32 (intbuf, intbuf, 1)
+166c168,170
+< 		stat = read (TB_FILE(tp), intbuf, SZ_INT)
+---
+> 		stat = read (TB_FILE(tp), intbuf, SZ_INT32)
+>                 if (SZ_INT != SZ_INT32)
+>                     call iupk32 (intbuf, intbuf, 1)
+253c257,259
+< 		stat = read (TB_FILE(tp), intbuf, SZ_INT)
+---
+> 		stat = read (TB_FILE(tp), intbuf, SZ_INT32)
+>                 if (SZ_INT != SZ_INT32)
+>                     call iupk32 (intbuf, intbuf, 1)
+346c352,354
+< 		stat = read (TB_FILE(tp), buffer[k], SZ_INT)
+---
+> 		stat = read (TB_FILE(tp), buffer[k], SZ_INT32)
+>                 if (SZ_INT != SZ_INT32)
+>                     call iupk32 (buffer[k], buffer[k], 1)
+370c378,379
+< 		    if (nscan() < 1 || abs (dblbuf) > MAX_INT) {
+---
+> 		    if (nscan() < 1 || IS_INDEFD(dblbuf) ||
+> 				abs (dblbuf) > MAX_INT) {
+437c446,448
+< 		stat = read (TB_FILE(tp), intbuf, SZ_INT)
+---
+> 		stat = read (TB_FILE(tp), intbuf, SZ_INT32)
+>                 if (SZ_INT != SZ_INT32)
+>                     call iupk32 (intbuf, intbuf, 1)
+461c472,473
+< 		    if (nscan() < 1 || abs (dblbuf) > MAX_SHORT) {
+---
+> 		    if (nscan() < 1 || IS_INDEFD(dblbuf) ||
+> 				abs (dblbuf) > MAX_SHORT) {
+529c541,543
+< 		stat = read (TB_FILE(tp), intbuf, SZ_INT)
+---
+> 		stat = read (TB_FILE(tp), intbuf, SZ_INT32)
+>                 if (SZ_INT != SZ_INT32)
+>                     call iupk32 (intbuf, intbuf, 1)
+diff -rbB ./tbyrp.x /iraf/iraf/pkg/tbtables/tbyrp.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+63c61,63
+< 		call write (TB_FILE(tp), intbuf, SZ_INT)
+---
+>                 if (SZ_INT != SZ_INT32)
+>                     call ipak32 (intbuf, intbuf, 1)
+> 		call write (TB_FILE(tp), intbuf, SZ_INT32)
+134c134,136
+< 		call write (TB_FILE(tp), intbuf, SZ_INT)
+---
+>                 if (SZ_INT != SZ_INT32)
+>                     call ipak32 (intbuf, intbuf, 1)
+> 		call write (TB_FILE(tp), intbuf, SZ_INT32)
+204c206,208
+< 		call write (TB_FILE(tp), intbuf, SZ_INT)
+---
+>                 if (SZ_INT != SZ_INT32)
+>                     call ipak32 (intbuf, intbuf, 1)
+> 		call write (TB_FILE(tp), intbuf, SZ_INT32)
+274c278,280
+< 		call write (TB_FILE(tp), buffer[k], SZ_INT)
+---
+>                 if (SZ_INT != SZ_INT32)
+>                     call ipak32 (buffer[k], buffer[k], 1)
+> 		call write (TB_FILE(tp), buffer[k], SZ_INT32)
+348c354,356
+< 		call write (TB_FILE(tp), intbuf, SZ_INT)
+---
+>                 if (SZ_INT != SZ_INT32)
+>                     call ipak32 (intbuf, intbuf, 1)
+> 		call write (TB_FILE(tp), intbuf, SZ_INT32)
+423c431,433
+< 		call write (TB_FILE(tp), intbuf, SZ_INT)
+---
+>                 if (SZ_INT != SZ_INT32)
+>                     call ipak32 (intbuf, intbuf, 1)
+> 		call write (TB_FILE(tp), intbuf, SZ_INT32)
+diff -rbB ./tbyscn.x /iraf/iraf/pkg/tbtables/tbyscn.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbyscp.x /iraf/iraf/pkg/tbtables/tbyscp.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+46c44
+< 	sbufsiz = LEN_SIZINFO				# unit = SZ_INT
+---
+> 	sbufsiz = LEN_SIZINFO				# unit = SZ_INT32
+57a56,57
+>         if (SZ_INT != SZ_INT32)
+>              call ipak32 (Memr[sbuf], Memr[sbuf], SZ_SIZINFO)
+diff -rbB ./tbysft.x /iraf/iraf/pkg/tbtables/tbysft.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbysiz.x /iraf/iraf/pkg/tbtables/tbysiz.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbyudf.x /iraf/iraf/pkg/tbtables/tbyudf.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbywer.x /iraf/iraf/pkg/tbtables/tbywer.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbywnc.x /iraf/iraf/pkg/tbtables/tbywnc.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbzadd.x /iraf/iraf/pkg/tbtables/tbzadd.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbzcg.x /iraf/iraf/pkg/tbtables/tbzcg.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbzclo.x /iraf/iraf/pkg/tbtables/tbzclo.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbzcol.x /iraf/iraf/pkg/tbtables/tbzcol.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbzcp.x /iraf/iraf/pkg/tbtables/tbzcp.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbzd2t.x /iraf/iraf/pkg/tbtables/tbzd2t.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbzgt.x /iraf/iraf/pkg/tbtables/tbzgt.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbzi2d.x /iraf/iraf/pkg/tbtables/tbzi2d.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbzi2t.x /iraf/iraf/pkg/tbtables/tbzi2t.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbzkey.x /iraf/iraf/pkg/tbtables/tbzkey.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbzlin.x /iraf/iraf/pkg/tbtables/tbzlin.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbzmem.x /iraf/iraf/pkg/tbtables/tbzmem.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbznew.x /iraf/iraf/pkg/tbtables/tbznew.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+48c46
+< 	    call malloc (TB_COMMENT(tp), SZ_LINE, TY_CHAR)
+---
+> 	    call calloc (TB_COMMENT(tp), SZ_LINE, TY_CHAR)
+diff -rbB ./tbznll.x /iraf/iraf/pkg/tbtables/tbznll.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbzopn.x /iraf/iraf/pkg/tbtables/tbzopn.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+18a17
+> # Phil Hodge, 29-Mar-2001  Assign a value to TB_ROWLEN and TB_COLUSED.
+28a28,31
+> int	col
+> int	rowlen
+> pointer cp		# pointer to column descriptor
+> pointer tbcnum()
+56a60,68
+> 	# Compute row length (but not used, except for tbpsta).
+> 	rowlen = 0
+> 	do col = 1, TB_NCOLS(tp) {
+> 	    cp = tbcnum (tp, col)
+> 	    rowlen = rowlen + COL_LEN(cp)
+> 	}
+> 	TB_ROWLEN(tp) = rowlen
+> 	TB_COLUSED(tp) = rowlen
+> 
+diff -rbB ./tbzpt.x /iraf/iraf/pkg/tbtables/tbzpt.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbzrds.x /iraf/iraf/pkg/tbtables/tbzrds.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+143c141
+< 		COL_LEN(cp) = SZ_INT
+---
+> 		COL_LEN(cp) = SZ_INT32
+diff -rbB ./tbzrdx.x /iraf/iraf/pkg/tbtables/tbzrdx.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbzsft.x /iraf/iraf/pkg/tbtables/tbzsft.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbzsiz.x /iraf/iraf/pkg/tbtables/tbzsiz.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbzsub.x /iraf/iraf/pkg/tbtables/tbzsub.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbzt2t.x /iraf/iraf/pkg/tbtables/tbzt2t.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbztyp.x /iraf/iraf/pkg/tbtables/tbztyp.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbzudf.x /iraf/iraf/pkg/tbtables/tbzudf.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbzwer.x /iraf/iraf/pkg/tbtables/tbzwer.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./tbzwrt.x /iraf/iraf/pkg/tbtables/tbzwrt.x
+1,2d0
+< # Copyright restrictions apply - see tables$copyright.tables 
+< # 
+diff -rbB ./underscore.h /iraf/iraf/pkg/tbtables/underscore.h
+12a13,14
+> # define FSGTBB_U fsgtbb
+> # define FSPTBB_U fsptbb
+77a80,81
+> # define FSGTBB_U fsgtbb_
+> # define FSPTBB_U fsptbb_
+Only in /iraf/iraf/pkg/tbtables: cfitsio
+Only in .: diff.tmp
+Only in /iraf/iraf/pkg/tbtables/doc: cfitsio.install
+Only in /iraf/iraf/pkg/tbtables: tbfhp_f.x

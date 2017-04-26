@@ -1,0 +1,13 @@
+$call	relink
+$exit
+
+relink:
+	$update	libpkg.a
+	$omake	examples.x
+	$link	examples.o libpkg.a -lacecat -o xx_examples.e
+	;
+
+libpkg.a:
+	example1.x	example1.h <acecat.h>
+	example2.x	example2.h <acecat.h>
+	;

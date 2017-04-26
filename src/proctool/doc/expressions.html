@@ -1,0 +1,195 @@
+<HTML>
+<BODY>
+<TABLE WIDTH="100%" BORDER=0><TR>
+<TD ALIGN=LEFT><FONT SIZE=4>
+<B>expressions (Feb07)</B></FONT></TD>
+<TD ALIGN=CENTER><FONT SIZE=4>
+<B>IRAF Expressions</B>
+</FONT></TD>
+<TD ALIGN=RIGHT><FONT SIZE=4>
+<B>expressions (Feb07)</B></FONT></TD>
+</TR></TABLE><P>
+<TITLE>expressions</TITLE>
+<UL>
+</UL>
+<H2><A NAME="s_introduction">Introduction</A></H2>
+<! BeginSection: 'Introduction'>
+<UL>
+<P>
+Many
+<A HREF="#s_see_also">IRAF tasks</A>
+use expressions.  These all go through the same basic expression evaluator.
+This provides a standard set of operators and functions with a 
+common syntax similar to the CL.  However, each application can customize
+<P>
+<DL>
+<DT><B><A NAME="l_">*</A></B></DT>
+<! Sec='Introduction' Level=0 Label='' Line='*'>
+<DD>how expressions are input; e.g. from files or with special prefixes
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_">*</A></B></DT>
+<! Sec='Introduction' Level=0 Label='' Line='*'>
+<DD>how variables (called operands) are specified; e.g. with leading
+special characters such as <TT>'$'</TT> or with single letter capitals
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_">*</A></B></DT>
+<! Sec='Introduction' Level=0 Label='' Line='*'>
+<DD>where the values are obtained; e.g. from image header keywords or
+from data files
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_">*</A></B></DT>
+<! Sec='Introduction' Level=0 Label='' Line='*'>
+<DD>special, application specific functions; e.g. airmass or arcsep
+</DD>
+</DL>
+<P>
+This help topic covers the common features of expressions.  The
+individual task help descriptions may also include this material or
+just descripe the customization.
+<P>
+</UL>
+<! EndSection:   'Introduction'>
+<H2><A NAME="s_expressions">Expressions</A></H2>
+<! BeginSection: 'Expressions'>
+<UL>
+<P>
+Expressions consist of operands, numeric and string constants, operators,
+and functions.  Parentheses are also used to control the evaluation order
+as in standard algebraic expression.  String constants are quoted strings
+and numeric constants are pure unquoted numbers.  Numbers may be given in
+sexagesimal notation and are automatically converted to decimal numbers.
+The operators are arithmetic, logical, and string.
+<P>
+</UL>
+<! EndSection:   'Expressions'>
+<H2><A NAME="s_operands">Operands</A></H2>
+<! BeginSection: 'Operands'>
+<UL>
+<P>
+The way applications refer to operands is generally unique to that task.
+Sometimes they are simply alphanumeric identifiers, sometimes they
+have prefixes such <TT>'$'</TT>, sometimes they are limited to specific
+identifiers, and sometimes they have additional structure such as
+&lt;image&gt;.&lt;keyword&gt; where &lt;image&gt; is an identifier for an an image
+and &lt;keyword&gt; refers to a keyword in the image.  Common types of
+operands refer to images, table columns, and keywords.
+<P>
+There is one special common syntax for operands that include characters that
+correspond to the operators in expressions.  In this case the operand
+identifier must be quoted as a string and then referenced using a leading @
+character; e.g.  @'mjd-obs'.
+<P>
+</UL>
+<! EndSection:   'Operands'>
+<H2><A NAME="s_operators">Operators</A></H2>
+<! BeginSection: 'Operators'>
+<UL>
+<P>
+The following operators are recognized in expressions.  With the exception
+of the operators "<TT>?</TT>", "<TT>?=</TT>", and "<TT>@</TT>", the operator set is equivalent to that
+available in the CL.
+<P>
+<PRE>
+        +  -  *  /              arithmetic operators
+        **                      exponentiation
+        //                      string concatenation
+        !  -                    boolean not, unary negation
+        &lt;  &lt;= &gt;  &gt;=             order comparision (works for strings)
+        == != &amp;&amp; ||             equals, not equals, and, or
+        ?=                      string equals pattern
+        ? :                     conditional expression (ternary operator)
+        @                       reference a operand
+</PRE>
+<P>
+The operators "<TT>==</TT>", "<TT>&amp;&amp;</TT>", and "<TT>||</TT>" may be abbreviated as "<TT>=</TT>", "<TT>&amp;</TT>", and "<TT>|</TT>"
+if desired.  The ?= operator performs pattern matching upon strings.
+The pattern syntax is that described for the task
+<A HREF="match"><B>match</B>.</A>
+The @ operator is required to reference keywords with
+one of the operator characters.  This is most likely to be used as:
+<P>
+<PRE>
+        @"date-obs"
+</PRE>
+<P>
+A point to be aware of is that in the ?: conditional expression both
+possible result values are evaluated though the result of the expression
+is only one of them.
+<P>
+</UL>
+<! EndSection:   'Operators'>
+<H2><A NAME="s_functions">Functions</A></H2>
+<! BeginSection: 'Functions'>
+<UL>
+<P>
+A number of standard intrinsic functions are recognized within
+expressions.  Many of these may not be useful in the context of the
+application but are part of the language.  The set of
+functions currently supported is shown below.
+<P>
+<PRE>
+	abs     atan2   deg     log     min     real    sqrt
+	acos    bool    double  log10   mod     short   str
+	asin    cos     exp     long    nint    sin     tan
+	atan    cosh    int     max     rad     sinh    tanh
+</PRE>
+<P>
+The trigonometric functions operate in units of radians.
+The <I>min</I> and <I>max</I> functions may have any number of arguments up
+to a maximum of sixteen or so (configurable).  The arguments need not all
+be of the same datatype.
+<P>
+A function call may take either of the following forms:
+<P>
+<PRE>
+        &lt;identifier&gt; <TT>'('</TT> arglist <TT>')'</TT>
+        &lt;string_expr&gt; <TT>'('</TT> arglist <TT>')'</TT>
+</PRE>
+<P>
+The first form is the conventional form found in all programming languages.
+The second permits the generation of function names by string valued
+expressions and might be useful on rare occasions.
+<P>
+</UL>
+<! EndSection:   'Functions'>
+<H2><A NAME="s_see_also">SEE ALSO</A></H2>
+<! BeginSection: 'SEE ALSO'>
+<UL>
+<P>
+<A HREF="imexpr"><B>imexpr</B></A>
+<A HREF="hedit"><B>hedit</B></A>
+<A HREF="hselect"><B>hselect</B></A>
+<A HREF="asthedit"><B>asthedit</B></A>
+<A HREF="astcalc"><B>astcalc</B></A>
+<A HREF="irproc"><B>irproc</B></A>
+<A HREF="ircatalog"><B>ircatalog</B></A>
+<A HREF="ccget"><B>ccget</B></A>
+<A HREF="mskexpr"><B>mskexpr</B></A>
+<A HREF="mskreg"><B>mskreg</B></A>
+<A HREF="import"><B>import</B></A>
+<A HREF="export"><B>export</B></A>
+<A HREF="agetcat"><B>agetcat</B></A>
+<A HREF="pcalc"><B>pcalc</B></A>
+<A HREF="pconvert"><B>pconvert</B></A>
+<A HREF="pdump"><B>pdump</B></A>
+<A HREF="pselect"><B>pselect</B></A>
+<A HREF="tbcalc"><B>tbcalc</B></A>
+<A HREF="tbdump"><B>tbdump</B></A>
+<A HREF="tbselect"><B>tbselect</B></A>
+<A HREF="txcalc"><B>txcalc</B></A>
+<A HREF="txdump"><B>txdump</B></A>
+<A HREF="txselect"><B>txselect</B></A>
+<P>
+</UL>
+<! EndSection:    'SEE ALSO'>
+
+<! Contents: 'Introduction' 'Expressions' 'Operands' 'Operators' 'Functions' 'SEE ALSO'  >
+
+</BODY>
+</HTML>

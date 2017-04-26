@@ -1,0 +1,214 @@
+.help mkpodimef May12 odi
+.ih
+NAME
+mkpodimef -- Create working MEF and display pODI raw exposures
+.ih
+SYNOPSIS
+An input pODI raw exposure, specified as a directory containing
+FITS files for each OTA, is reformated into a "cell-merged"
+multi-extension format and (optionally) displayed.
+.ih
+USAGE   
+mkpodimef input
+.ih
+PARAMETERS
+.ls input
+A directory containing the OTA files of a raw pODI exposure.
+.le
+.ls overscan = yes
+Perform overscan subtraction on the cells?  If "no" the overscan regions
+are removed leaving the data values unchanged.  If "yes" the overscan
+is used to correct each cell for its amplifier bias after which the
+overscan regions are removed.
+.le
+.ls adjust = "scale" (none|zero|scale)
+While the overscan option provides for amplifier bias adjustments for
+display or other purposes the user may wish the cells values be adjusted
+by the cell modes to produce a better display.
+.le
+.ls override = no
+This task produces a file <input>.fits, where <input> is the exposure
+directory name.  One can use this task to create this just the first time
+it is used and then simply redisplay it as needed.  But if one wants to
+force the formating again, say because of change of the overscan or adjust
+options, then one must request the previous version be overridden.
+.le
+.ls verbose = yes
+Provide some progress output.
+.le
+
+The following are a subset of parameters from \fBmscdisplay\fR.  Note
+all \fBmscdisplay\fR parameters not specified here will still take effect
+if set externally.
+
+.ls display = "center" (none|center|default)
+Selects what to display.  If "none" then the display step is skipped.
+If "center" then the central filed area of a pODI exposure is displayed.
+If "default" then all the OTAs are displayed.
+.le
+.ls frame = 1
+Display server frame buffer to load.
+.le
+.ls zscale = yes
+Set the display range based on the image data?  This works with the
+remaining parameters.  If the value is "no" then no scaling adjustments
+between OTAs is applied and the display range is set by the \fIz1\fR and
+\fIz2\fR parameters.
+.le
+.ls zcombine = "auto" (none|auto|minmax|average|median)
+Each OTA will have a different optimum display range produced by the
+\fIzscale\fR optoin.  This parameter defines how the different values
+are combined for the final display range.  See \fBmscdisplay\fR for the
+options.
+.le
+.ls z1 = 0, z2 = 1000
+When \fIzscale\fR=no these parameters set the display range.
+.le
+.ih
+DESCRIPTION
+
+An input pODI raw exposure, specified as a directory containing FITS files
+for each OTA, is reformated into a "cell-merged" multi-extension format
+if not already done or if requested to override a previous version and
+(optionally) displayed.  This is a convenience tool for interacting with
+pODI raw data.  By converting to cell-merged MEF format all the tools of
+the \fBmsctools\fR package are easily available.
+
+One of the most common tasks for pODI raw data is to examine it using
+a display server.  So this task provides the following logic:
+
+.nf
+    1. create the MEF if not already done
+    2. display the MEF if desired
+.fi
+
+So the first time the command is used for a particular exposure it will
+create the MEF file with the same name as the exposure and subsequent
+times it can quickly display and redisplay the result.  The displayed
+result, provided the XIMTOOL display server is used, can then be interacted
+with using \fBimexamine\fR.
+
+In preparing the MEF two things can happen to the pixel values.
+The first is overscan subtraction.  This makes use of \fBodiproc\fR.
+The second is an offset or gain adjustment based on the modes of each cell.
+This makes use of \fBodireformat\fR which, in term, uses \fBimcombine\fR.
+The adjustment between OTAs is the provence of the \fBmscdisplay\fR program.
+
+Caveats: Nothing is currently done about keeping track of the gaps such as
+with masks.
+
+.ih
+EXAMPLES
+
+1. Display a raw laboratory bias exposure.
+
+.nf
+    odi> dir
+    b20120523T114031.0
+    odi> mkpodimef b20120523T114031.0
+    Processing b20120523T114031.0 to poditmp
+    Merge cells in OTA poditmp/poditmp.00.fits
+    WARNING: Negative scale factors -- ignoring scaling
+    Add OTA to MEF b20120523T114031.0.fits[xy00]
+    Merge cells in OTA poditmp/poditmp.16.fits
+    Add OTA to MEF b20120523T114031.0.fits[xy61]
+    Merge cells in OTA poditmp/poditmp.22.fits
+    Add OTA to MEF b20120523T114031.0.fits[xy22]
+    Merge cells in OTA poditmp/poditmp.23.fits
+    WARNING: Negative scale factors -- ignoring scaling
+    Add OTA to MEF b20120523T114031.0.fits[xy32]
+    Merge cells in OTA poditmp/poditmp.24.fits
+    Add OTA to MEF b20120523T114031.0.fits[xy42]
+    Merge cells in OTA poditmp/poditmp.32.fits
+    Add OTA to MEF b20120523T114031.0.fits[xy23]
+    Merge cells in OTA poditmp/poditmp.33.fits
+    Add OTA to MEF b20120523T114031.0.fits[xy33]
+    Merge cells in OTA poditmp/poditmp.34.fits
+    WARNING: Negative scale factors -- ignoring scaling
+    Add OTA to MEF b20120523T114031.0.fits[xy43]
+    Merge cells in OTA poditmp/poditmp.42.fits
+    WARNING: Negative scale factors -- ignoring scaling
+    Add OTA to MEF b20120523T114031.0.fits[xy24]
+    Merge cells in OTA poditmp/poditmp.43.fits
+    WARNING: Negative scale factors -- ignoring scaling
+    Add OTA to MEF b20120523T114031.0.fits[xy34]
+    Merge cells in OTA poditmp/poditmp.44.fits
+    WARNING: Negative scale factors -- ignoring scaling
+    Add OTA to MEF b20120523T114031.0.fits[xy44]
+    Merge cells in OTA poditmp/poditmp.55.fits
+    WARNING: Negative scale factors -- ignoring scaling
+    Add OTA to MEF b20120523T114031.0.fits[xy55]
+    Merge cells in OTA poditmp/poditmp.61.fits
+    WARNING: Negative scale factors -- ignoring scaling
+    Add OTA to MEF b20120523T114031.0.fits[xy16]
+     Image:         Individual       Display (zcombine=none)
+      xy22:       -10.3     12.0           -10.3     12.0
+      xy23:       -23.8     28.4           -23.8     28.4
+      xy24:       -20.4     32.4           -20.4     32.4
+      xy32:       -25.4     45.6           -25.4     45.6
+      xy33:       -16.3     14.5           -16.3     14.5
+      xy34:       -23.0     30.5           -23.0     30.5
+      xy42:      -133.1    145.0          -133.1    145.0
+      xy43:       -41.2     45.5           -41.2     45.5
+      xy44:       -16.6     35.1           -16.6     35.1
+    odi> dir
+    b20120523T114031.0    b20120523T114031.0.fits
+.fi
+
+2. Examine the data with \fBimexam\fR.
+
+.nf
+    odi> imexam
+.fi
+
+Imexamine works when mscdisplay loads the display including information
+about what part of the display belongs to which extension.  XIMTOOL stores
+this information and then cursor reads by imexam can use that to go back
+to the actual image data in the MEF.  This does not work with DS9 (sorry).
+
+3. Select keywords from each OTA. Note that the cells have been merged
+so individual cell headers have been lost and any cell level keywords are
+from the first cell:
+
+.nf
+    odi> mscselect b20120523T114031.0.fits $I,DAC_CAL0
+    Warning: Cannot open image (b20120523T114031.0.fits[0])
+    b20120523T114031.0.fits[xy00]   "7 52 -209 -252 -223 -243 -248 -201"
+    b20120523T114031.0.fits[xy61]   "-177 -191 -204 -205 -170 -186 -202 -182"
+    b20120523T114031.0.fits[xy22]   "-218 -200 -211 -157 -156 -199 -160 -100"
+    b20120523T114031.0.fits[xy32]   "-199 -212 -219 -214 -207 -186 -186 -139"
+    b20120523T114031.0.fits[xy42]   "-22 -52 -45 -26 -30 -58 -41 -56"
+    b20120523T114031.0.fits[xy23]   "-241 -173 -192 -202 -229 -244 -184 -202"
+    b20120523T114031.0.fits[xy33]   "-196 -206 -187 -209 -210 -209 -168 -139"
+    b20120523T114031.0.fits[xy43]   "-182 -157 -216 -182 -220 -192 -167 -196"
+    b20120523T114031.0.fits[xy24]   "-114 -85 -165 -148 -136 -161 -102 -142"
+    b20120523T114031.0.fits[xy34]   "-160 -199 -181 -210 -262 -182 -219 -175"
+    b20120523T114031.0.fits[xy44]   "-288 -260 -307 -239 -225 -253 -196 -184"
+    b20120523T114031.0.fits[xy55]   "-180 -158 -211 -226 -212 -165 -182 -248"
+    b20120523T114031.0.fits[xy16]   "-265 -224 -231 -221 -215 -252 -173 -149"
+.fi
+
+4.  Image statistics:
+
+.nf
+    odi> mscstat b20120523T114031.0.fits fields="image,mean,min,max"      
+    #               IMAGE              MEAN       MIN       MAX
+    b20120523T114031.0.fits[xy00]     2.677   -65245.     5880.
+    b20120523T114031.0.fits[xy61]  2.632105  -1623.056  18974.02
+    b20120523T114031.0.fits[xy22]  1.179367  -1002.393  13953.71
+    b20120523T114031.0.fits[xy32]  5.460754  -1496.569  8041.861
+    b20120523T114031.0.fits[xy42]  17.8783  -14276.07  52769.71
+    b20120523T114031.0.fits[xy23]  4.327352  -7119.966  12655.74
+    b20120523T114031.0.fits[xy33]  2.283325  -781.5204  1834.036
+    b20120523T114031.0.fits[xy43]  -16.5371  -2209.792  64553.03
+    b20120523T114031.0.fits[xy24]  2.70246  -1277.439  5433.43
+    b20120523T114031.0.fits[xy34]  4.522082  -1397.222  6069.613
+    b20120523T114031.0.fits[xy44]  4.146359  -2756.996  3991.015
+    b20120523T114031.0.fits[xy55]  3.142803  -1328.274  2491.807
+    b20120523T114031.0.fits[xy16]  4.453662  -1541.954  3855.949
+.fi
+
+.ih
+SEE ALSO
+odireformat
+.endhelp

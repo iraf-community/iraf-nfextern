@@ -1,0 +1,25 @@
+imcats,s,a,,,,List of image catalogs
+imcatdef,s,h,"",,,Image catalog definitions
+imwcs,s,h,"",,,List of image WCS
+imfilter,s,h,"",,,Image catalog filter
+refcats,s,a,,,,List of reference catalogs
+refcatdef,s,h,"",,,Reference catalog definitions
+reffilter,s,h,"",,,Reference catalog filter
+matchcats,s,h,"",,,List of output matched catalogs
+all,b,h,no,,,Use all catalogs as a single field?
+search,r,h,0.,0.,,Maximum search radius (arcsec)
+rsearch,r,h,0.,0.,,Maximum rotation search (deg)
+rstep,r,h,0.1,0.,,Rotation search step (deg)
+histimages,s,h,"",,,List of histogram images
+nim,i,h,1000,10,,Maximum image catalog objects to use
+nref,i,h,1000,10,,Maximum reference catalog objects to use
+nmin,r,h,50,0.,,Min detections (num or frac of reference)
+fwhm,r,h,1.,0.,,FWHM of catalog sources (arcsec)
+match,r,h,2.,0.,,Matching distance (arcsec)
+fracmatch,r,h,0.5,0.,1.,Minimum matching fraction
+xi,r,h,0.,,,RA shift (arcsec)
+eta,r,h,0.,,,DEC shift (arcsec)
+theta,r,h,0.,,,Rotation (deg)
+erraction,s,h,"abort", "abort|warn",,Action on error
+logfiles,f,h,"logfile",,,Logfile
+verbose,b,h,yes,,,Verbose output?

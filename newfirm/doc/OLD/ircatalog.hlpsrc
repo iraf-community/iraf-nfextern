@@ -1,0 +1,424 @@
+.help ircatalog Mar07 newfirm
+.ih
+NAME
+ircatalog -- Catalog sources in IR images 
+.ih
+USAGE   
+ircatalog images catalogs
+.ih
+PARAMETERS
+.ls images
+List of images to be cataloged.  These may single images or multi-extension
+format (MEF) files where all the image extensions will be cataloged.
+.le
+.ls catalogs
+Optional list of output catalogs matching the input list.  For single
+input images the catalogs may be text, STSDAS, or FITS binary tables.
+STSDAS tables are created when the filename has a ".tab" extensions and
+FITS binary tables are created when the filename has a ".fits", ".fit", or
+".??f" extension, where ? is any character.  For MEF files the catalogs
+will be FITS binary tables regardless of the extension and for non-FITS
+extensions the extension ".fits" will be added; e.g. abc.txt will result
+in abc.txt.fits.  If a no list is specified the task will run but no
+catalog output will be produced.
+.le
+.ls objmasks = ""
+Optional list of output object masks matching the input list.  For single
+input images the masks may be in pixel list format or FITS binary table
+mask format.  The pixel list format is selected by a ".pl" extension
+otherwise a FITS file with extension ".fits" will be created with extension
+name "pl".  For MEF  files the object masks will be only in FITS binary
+table mask format and any ".pl" extension will be converted to ".fits".
+If no list is specified then no output mask will be produced.  Note that if
+only object masks are desired the variant task \T(irobjmask) may be used.
+.le
+.ls masks = "!BPM"
+Optional list of bad pixel masks for the input images.  This may be a
+reference to an header keyword in the input image, a mask to apply
+to all input images, or a matching list of masks.  For input MEF files
+a keyword reference is to a mask image otherwise the specified mask
+files are also MEF files with mask extensions having the same extension
+names as the input.  The masks will be matched to the input images by
+physical coordinates.  See \T(xt_pmmap) for more technical detail.
+.le
+.ls rimages = ""
+Optional list of reference sky images matching the input list or having
+the special syntax "!<keyword>" where <keyword> is an image header keyword
+in the input image whose value is the sky image to use.  When specified
+the detection is performed on the difference after removing a independent
+background from each one.
+.le
+.ls rmasks = "!BPM"
+Optional list of bad pixel masks for the reference sky images.  This may
+be a reference to an header keyword in the input image, a mask to apply
+to all input images, or a matching list of masks.  For input MEF files a
+keyword reference is to a mask image otherwise the specified mask files
+are also MEF files with mask extensions having the same extension names
+as the input.  The masks will be matched to the input images by physical
+coordinates.  See \T(xt_pmmap) for more technical detail.
+.le
+.ls extnames = ""
+List of extension names or patterns in the input MEF files to be cataloged.
+See \fT(mscextensions) for more information on specifying extension names.
+.le
+.ls omtype = "all" (boolean|numbers|colors|bboolean|bnumbers|bcolors|all)
+Object mask type when object masks are created.  A value of zero represents
+background.  A "boolean" mask has a value of 1 for all pixels which
+are detected as part of an object or are in the input bad pixel mask.
+A "numbers" mask will assign the detection sequence number for each object
+to all pixels in the object and retain the input bad pixel values less than
+10 and set them to 10 otherwise.  A "colors" mask has input bad pixels set
+to 1 and the objects cycle through values between 2 and 9. The variants
+of these that begin with 'b' set the mask values only for the boundary
+pixels in the object detections.  An "all" mask is like the "numbers"
+mask except that high order bits are used as flags within each object
+(see the technical DESCRIPTION for more information).
+.le
+.ls catdefs = "acelib$catdef.dat"
+List of catalog definition files.  This may be a null string for the default
+set of catalog fields, a single file to apply to all catalogs, or a list
+which matches the list of input files.  See \T(catdefs) for more detail on
+the format and the section \S(CATALOG FIELDS) for the available catalog
+fields.  If a null string is specified the catalog definition file
+"acelib$catdef.dat" is used.
+.le
+.ls catfilter = ""
+Output catalog filter
+.le
+.ls logfiles = "STDOUT"
+List of log files
+.le
+
+# Detection
+.ls blksize = -10
+Block size (+=pixels, -=blocks)
+.le
+.ls bpdetect = "1-100"
+Input bad pixel values in image
+.le
+.ls bpflag = "1-100"
+Input bad pixel values to flag in sources
+.le
+.ls convolve = "block 3 3"
+Convolution kernel
+.le
+.ls hsigma = 3.
+Sigma threshold above sky
+.le
+.ls lsigma = 10.
+Sigma threshold below sky
+.le
+.ls hdetect = yes
+Detect objects above sky?
+.le
+.ls ldetect = no
+Detect objects below sky?
+.le
+.ls neighbors = "8"
+Neighbor type
+.le
+.ls minpix = 6
+Minimum number of pixels in detected objects
+.le
+.ls sigavg = 4.
+Sigma of mean flux cutoff
+.le
+.ls sigmax = 4.
+Sigma of maximum pixel
+.le
+
+# Splitting
+.ls dosplit = yes
+Split merged objects?
+.le
+.ls splitmax = INDEF
+Maximum sigma above sky for splitting
+.le
+.ls splitstep = 0.4
+Splitting steps in convolved sigma
+.le
+.ls splitthresh = 5.
+Splitting threshold in sigma
+.le
+.ls sminpix = 8
+Minimum number of pixels in split objects
+.le
+.ls ssigavg = 10.
+Sigma of mean flux cutoff
+.le
+.ls ssigmax = 5.
+"Sigma of maximum pixel
+.le
+
+# Growing
+.ls ngrow = 2
+Number of grow rings
+.le
+.ls agrow = 2.
+"Area grow factor
+.le
+
+# Evaluate
+.ls magzero = "INDEF"
+Magnitude zero point
+.le
+
+.ls hidden = "_ircathide"
+Hidden parameters
+.le
+.sh
+DESCRIPTION
+
+- catalogs may be examined and manipulated with the TABLES package
+.ih
+CATALOG FIELDS
+
+Each "object", where an object is a detection of some number of contiguous
+pixels and which may be a merged source with other daughter objects,
+is evaluated and possibly (\P(filter)) written to the catalog may have
+any of the following quantities recorded.  The catalog definition file
+(\T(catdefs)) may be used to select a subset of these or to assign new
+field names in the catalog.  If no catalog definition is specified then
+the catalog will have these fields in this order.
+
+A function MAG(x), where x is any catalog quantity, may be used to convert
+to an astronomical magnitude defined by
+
+.nf
+\fImagzero\fR-2.5*log(FLUX)
+.fi
+
+where \P(magzero) is the magnitude zero point parameter.
+Of course, this only makes sense for flux related quantities.
+
+There are also eleven circular aperture flux quantities FCORE, APFLUX(x),
+APFLUX1(x), ..., APFLUX9(x) where x is a radius argument.  FCORE is
+a core circular aperture of a radius of 4 pixels centered on the the
+brightest pixel (XPEAK,YPEAK) while the APFLUX quantities are centered
+on the centroid over this core aperture (XAP,YAP).  If the distance to
+the center of a pixel (whether within the detection area or not) from the
+aperture center is is less than the aperture radius then the background
+subtracted pixel value is accumulated.  The distance and radii are in
+image pixel units.  Note that these aperture fluxes do not use any partial
+pixel weighting.
+
+.ls NUM 
+Object number assigned during detection.  The numbers start with 11 because
+the object numbers are also used in the object masks and the lower numbers
+are reserved for other uses.
+.le
+.ls PNUM
+Object number of parent for split objects.  Objects without split parents
+have a valut of 0 for this quantity.
+.le
+.ls XPEAK
+X pixel coordinate of the peak background subtracted pixel value in
+the object.
+.le
+.ls YPEAK
+Y pixel coordinate of the peak background subtracted pixel value in
+the object.
+.le
+.ls FLUX
+Background subtracted pixel value sum over the detection area.
+.le
+.ls MAG(FLUX)
+Background subtracted pixel value sum over the detection area expressed
+as a magnitude.
+.le
+.ls NPIX
+Number/area of pixels in an object.  Note that this is after any splitting
+and growing.
+.le
+.ls NDETECT
+Number/area of original detected pixels before growing.  For split objects
+this is the number of pixels remaining after the object was split from a
+parent.
+.le
+.ls SIG 
+Average sky sigma value over the detection pixels.
+.le
+.ls ISIGAVG
+Average value of the sky subtracted pixel value divided by the
+sky sigma over the detection pixels.
+.le
+.ls ISIGMAX
+Maximum value of the sky subtracted pixel value divided by the
+sky sigma over the detection pixels.
+.le
+.ls FLAGS
+Flag string which has the characters:
+.nf
+    -    Place holder without meaning
+    D    Object detection below sky (i.e. dark object)
+    E    Object was sucessfully evaluated
+    G    Object has pixels which were added by growing
+    S    Object is was split from a parent and has no children
+    M    Object is the parent of split objects
+    B    Object contains a bad pixel
+.fi
+.le
+.ls SKY 
+Average sky value over the detection pixels.
+.le
+.ls THRESH
+Average background subtracted pixel value of detection area boundary
+pixels.  Boundary pixels are those not surrounded by other detection area
+pixels.
+.le
+.ls PEAK
+Peak background subtracted pixel value in the object.
+.le
+.ls FCORE
+Background subtracted pixel value sum over a 4 pixel radius circular
+aperture centered on the peak pixel (XPEAK,YPEAK).
+.le
+.ls APFLUX(3)
+Background subtracted pixel value sum over a 3 pixel radius circular
+aperture centered at (XAP,YAP).
+.le
+.ls MAG(APFLUX(3))
+Background subtracted pixel value sum over a 3 pixel radius circular
+aperture centered at (XAP,YAP) expressed as a magnitude.
+.le
+.ls FRACFLUX
+.le
+.ls FRAC
+.le
+.ls XMIN
+Minimum X pixel value over the detection area.
+.le
+.ls XMAX
+Minimum X pixel value over the detection area.
+.le
+.ls YMIN
+Maximum Y pixel value over the detection area.
+.le
+.ls YMAX
+Maximum Y pixel value over the detection area.
+.le
+.ls WX  
+World coordinate for the first axis of the image world coordinate system
+(WCS).  This is evaluated from the XAP and YAP image pixel coordinates.
+Note that right ascension coordinates are recorded in hours.  All other
+WCS system coordinates wil be in their FITS WCS standard units;
+e.g. declination is in degrees.
+.le
+.ls WY  
+World coordinate for the first axis of the image world coordinate system
+(WCS).  This is evaluated from the XAP and YAP image pixel coordinates.
+Note that right ascension coordinates are recorded in hours.  All other
+WCS system coordinates wil be in their FITS WCS standard units;
+e.g. declination is in degrees.
+.le
+.ls PX  
+Physical coordinate for the first physical image axis.  This is evaluated
+from the XAP and YAP image pixel coordinates using the coordinate
+transformation given by the LTV and LTM keywords.  Often the physical
+coordinates are the same as the image pixel coordinates.
+.le
+.ls PY  
+Physical coordinate for the first physical image axis.  This is evaluated
+from the XAP and YAP image pixel coordinates using the coordinate
+transformation given by the LTV and LTM keywords.  Often the physical
+coordinates are the same as the image pixel coordinates.
+.le
+.ls XAP 
+Background subtracted pixel value weighted column (first image axis)
+centroid over a four pixel radius aperture centered on the brightest
+pixel within the detection area.
+.le
+.ls YAP 
+Background subtracted pixel value weighted line (second image axis)
+centroid over a four pixel radius aperture centered on the brightest
+pixel within the detection area.
+.le
+.ls X1  
+Background subtracted pixel value weighted X centroid over the detection
+area.
+.le
+.ls Y1  
+Background subtracted pixel value weighted Y centroid over the detection
+area.
+.le
+.ls X2  
+Background subtracted pixel value weighted X second moment over the detection
+area.
+.le
+.ls Y2  
+Background subtracted pixel value weighted Y second moment over the detection
+area.
+.le
+.ls XY  
+Background subtracted pixel value weighted XY cross moment over the detection
+area.
+.le
+.ls R   
+Background subtracted pixel value weighted R centroid over the detection
+area where R is measured from the aperture center (XAP,YAP).
+.le
+.ls RI2 
+Square of the background subtracted pixel value weighted R centroid over
+the detection area where R is measured from the aperture center (XAP,YAP).
+.le
+.ls FWHM
+.le
+.ls FLUXVAR
+.le
+.ls XVAR
+.le
+.ls YVAR
+.le
+.ls XYCOV
+.le
+.ls A   
+Semi-major radius derived from the second moments by
+sqrt((X2+Y2+sqrt((X2-Y2)**2+4*XY**2).
+.le
+.ls B   
+Semi-minor radius derived from the second moments by
+sqrt((X2+Y2-sqrt((X2-Y2)**2+4*XY**2).
+.le
+.ls THETA
+Position angle (deg counterclockwise from the x axis) of the second moment
+axis given by arctan(2*XY/(X2-Y2)/2.
+.le
+.ls ELONG
+Derived as A/B.
+.le
+.ls ELLIP
+Derived as 1-B/A.
+.le
+.ls R2  
+Radius derived from the second moments by sqrt (pi / 4 * (X2 + Y2)).
+.le
+.ls CXX 
+.le
+.ls CYY 
+.le
+.ls CXY 
+.le
+.ls FLUXERR
+.le
+.ls XERR
+.le
+.ls YERR
+.le
+.ls AERR
+.le
+.ls BERR
+.le
+.ls THETAERR
+.le
+.ls CXXERR
+.le
+.ls CYYERR
+.le
+.ls CXYERR
+.le
+
+.ih
+SEE ALSO
+\T(procexpr) \T(ccdred.ccdproc) \T(mscred.ccdproc) \T(quadred.ccdproc)
+\T(fixpix) \T(icfit)
+.endhelp

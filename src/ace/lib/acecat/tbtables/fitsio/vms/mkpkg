@@ -1,0 +1,12 @@
+# FITSIO -- Update the system-dependent subroutines in the FITSIO library.
+
+lacecat:
+	$checkout libacecat.a ../
+	$update   libacecat.a
+	$checkin  libacecat.a ../
+	;
+
+libacecat.a:
+	ftpcbf.x
+	ftgcbf.x
+	;

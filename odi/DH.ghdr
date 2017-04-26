@@ -1,0 +1,176 @@
+SIMPLE  =                    T / Standard FITS                                  
+BITPIX  =                   16 / (not applicable to PHU)                        
+NAXIS   =                    0 / no data in PHU                                 
+EXTEND  =                    T / File contains extensions                       
+NEXTEND =                   64 / from the focalplane def                        
+FILENAME= 'b20110915T145917.001.fits' / Original host filename
+OBSID   = 'b20110915T145917'   / Observation identifier
+FPPOS   = 'xy01    '           / position of detector in focal plane mosaic     
+OBJECT  = 'bias    '           / Observation title
+OBSTYPE = 'ZERO    '           / observation type                               
+RADECSYS= 'Helio. mean FK5'    / Default coordinate system
+TIMESYS = 'UTC approximate'    / Time system
+LSTHDR  = '18:00:36.0'         / LST of header creation
+OBSERVAT= 'KPNO    '           / Observatory
+TELESCOP= 'WIYN 3.5 meter telescope' / Telescope
+OBSERVER= '<unknown>'          / Observer(s)
+OBSLOGIN= '<unknown>'          / Login ID for observing GUI
+PROPOSER= '<unknown>'          / Proposer(s)
+PROPID  = '<unknown>'          / Proposal ID(s)
+PROGID  = 'NOAO-12A-0193'      / Observing Program (Run) identification
+TACID   = 'NOAO    '           / Time granting institution
+PROPPERD=                  540 / Proprietary period of this image
+RELEASE = '2012-12-17'         / Public release date of this image (UT)
+RA      = '+18:26:00.66'       / Telescope RA of observation (hr)
+DEC     = '+82:52:10.351'      / Telescope DEC of observation (deg)
+TELRAOFF= '00:00:00.0'         / Telescope RA offset
+TELDECOF= '00:00:00.0'         / Telescope DEC offset
+TARGRA  = '00:48:00.00'        / Requested target RA
+TARGDEC = '31:59:59.92'        / Requested target DEC
+ROTSTART=                 0.00 / WNIR rotator angle at start of exposure
+ROTEND  =                 0.00 / WNIR rotator angle, degrees CW from N 
+ROTOFF  =                 0.00 / WNIR rotator angle offset
+EQUINOX =              2011.00 / Equinox of coordinate system [why duplicated?)
+TELEQUIN=              2011.00 / Equinox of coordinate system
+FILTER  = 'SDSS g (ODI g #4)'  / Filter configuration name in beam
+FILTERID=                    4 / comma separated list of filter barcode IDs
+EXPTIME =                120.1 / Exposure time in seconds
+EXPREQ  =                120.0 / Requested exposure time in seconds
+DATE-OBS= '2011-10-13T23:58:12.0' / Date of observation start (UTC approximate)
+TIME-OBS= '23:58:12.0'         / Time of observation start
+MJD-OBS =       55847.99875000 / MJD of observation start
+ZD      = '82:17:58.2'         / Zenith distance
+AIRMASS =                 7.11 / Airmass
+TELFOCUS=              6831.25 / Telescope focus
+TRACK   = 'Not tracking'       / Telescope tracking
+ELMAP   = '39:00:00.0'         / mapper elevation
+AZMAP   = '00:59:59.9388'      / mapper azimuth
+ROTPORT = 'wnir    '           / Tertiary port selection
+FOLDPOS = 'wnir    '           / Tertiary port selection
+OBSBLOCK= '<obsid> '           / ID of originating observing block definition
+DITHNAME= '<name>  '           / Name of dither pattern
+DITHALL =                    3 / Tot num of exposures in this dither sequence
+DITHERN =                    1 / nth number in the dither sequence
+IMAGESWV= 'edu.wiyn.ODI.pipeline.GraspToFitsV0.09' / Image Creation Software    
+ORIGIN  = 'ODI.hemi'           / ODI instrument 
+INSTRUME= 'ODI.hemi'           / ODI instrument 
+FOCCONF = '<URL>'              / URL for the focal plane configuration file               
+OTMODE  = 'STATIC'             / OT mode (STATIC|COMMON|LOCAL)
+COMMENT Detector                                                                
+COMMENT --------                                                                
+DETECTOR= 'WIYNODI'            / Detector
+NAMPS   =                   64 / cell columns                                   
+PRESCAN1=                    0 / x prescan                                      
+PRESCAN2=                    0 / y prescan                                      
+OVRSCAN1=                   10 / x overscan                                     
+OVRSCAN2=                   10 / y overscan                                     
+PIXSIZE1=                 12.0 / pixel size of axis1 (microns)                  
+PIXSIZE2=                 12.0 / pixel size of axis2 (microns)
+PIXSCAL1=                 0.11 / Pixel scale for axis 1 (arcsec/pixel)
+PIXSCAL2=                 0.11 / Pixel scale for axis 2 (arcsec/pixel)
+IMNAXIS1=                 4036 / OTA image width in unbinned pixels             
+IMNAXIS2=                 4031 / OTA image height in unbinned pixels            
+IMTM1_1 =                  1.0 / IMage Transform Matrix; a unit vector in the   
+IMTM1_2 =                  0.0 / serial (fast) direction of amplifier readout   
+IMTM2_1 =                  0.0 / and a unit vector in parallel (slow) direction 
+IMTM2_2 =                 -1.0 / of amplifier readout                           
+CELLGAP1=                   28 / cell gap between columns (in ubinned pixels)   
+CELLGAP2=                    9 / cell gap between rows (in ubinned pixels)      
+CNAXIS1 =                  480 / cell imaging size in unbinned pixel columns    
+CNAXIS2 =                  496 / cell imaging size in unbinned pixel rows       
+CCDBIN1 =                    1 / column binning                                 
+CCDBIN2 =                    1 / row binning                                    
+OTA_ID  = '1378    '           / OTA serial number                              
+REQ_EXPT=                  1.0 / requested exposure time                        
+COMMENT Iraf coordinates                                                        
+COMMENT ----------------                                                        
+DETSIZE = '[1:4036, 1:4031]'   / IRAF total image pixels in full mosaic         
+COMMENT Grasp Telemetry                                                         
+COMMENT --------------                                                          
+PONTIME =                44877 / [sec] Time since last detector "power on"      
+CONTROLR= 'STARGRASP'          / Detector Controller                            
+CONSWURL= 'https://svn/gpc/repos/sw/trunk/detector/ppc405/u-boot' / Controller s
+CONSWV  = '4304    '           / Controller software SVN revision               
+CON_MAC = '00:50:c2:64:90:50'  / Controller MAC (HW Ethernet) Address           
+CON_IP  = '192.168.1.168'      / Controller IP Address                          
+CON_NAME= 'stargrasp9050'      / Controller IP Hostname                         
+CON_DEV =                    0 / Controller device number (0 or 1)              
+CON_UP  =                44877 / [seconds] Controller up-time                   
+FPGASER =                   19 / Controller FPGA board serial number            
+FPGAVER = '1.1     '           / Controller FPGA board version                  
+FPGATAR = 'GPC     '           / Controller FPGA board target system            
+DAQ3USER=                   19 / Controller DAQ3U board serial number           
+DAQ3UVER= '2.2     '           / Controller DAQ3U board version                 
+DAQ3UTAR= 'GPC     '           / Controller DAQ3U board target system           
+COMMENT If DETTEMOV is T, DETTEMP was overridden. Old                           
+COMMENT temp. is CDETTEM and new temp. was derived as:                          
+COMMENT V = (ADU-B) / (A*32768)                                                 
+COMMENT T = 3369-sqrt[3369^2+1313^2*(13.1*V-1)/(V-1)]                           
+CELLMODE= 'SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS' /  
+CLV_PPG4= 'ecbb:cbb2:bb2e:65d8:5d97:68ba:5544:6231' / Coded parallel timings    
+CLV_PG3 = '3808:00d0:1c07:b070:0681:0410:cc93:0326' / Coded serial timings      
+CLV_PG4 = '4412:0040:1506:0050:07c2:0014:2720:08a2' / Coded SW/RST/VCLAMP/SAMP  
+CLV_ADC = '1500    '           / Coded ADC parameters                           
+CLV_TRIG=                    0 / Cross-trigger phase delay (x 10nsec)           
+CLV_PRES=                    3 / Serial prescan, (skipped in addition to CNPIX1)
+CLV_PIPE=                    1 / Clocking pattern pipeline (in addition to ADC) 
+CLV_PXTP=                    1 / OT Pixel Type 1 or 2 (or 0 for normal CCD)     
+ADC_CONF= '0c8:0c8:0c8:0c8:0c8:0c8:0c8:0c8' / ADC configuration                 
+ADC_MUX = '0c0:0c0:0c0:0c0:0c0:0c0:0c0:0c0' / ADC MUX configuration             
+ADC_PGAR= '026:026:026:026:026:026:026:026' / Red ADC pga (adcgain 2.0)         
+ADC_PGAG= '000:000:000:000:000:000:000:000' / Grn ADC pga (adcgain val)         
+ADC_PGAB= '000:000:000:000:000:000:000:000' / Blu ADC pga (adcgain val)         
+ADC_OFSR= '000:000:000:000:000:000:000:000' / Red ADC offset                    
+ADC_OFSG= '000:000:000:000:000:000:000:000' / Grn ADC offset                    
+ADC_OFSB= '000:000:000:000:000:000:000:000' / Blu ADC offset                    
+DAC_S_L =               +0.050 / [V] Serial and summing well LO dac06=+0050 mV  
+DAC_S_H =               +0.050 / [V] Serial and summing well HI dac07=+0050 mV  
+DAC_P_L =               +0.050 / [V] Parallel and P. standby LO dac14=+0050 mV  
+DAC_P_H =               +0.050 / [V] Parallel and P. standby HI dac15=+0050 mV  
+DAC_RG_L=               +0.050 / [V] Reset Gate LO              dac16=+0050 mV  
+DAC_RG_H=               +0.050 / [V] Reset Gate HI              dac17=+0050 mV  
+DAC_INIT=                 1100 / [mV] DAC internal vref offset voltage          
+DAC_SO  =               +0.050 / [V] 1st Stage Source           dac18=+0050 mV  
+DAC_DR  =               +0.150 / [V] Drain Bias                 dac19=+0050 mV  
+DAC_VSS =               +0.050 / [V] Logic Low Supply           dac20=+0050 mV  
+DAC_VDDL=               +0.050 / [V] Logic Drain Supply LO      dac21=+0050 mV  
+DAC_VDDH=               +0.100 / [V] Logic Drain Supply HI      dac22=+0050 mV  
+DAC_OG1 =               +0.050 / [V] Output Gate Bias           dac25=+0050 mV  
+DAC_RD  =               +0.100 / [V] Reset Drain Bias           dac26=+0050 mV  
+DAC_SUB =               +0.150 / [V] Substrate                  dac27=+0050 mV  
+DAC_SCP =               +0.100 / [V] Scupper Bias               dac28=+0050 mV  
+DAC_LREF=               +0.050 / [V] Logic Reference Ground     dac29=+0050 mV  
+COMMENT Instrument Detailed Information 
+DEWAR   = 'ODI Dewar'          / Dewar identification
+COOLHEAD=                 70.9 / Cooling Head Avg Temperature ¼K
+COLPLATE=                130.0 / Cold Plate Avg Temperature ¼K
+FOCPLATE=                165.0 / Focal Plane Avg Temeprate ¼K
+TEMPSTAT= 'OK      '           / Status of Thermal System
+DEWPRESS=                   20 / Pressure in Dewar mTorr               
+ADCANG1 =                    0 / Rotation Angle of ADC Prism 1               
+ADCANG2 =                    0 / Rotation Angle of ADC Prism 2               
+ADCMODE = 'PREDICT '           / ADC operation mode  
+ADCJD   =       55847.99875000 / Predicted MJD mid time of exposure 
+                                              for ADC configuration
+FLTARM1A= 'IN      '           / Status of Filter arm 1A               
+FLTARM1B= 'OUT     '           / Status of Filter arm 1B
+FLTARM1C= 'OUT     '           / Status of Filter arm 1C
+FLTARM2A= 'OUT     '           / Status of Filter arm 2A
+FLTARM2B= 'OUT     '           / Status of Filter arm 2B
+FLTARM2C= 'OUT     '           / Status of Filter arm 2C
+FLTARM3A= 'OUT     '           / Status of Filter arm 3A
+FLTARM3B= 'OUT     '           / Status of Filter arm 3B
+FLTARM3C= 'OUT     '           / Status of Filter arm 3C
+SHUTDIR = 'A->B    '           / Shutter operation direction
+SHUTOPEN= '        '           / Time stamp shutter open event
+SHUTCLOS= '        '           / Time stamp shutter close event
+WCSASTRM= 'Identification of WCS' / WCS Versioning
+WCSAXES =                    2 / WCS dimensionality
+CTYPE1  = 'RA---TAN'           / Coordinate type
+CTYPE2  = 'DEC--TAN'           / Coordinate type
+CRVAL1  =   276.84772023849365 / Coordinate reference value
+CRVAL2  =   82.862424837256157 / Coordinate reference value
+CD1_1   =         1.286097e-06 / Coordinate matrix
+CD2_1   =        3.9263649e-05 / Coordinate matrix
+CD1_2   =        3.9090865e-05 / Coordinate matrix
+CD2_2   =       -1.0401377e-06 / Coordinate matrix

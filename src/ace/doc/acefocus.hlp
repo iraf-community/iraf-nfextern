@@ -1,0 +1,335 @@
+.help acefocus Nov07 ace
+.ih
+NAME
+acefocus -- Analyze focus sequences
+.ih
+USAGE
+acefocus input
+.ih
+PARAMETERS
+.ls input
+List of images or catalogs to analyze.  Images must have the keyword
+CATALOG identifying the catalog.  The images or catalogs may be
+multiextension format (MEF) FITS files.  All catalogs from all images
+.le
+.ls catdef
+.le
+.ls focus
+.le
+.ls filter
+.le
+.ls match = 10.
+The catalog sources are matched between each focus exposure either in
+celestial coordinates or in pixels.  A positive value specifies a
+maximum matching distance in arc seconds.  A negative value specifies
+that the absolute value be used as the maximum matching distance in
+pixels.
+.le
+.ls rsig
+.le
+.ls fsig
+.le
+.ls logfiles = "STDOUT,logfile"
+List of output log files.  The value "STDOUT" is used for output to
+the terminal.
+.le
+.ls interactive = yes
+Analyze the source measurements and focus graphics interactively?
+This must be yes in order to interactively delete bad measurements.
+.le
+.ls graphcur = ""
+Graphics input.  Normally this is the null string to select graphics
+device cursor.  However, a file may be specified to take input from
+the file for special applications.
+.le
+.ls bestfocus
+Output parameter for the recommended focus.
+.le
+.ls bestsize
+Output parameter for the estimated best full-width at half-maximum.
+.le
+.ih
+DESCRIPTION
+ACEFOCUS groups measurements from a set of catalogs by a numeric parameter
+which is the same for all entries in a catalog.  Any numeric value may be
+used but it is typically something related to a telescope or instrument
+focus for the image so it will be referred to as the focus in this
+description.  The catalogs contain a field which varies with the focus from
+which a focus that minimize the quantity is estimated.  Typically this field
+is a full-width at half-maximum  and in this description the field will be
+referred to as the size.  Other fields giving source identifications,
+spatial positions, and fluxes may be used.  An example of the use of
+this task for focus estimation in observational data is \fBnffocus\fR.
+See the help for that task and example 1 below for more information.
+
+The input catalogs may be in any format allowed by ACE.  This includes
+both externally derived text or binary table catalogs as well as those
+created by an ACE cataloging task.  The mapping between catalog fields
+and those used by ACEFOCUS is specified by the \fIcatdef\fR parameter.
+A size field is required.
+
+TABLE 1: ACEFOCUS input catalog fields
+
+.ls SIZE [real]
+Size to be analyzed.
+.le
+.ls STARID [integer]
+Identifier matching entries across catalogs when \fImatch\fR is INDEF.
+.le
+.ls X, Y [double]
+Pixel coordinates for matching and spatial display.
+.le
+.ls RA, DEC [double]
+Celestial coordinates for matching.  RA is in hours and DEC is in
+degrees.
+.le
+.ls FLUX [real]
+Sky subtracted flux for weighting and display as magnitude [real]
+.le
+.ls ELLIP, PA [real]
+Ellipticity and position angle.  These are currently only used in
+the log output
+.le
+
+
+Instead of a catalog definition file a catalog header keyword giving a
+global size value may be used.
+
+
+focus
+NFFOCUS is a script for analyzing NEWFIRM focus exposures.  It combines the
+steps of cataloging sources, possibly with sky subtraction, in each input
+exposure and running the ACEFOCUS routine for matching the sources at
+different focus values and analyzing the full-width at half-maximum (FWHM)
+measurements.
+
+Detection, measuring and catalog of sources is performed by the tasks
+ACECATALOG or ACEDIFF.  The former is used when no sky exposure is specified
+and the latter is used to subtract the sky exposure prior to
+detection.  In either case the same quantities are measured and cataloged.
+The key quantity for focus analysis is the FWHM.  Other quantities are used
+for matching, spatial analysis, and magnitude weighting and display.
+
+Briefly, the FWHM measurement is computed as follows.  The half-maximum
+value for a source is defined as one-half of the peak pixel value and the
+source position is defined by the flux weighted centroid.  For each pixel
+with value within 10% of the half-maximum value a gaussian with the same
+centroid, maximum value (even if the maximum and centroid are not
+coincident), and pixel value is used as a simple extrapolator to find the
+half-maximum radius.  Each of these single pixel estimates are averaged with
+weights based on the difference in the pixel value from an exact
+half-maximum value.  Twice this average is then the FWHM value.
+
+The first time the task is run the catalogs are created with filenames
+beginning with the image name followed by the user specified catalog suffix.
+There is a catalog for each array.  Depending on the machine speed, creating
+a catalog from a 2K array takes of order 5-10 seconds.  The \fIverbose\fR
+parameter prints a line as each catalog is created to monitor the progress
+of the task.
+
+If the task is run again it will check for existing catalogs and, if found,
+will issue a warning but will not recreate the catalogs and getting to the
+focus analysis is fast.  You are free to run the task multiple times.  Note
+this means that changing parameters involving the detection and cataloging,
+such as the sky subtraction, requires first manually deleting the catalogs
+or using a different catalog suffix.
+
+The source detection is limited to good signal-to-noise and compact sources.
+The detection threshold is 5 times the background noise sigma with no
+convolution filter used.  A minimum of 8 pixels is required in a source.  A
+first filtering of sources selects those with FWHM value less than 2.5 times
+the mode of the FWHM for all sources and with an ellipticity, based on the
+second moments of the light distribution, less than 0.2.
+
+One other selection criteria may be applied to eliminate sources which
+saturate or have significantly non-linear pixels.  If the \fIsaturate\fR
+parameter is specified then sources with peak value (without sky
+subtraction) above that value are eliminated.  Note that the special value
+"$<keyword>" sets a value from a header keyword to allow different values
+for each array.  In NEWFIRM a keyword SATURATE is provided for this
+purpose.
+
+If the exposures contain many sources it may be desirable to limit the
+number catalog using the \fInmaxrec\fR parameter.  The specified
+maximum number of sources is made using an ordering by the source peak
+values above background, brightest first.  If used the number should
+not be too small to insure sufficient matches across all focus
+exposures.  In other words, there is no assurance that the same set of
+sources will be detected and be in the same peak value order in each
+exposure.
+
+The individual source measurements from individual catalogs are matched
+using a simple nearest distance in either pixels or world coordinates (i.e.
+RA and DEC) where the type of maximum matching distance is signaled by the
+sign of \fImatch\fR parameter.  Generally one should use a liberal
+matching distance in world coordinates.  This allows focus exposures
+to be dithered if desired; though this is not the recommended way to
+take focus sequences.
+
+In the analysis stage only sources which are matched in all focus exposures
+are used which is why it is important not to overly limit the catalogs with
+the \fInmaxrec\fR parameter.  There is one exception, if no matches are made
+(which can be forced by setting \fImatch\fR to zero), then the analysis will
+be done using the median FWHM of all sources at each focus exposure.
+
+There is an initial stage of sigma clipping to eliminate outliers.  The
+clipping is done for both the FWHM values and the estimated focus values
+from each source.  This applies to both the matched and no match cases.  In
+the matched case an outlier at one focus eliminates the matched source at
+all focus values.
+
+The analysis task estimates a focus and FWHM for each source which has
+not been eliminated or interactively deleted or the median
+points when no individual matched sources are available, The estimates are
+computed by selecting the three lowest FWHM values and averaging the focus
+and FWHM values.  The averaging is weighted where the measurement with the
+lowest FWHM is given a weight of 1 and the other two measurements have
+weights that decrease rapidly with differences in the FWHM and focus.  The
+effect is that if the next smallest FWHM measurements are similar in FWHM
+and focus then the weights are near 1 and if not the weights are
+significantly smaller.
+
+The overall best focus is the magnitude-weighted average of the individual
+source best focus estimates.
+
+When the \fIinteractive\fR parameter is set (recommended) then an
+interactive graphical stage is entered.  This allows visualizing the source
+measurements in various ways.  The initial graph shows FWHM as a
+function of focus.  The cross points are the initial source
+measurements which have not be eliminated or deleted and the boxes
+are the medians with the lower of the two central FWHM in the case
+of an even number of values.  Also shown with dashed lines are the
+estimated best focus and FWHM.
+
+Commands are entered in cursor mode (when a cursor is present).  These
+are either single keystrokes or colon commands.  The list of commands
+may be paged by typing '?'.  This is also given below.
+
+An important interactive key is 'd' to delete the source or point
+nearest the cursor.  This applies to any graph.  When sources are
+matched then selecting a point to delete will also delete all other
+points associated with that source.  When the sources are not matched
+then only the single point is deleted.  The 'd' key is particularly
+useful in the FWHM vs focus or best focus spatial points.
+
+The best focus spatial plot is available when sources have been
+matched.  This provides for a spatial analysis to see focus trends.
+The plot shows the full mosaic in the center and two pairs of
+projection plots.  The left and bottom show FWHM as a function of
+column and line.  The top and right show the focus estimate for each
+source (as described above) as a function of column and line.
+
+.ih
+CURSOR COMMAND OPTIONS
+
+
+.nf
+? Help            d Delete          q Quit            u Undelete
+<space> Next      f Focus           r Redraw          x Delete
+a Spatial         i Info            s Mag symbols     y Box delete
+b Best            m Magnitude       t Field radius
+
+:show <file>      :scale <val>      :xcenter <val>    :ycenter <val>
+.fi
+
+.ls ?
+Page this help information
+.le
+.ls <space>
+Step through different focus or stars in current plot type
+.le
+.ls a
+Spatial plot at a single focus (when there are matched points)
+.le
+.ls b
+Spatial plot of best focus values (when there are matched points)
+.le
+.ls d
+Delete star (when matched) or point (unmatched) nearest to cursor 
+.le
+.ls f
+Size vs focus for all data
+.le
+.ls i
+Information about point nearest the cursor
+.le
+.ls m
+Size vs relative magnitude at one focus
+.le
+.ls q
+Quit
+.le
+.ls r
+Redraw
+.le
+.ls s
+Toggle magnitude symbols in spatial plots
+.le
+.ls t
+Size vs radius from field center at one focus
+.le
+.ls u
+Undelete points
+.le
+.ls x
+Delete nearest point, star, focus, or image (selected by query)
+.le
+.ls y
+Delete points within box region (two cursor reads)
+.le
+.ls :show <file>
+Page all information for the current set of objects
+.le
+.ls :scale <val>
+Pixel scale for size values
+.le
+.ls :xcenter <val>
+X field center for radius from field center plots
+.le
+.ls :ycenter <val>
+Y field center for radius from field center plots
+.le
+
+.ih
+EXAMPLES
+
+1.  The \fBnffocus\fR task generates ACE catalogs with the following
+catalog definition file.  Note that the measured FWHM is converted
+into arc seconds.  Another point to appreciate in the description of
+that task is that the catalogs are create with a filter that selects
+compact, round, and unsaturated sources.
+
+.nf
+NUM
+X
+Y
+RA(X,Y)         RA
+DEC(X,Y)        DEC
+FR(FWHM*0.395)	FWHM
+FLUX
+ELLIP
+THETA
+.fi
+
+This catalog is then mapped into \fBacefocus\fR with the catalog
+definition file below.
+
+.nf
+STARID  NUM
+X
+Y
+RA
+DEC
+SIZE    FWHM
+FLUX
+ELLIP
+PA      THETA
+.fi
+
+ACEFOCUS is then executed with the following non-default parameters.
+
+.nf
+cl> acefocus @focuslist focus=!telfocus match=10
+.fi
+
+.endhelp

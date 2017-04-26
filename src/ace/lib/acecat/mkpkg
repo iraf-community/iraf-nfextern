@@ -1,0 +1,42 @@
+# ACECAT LIBRARY
+
+lacecat:
+	$set XFLAGS = "-Inolibc $(XFLAGS)"
+	$checkout libacecat.a nfebin$
+	$update   libacecat.a
+	$checkin  libacecat.a nfebin$
+	;
+
+libacecat.a:
+	$ifnfile (lib$libtbtables.a)
+	    @tbtables
+
+	    tbttyp.x	<chars.h> <mach.h> <tbset.h> tbtables/tbtables.h
+	    tbhanp.x	<ctype.h> <tbset.h> tbtables/tbtables.h
+	    tbhpnp.x	<ctype.h> <tbset.h> tbtables/tbtables.h
+	$endif
+
+	afn.x
+	catacc.x	<acecat.h>
+	catclose.x	<acecat1.h> <acecat.h>
+	catcreate.x	<acecat1.h> <acecat.h>
+	catdefine.x	<acecat1.h> <acecat.h>
+	catexpr.x	<evvexpr.h>
+	catextn.x
+	catfilter.x	<acecat.h> <ctype.h> <evvexpr.h>
+	catfunc.x	<acecat1.h> <acecat.h> <ctype.h> <evvexpr.h> <math.h>
+	catget.x	<acecat1.h> <acecat.h>
+	catgid.x	<acecat1.h> <acecat.h>
+	catgrec.x	<acecat1.h> <acecat.h>
+	cathdr.x	<imhdr.h> <imio.h> <tbset.h>
+	cathead.x	<acecat1.h> <acecat.h>
+	catnext.x	<acecat1.h> <acecat.h> <aceobjs.h>
+	catopen.x	<acecat1.h> <acecat.h>
+	catput.x	<acecat1.h> <acecat.h>
+	catrhdr.x	<acecat1.h> <acecat.h>
+	catrrecs.x	<acecat1.h> <acecat.h> <tbset.h>
+	catsort.x	<acecat.h>
+	catwcs.x	<acecat1.h> <acecat.h> <imhdr.h>
+	catwhdr.x	<acecat1.h> <acecat.h>
+	catwrecs.x	<acecat1.h> <acecat.h>
+	;

@@ -1,0 +1,282 @@
+<HTML>
+<BODY>
+<TABLE WIDTH="100%" BORDER=0><TR>
+<TD ALIGN=LEFT><FONT SIZE=4>
+<B>mkpodimef (May12)</B></FONT></TD>
+<TD ALIGN=CENTER><FONT SIZE=4>
+<B>odi</B>
+</FONT></TD>
+<TD ALIGN=RIGHT><FONT SIZE=4>
+<B>mkpodimef (May12)</B></FONT></TD>
+</TR></TABLE><P>
+<TITLE>mkpodimef</TITLE>
+<UL>
+</UL>
+<H2><A NAME="s_name">NAME</A></H2>
+<! BeginSection: 'NAME'>
+<UL>
+mkpodimef -- Create working MEF and display pODI raw exposures
+</UL>
+<! EndSection:   'NAME'>
+<H2><A NAME="s_synopsis">SYNOPSIS</A></H2>
+<! BeginSection: 'SYNOPSIS'>
+<UL>
+An input pODI raw exposure, specified as a directory containing
+FITS files for each OTA, is reformated into a "<TT>cell-merged</TT>"
+multi-extension format and (optionally) displayed.
+</UL>
+<! EndSection:   'SYNOPSIS'>
+<H2><A NAME="s_usage___">USAGE   </A></H2>
+<! BeginSection: 'USAGE   '>
+<UL>
+mkpodimef input
+</UL>
+<! EndSection:   'USAGE   '>
+<H2><A NAME="s_parameters">PARAMETERS</A></H2>
+<! BeginSection: 'PARAMETERS'>
+<UL>
+<DL>
+<DT><B><A NAME="l_input">input</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='input' Line='input'>
+<DD>A directory containing the OTA files of a raw pODI exposure.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_overscan">overscan = yes</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='overscan' Line='overscan = yes'>
+<DD>Perform overscan subtraction on the cells?  If "<TT>no</TT>" the overscan regions
+are removed leaving the data values unchanged.  If "<TT>yes</TT>" the overscan
+is used to correct each cell for its amplifier bias after which the
+overscan regions are removed.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_adjust">adjust = "<TT>scale</TT>" (none|zero|scale)</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='adjust' Line='adjust = "scale" (none|zero|scale)'>
+<DD>While the overscan option provides for amplifier bias adjustments for
+display or other purposes the user may wish the cells values be adjusted
+by the cell modes to produce a better display.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_override">override = no</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='override' Line='override = no'>
+<DD>This task produces a file &lt;input&gt;.fits, where &lt;input&gt; is the exposure
+directory name.  One can use this task to create this just the first time
+it is used and then simply redisplay it as needed.  But if one wants to
+force the formating again, say because of change of the overscan or adjust
+options, then one must request the previous version be overridden.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_verbose">verbose = yes</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='verbose' Line='verbose = yes'>
+<DD>Provide some progress output.
+</DD>
+</DL>
+<P>
+The following are a subset of parameters from <B>mscdisplay</B>.  Note
+all <B>mscdisplay</B> parameters not specified here will still take effect
+if set externally.
+<P>
+<DL>
+<DT><B><A NAME="l_display">display = "<TT>center</TT>" (none|center|default)</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='display' Line='display = "center" (none|center|default)'>
+<DD>Selects what to display.  If "<TT>none</TT>" then the display step is skipped.
+If "<TT>center</TT>" then the central filed area of a pODI exposure is displayed.
+If "<TT>default</TT>" then all the OTAs are displayed.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_frame">frame = 1</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='frame' Line='frame = 1'>
+<DD>Display server frame buffer to load.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_zscale">zscale = yes</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='zscale' Line='zscale = yes'>
+<DD>Set the display range based on the image data?  This works with the
+remaining parameters.  If the value is "<TT>no</TT>" then no scaling adjustments
+between OTAs is applied and the display range is set by the <I>z1</I> and
+<I>z2</I> parameters.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_zcombine">zcombine = "<TT>auto</TT>" (none|auto|minmax|average|median)</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='zcombine' Line='zcombine = "auto" (none|auto|minmax|average|median)'>
+<DD>Each OTA will have a different optimum display range produced by the
+<I>zscale</I> optoin.  This parameter defines how the different values
+are combined for the final display range.  See <B>mscdisplay</B> for the
+options.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_z1">z1 = 0, z2 = 1000</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='z1' Line='z1 = 0, z2 = 1000'>
+<DD>When <I>zscale</I>=no these parameters set the display range.
+</DD>
+</DL>
+</UL>
+<! EndSection:   'PARAMETERS'>
+<H2><A NAME="s_description">DESCRIPTION</A></H2>
+<! BeginSection: 'DESCRIPTION'>
+<UL>
+<P>
+An input pODI raw exposure, specified as a directory containing FITS files
+for each OTA, is reformated into a "<TT>cell-merged</TT>" multi-extension format
+if not already done or if requested to override a previous version and
+(optionally) displayed.  This is a convenience tool for interacting with
+pODI raw data.  By converting to cell-merged MEF format all the tools of
+the <B>msctools</B> package are easily available.
+<P>
+One of the most common tasks for pODI raw data is to examine it using
+a display server.  So this task provides the following logic:
+<P>
+<PRE>
+    1. create the MEF if not already done
+    2. display the MEF if desired
+</PRE>
+<P>
+So the first time the command is used for a particular exposure it will
+create the MEF file with the same name as the exposure and subsequent
+times it can quickly display and redisplay the result.  The displayed
+result, provided the XIMTOOL display server is used, can then be interacted
+with using <B>imexamine</B>.
+<P>
+In preparing the MEF two things can happen to the pixel values.
+The first is overscan subtraction.  This makes use of <B>odiproc</B>.
+The second is an offset or gain adjustment based on the modes of each cell.
+This makes use of <B>odireformat</B> which, in term, uses <B>imcombine</B>.
+The adjustment between OTAs is the provence of the <B>mscdisplay</B> program.
+<P>
+Caveats: Nothing is currently done about keeping track of the gaps such as
+with masks.
+<P>
+</UL>
+<! EndSection:   'DESCRIPTION'>
+<H2><A NAME="s_examples">EXAMPLES</A></H2>
+<! BeginSection: 'EXAMPLES'>
+<UL>
+<P>
+1. Display a raw laboratory bias exposure.
+<P>
+<PRE>
+    odi&gt; dir
+    b20120523T114031.0
+    odi&gt; mkpodimef b20120523T114031.0
+    Processing b20120523T114031.0 to poditmp
+    Merge cells in OTA poditmp/poditmp.00.fits
+    WARNING: Negative scale factors -- ignoring scaling
+    Add OTA to MEF b20120523T114031.0.fits[xy00]
+    Merge cells in OTA poditmp/poditmp.16.fits
+    Add OTA to MEF b20120523T114031.0.fits[xy61]
+    Merge cells in OTA poditmp/poditmp.22.fits
+    Add OTA to MEF b20120523T114031.0.fits[xy22]
+    Merge cells in OTA poditmp/poditmp.23.fits
+    WARNING: Negative scale factors -- ignoring scaling
+    Add OTA to MEF b20120523T114031.0.fits[xy32]
+    Merge cells in OTA poditmp/poditmp.24.fits
+    Add OTA to MEF b20120523T114031.0.fits[xy42]
+    Merge cells in OTA poditmp/poditmp.32.fits
+    Add OTA to MEF b20120523T114031.0.fits[xy23]
+    Merge cells in OTA poditmp/poditmp.33.fits
+    Add OTA to MEF b20120523T114031.0.fits[xy33]
+    Merge cells in OTA poditmp/poditmp.34.fits
+    WARNING: Negative scale factors -- ignoring scaling
+    Add OTA to MEF b20120523T114031.0.fits[xy43]
+    Merge cells in OTA poditmp/poditmp.42.fits
+    WARNING: Negative scale factors -- ignoring scaling
+    Add OTA to MEF b20120523T114031.0.fits[xy24]
+    Merge cells in OTA poditmp/poditmp.43.fits
+    WARNING: Negative scale factors -- ignoring scaling
+    Add OTA to MEF b20120523T114031.0.fits[xy34]
+    Merge cells in OTA poditmp/poditmp.44.fits
+    WARNING: Negative scale factors -- ignoring scaling
+    Add OTA to MEF b20120523T114031.0.fits[xy44]
+    Merge cells in OTA poditmp/poditmp.55.fits
+    WARNING: Negative scale factors -- ignoring scaling
+    Add OTA to MEF b20120523T114031.0.fits[xy55]
+    Merge cells in OTA poditmp/poditmp.61.fits
+    WARNING: Negative scale factors -- ignoring scaling
+    Add OTA to MEF b20120523T114031.0.fits[xy16]
+     Image:         Individual       Display (zcombine=none)
+      xy22:       -10.3     12.0           -10.3     12.0
+      xy23:       -23.8     28.4           -23.8     28.4
+      xy24:       -20.4     32.4           -20.4     32.4
+      xy32:       -25.4     45.6           -25.4     45.6
+      xy33:       -16.3     14.5           -16.3     14.5
+      xy34:       -23.0     30.5           -23.0     30.5
+      xy42:      -133.1    145.0          -133.1    145.0
+      xy43:       -41.2     45.5           -41.2     45.5
+      xy44:       -16.6     35.1           -16.6     35.1
+    odi&gt; dir
+    b20120523T114031.0    b20120523T114031.0.fits
+</PRE>
+<P>
+2. Examine the data with <B>imexam</B>.
+<P>
+<PRE>
+    odi&gt; imexam
+</PRE>
+<P>
+Imexamine works when mscdisplay loads the display including information
+about what part of the display belongs to which extension.  XIMTOOL stores
+this information and then cursor reads by imexam can use that to go back
+to the actual image data in the MEF.  This does not work with DS9 (sorry).
+<P>
+3. Select keywords from each OTA. Note that the cells have been merged
+so individual cell headers have been lost and any cell level keywords are
+from the first cell:
+<P>
+<PRE>
+    odi&gt; mscselect b20120523T114031.0.fits $I,DAC_CAL0
+    Warning: Cannot open image (b20120523T114031.0.fits[0])
+    b20120523T114031.0.fits[xy00]   "7 52 -209 -252 -223 -243 -248 -201"
+    b20120523T114031.0.fits[xy61]   "-177 -191 -204 -205 -170 -186 -202 -182"
+    b20120523T114031.0.fits[xy22]   "-218 -200 -211 -157 -156 -199 -160 -100"
+    b20120523T114031.0.fits[xy32]   "-199 -212 -219 -214 -207 -186 -186 -139"
+    b20120523T114031.0.fits[xy42]   "-22 -52 -45 -26 -30 -58 -41 -56"
+    b20120523T114031.0.fits[xy23]   "-241 -173 -192 -202 -229 -244 -184 -202"
+    b20120523T114031.0.fits[xy33]   "-196 -206 -187 -209 -210 -209 -168 -139"
+    b20120523T114031.0.fits[xy43]   "-182 -157 -216 -182 -220 -192 -167 -196"
+    b20120523T114031.0.fits[xy24]   "-114 -85 -165 -148 -136 -161 -102 -142"
+    b20120523T114031.0.fits[xy34]   "-160 -199 -181 -210 -262 -182 -219 -175"
+    b20120523T114031.0.fits[xy44]   "-288 -260 -307 -239 -225 -253 -196 -184"
+    b20120523T114031.0.fits[xy55]   "-180 -158 -211 -226 -212 -165 -182 -248"
+    b20120523T114031.0.fits[xy16]   "-265 -224 -231 -221 -215 -252 -173 -149"
+</PRE>
+<P>
+4.  Image statistics:
+<P>
+<PRE>
+    odi&gt; mscstat b20120523T114031.0.fits fields="image,mean,min,max"      
+    #               IMAGE              MEAN       MIN       MAX
+    b20120523T114031.0.fits[xy00]     2.677   -65245.     5880.
+    b20120523T114031.0.fits[xy61]  2.632105  -1623.056  18974.02
+    b20120523T114031.0.fits[xy22]  1.179367  -1002.393  13953.71
+    b20120523T114031.0.fits[xy32]  5.460754  -1496.569  8041.861
+    b20120523T114031.0.fits[xy42]  17.8783  -14276.07  52769.71
+    b20120523T114031.0.fits[xy23]  4.327352  -7119.966  12655.74
+    b20120523T114031.0.fits[xy33]  2.283325  -781.5204  1834.036
+    b20120523T114031.0.fits[xy43]  -16.5371  -2209.792  64553.03
+    b20120523T114031.0.fits[xy24]  2.70246  -1277.439  5433.43
+    b20120523T114031.0.fits[xy34]  4.522082  -1397.222  6069.613
+    b20120523T114031.0.fits[xy44]  4.146359  -2756.996  3991.015
+    b20120523T114031.0.fits[xy55]  3.142803  -1328.274  2491.807
+    b20120523T114031.0.fits[xy16]  4.453662  -1541.954  3855.949
+</PRE>
+<P>
+</UL>
+<! EndSection:   'EXAMPLES'>
+<H2><A NAME="s_see_also">SEE ALSO</A></H2>
+<! BeginSection: 'SEE ALSO'>
+<UL>
+odireformat
+</UL>
+<! EndSection:    'SEE ALSO'>
+
+<! Contents: 'NAME' 'SYNOPSIS' 'USAGE   ' 'PARAMETERS' 'DESCRIPTION' 'EXAMPLES' 'SEE ALSO'  >
+
+</BODY>
+</HTML>

@@ -1,0 +1,5 @@
+# Help directory for the NFEXTERN package library.
+
+xt_extns	hlp=xtextns.hlp
+xt_maskname	hlp=xtmaskname.hlp
+xt_pmmap	hlp=xtpmmap.hlp

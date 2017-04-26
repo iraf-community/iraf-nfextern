@@ -1,0 +1,396 @@
+<HTML>
+<BODY>
+<TABLE WIDTH="100%" BORDER=0><TR>
+<TD ALIGN=LEFT><FONT SIZE=4>
+<B>irprocexpr (Mar05)</B></FONT></TD>
+<TD ALIGN=CENTER><FONT SIZE=4>
+<B>irred</B>
+</FONT></TD>
+<TD ALIGN=RIGHT><FONT SIZE=4>
+<B>irprocexpr (Mar05)</B></FONT></TD>
+</TR></TABLE><P>
+<TITLE>irprocexpr</TITLE>
+<UL>
+<CENTER><B>IRPROC</B> Keyword and Linearity Expressions
+
+</CENTER><BR>
+<P>
+</UL>
+<H2><A NAME="s_introduction">Introduction</A></H2>
+<! BeginSection: 'Introduction'>
+<UL>
+<P>
+The <B>irproc</B> task uses of expressions which treat keywords and pixel
+values as operands.  The expressions are used to select and group images,
+provide sort keys, evaluate exposure times, apply a non-linearity
+corrections and idenitfy bad pixels.  The expressions provide a great deal
+of flexiblity and accomodate data from different instruments within and
+between observatories.
+<P>
+The expression syntax follows common algebraic and programming rules.  For
+instance it is the same as available in the CL.  The main things to
+understand are what constitutes a operand, what type of final value is
+required, and what functions are provided.
+<P>
+Expressions consist of operands, numeric and string constants, operators,
+and functions.  Parentheses are also used to control the evaluation order
+as in standard algebraic expression.  String constants are quoted strings
+and numeric constants are pure unquoted numbers.  Numbers may be given in
+sexagesimal notation and are automatically converted to decimal numbers.
+The operators are arithmetic, logical, and string.
+<P>
+One feature of the <B>irproc</B> parameter values where the expressions are
+specified is that the expression may be read from a file using the @file
+syntax.  This is useful if expressions are long.  In the file newlines may
+be used make the expression more readable.
+<P>
+</UL>
+<! EndSection:   'Introduction'>
+<H2><A NAME="s_operands">Operands</A></H2>
+<! BeginSection: 'Operands'>
+<UL>
+<P>
+Except for the bad pixel and linearity correction expressions the only
+operands are keyword names.  This means a operand is anything that is
+allowed for a keyword name and which is not quoted in the expression.
+There is one exception for keywords that include the characters that
+correspond to the operators in expressions.  In this case the keyword is
+quoted as a string and then referenced as a keyword using a leading @
+character; e.g.  @"<TT>date-obs</TT>".
+<P>
+In the bad pixel and linearity expressions the values of pixels in the
+image being processed.  The linearity expression also allows using the
+values of pixels representing coefficients in a linearity coefficient image
+as operands.  The pixels in the image being processed are referenced by the
+operand $I.  The pixels in the coefficient image are reference by $C1, $C2,
+etc.  The number refers to the element of the third dimension of the
+coefficient image.
+<P>
+There are some special operands that relate to standard elements of
+an image and may not be the same as the FITS keywords.  These are
+<P>
+<PRE>
+	title - title of the exposure
+	naxis - number of axes
+	naxis1 - number of pixel along the first axis
+	naxis2 - number of pixel along the second axis
+</PRE>
+<P>
+</UL>
+<! EndSection:   'Operands'>
+<H2><A NAME="s_operators">Operators</A></H2>
+<! BeginSection: 'Operators'>
+<UL>
+<P>
+The following operators are recognized in expressions.  With the exception
+of the operators "<TT>?</TT>", "<TT>?=</TT>", and "<TT>@</TT>", the operator set is equivalent to that
+available in the CL.
+<P>
+<PRE>
+        +  -  *  /              arithmetic operators
+        **                      exponentiation
+        //                      string concatenation
+        !  -                    boolean not, unary negation
+        &lt;  &lt;= &gt;  &gt;=             order comparision (works for strings)
+        == != &amp;&amp; ||             equals, not equals, and, or
+        ?=                      string equals pattern
+        ? :                     conditional expression (ternary operator)
+        @                       reference a operand
+</PRE>
+<P>
+The operators "<TT>==</TT>", "<TT>&amp;&amp;</TT>", and "<TT>||</TT>" may be abbreviated as "<TT>=</TT>", "<TT>&amp;</TT>", and "<TT>|</TT>"
+if desired.  The ?= operator performs pattern matching upon strings.
+The pattern syntax is that described for the task <B>match</B>.
+The @ operator is required to reference keywords with
+one of the operator characters.  This is most likely to be used as:
+<P>
+<PRE>
+        @"date-obs"
+</PRE>
+<P>
+A point to be aware of is that in the ?: conditional expression both
+possible result values are evaluated though the result of the expression
+is only one of them.
+<P>
+</UL>
+<! EndSection:   'Operators'>
+<H2><A NAME="s_functions">Functions</A></H2>
+<! BeginSection: 'Functions'>
+<UL>
+<P>
+A number of standard intrinsic functions are recognized within
+expressions.  Many of these may not be useful in the context of the
+<B>irproc</B> expressions but are part of the language.  The set of
+functions currently supported is shown below.
+<P>
+<PRE>
+	abs     atan2   deg     log     min     real    sqrt
+	acos    bool    double  log10   mod     short   str
+	asin    cos     exp     long    nint    sin     tan
+	atan    cosh    int     max     rad     sinh    tanh
+</PRE>
+<P>
+The trigonometric functions operate in units of radians.
+The <I>min</I> and <I>max</I> functions may have any number of arguments up
+to a maximum of sixteen or so (configurable).  The arguments need not all
+be of the same datatype.
+<P>
+A function call may take either of the following forms:
+<P>
+<PRE>
+        &lt;identifier&gt; <TT>'('</TT> arglist <TT>')'</TT>
+        &lt;string_expr&gt; <TT>'('</TT> arglist <TT>')'</TT>
+</PRE>
+<P>
+The first form is the conventional form found in all programming languages.
+The second permits the generation of function names by string valued
+expressions and might be useful on rare occasions.
+<P>
+There are a number of additional functions in addition to the above
+intrinsic functions.  One may be particularly useful for <B>irproc</B>
+to map arbitrary strings in keywords to the same value for grouping
+or to translate long strings to shorter strings.  This is the
+"<TT>strmap</TT>" function.
+<P>
+<DL>
+<DT><B><A NAME="l_strmap">strmap (string, [oldstr, newstr, ...])</A></B></DT>
+<! Sec='Functions' Level=0 Label='strmap' Line='strmap (string, [oldstr, newstr, ...])'>
+<DD>The first argument is a reference string to be mapped.  Typically it
+would be a keyword operand whose value is to be mapped, though it can be any
+string valued expression including combinations of keyword values.  The
+oldstr and newstr arguments must occur in pairs; i..e the number of
+arguments must odd.  If the reference string value does not match any of
+the oldstr arguments the value of the function is the reference string.
+</DD>
+</DL>
+<P>
+The other special functions provide astronomical features.  These are:
+<P>
+<PRE>
+	     sexstr - convert a number to a sexagesimal string
+	      epoch - compute an epoch
+	     julday - compute a Julian day
+		mst - compute a mean siderial time
+	    precess - precess a coordinate pair
+	 ra_precess - precess ra
+	dec_precess - precess dec
+	     arcsep - arc second separation of two coordinates
+	    airmass - compute airmass
+	   eairmass - compute effective airmass
+</PRE>
+<P>
+<DL>
+<DT><B><A NAME="l_sexstr">sexstr (number), sexstr (number, digits)</A></B></DT>
+<! Sec='Functions' Level=0 Label='sexstr' Line='sexstr (number), sexstr (number, digits)'>
+<DD>Convert a number to a sexagesimal string in the format X:MM:SS.SS.  There
+is an optional second argument (the default is 0) which is the number of
+decimal digits in the seconds field.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_epoch">epoch (date[, ut])</A></B></DT>
+<! Sec='Functions' Level=0 Label='epoch' Line='epoch (date[, ut])'>
+<DD>Compute an epoch given a date and time.  The date is a string in the
+format DD/MM/YY, YYYY-MM-DD, or YYYY-MM-DDTHH:MM:SS.
+Typically this argument will be the standard FITS
+keyword DATE-OBS.  Because of possible confusion of the hyphen with
+subtraction this keyword would be specified as @"<TT>date-obs</TT>".  The time
+argument is optional.  If it is not given the time from the date
+string will be used and if absent a time of 0h is used.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_julday">julday (date[, ut])</A></B></DT>
+<! Sec='Functions' Level=0 Label='julday' Line='julday (date[, ut])'>
+<DD>Compute a Julian day given a date and time.  The date and time are
+specified as described previously.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_mst">mst (date[, ut], longitude)</A></B></DT>
+<! Sec='Functions' Level=0 Label='mst' Line='mst (date[, ut], longitude)'>
+<DD>Compute a mean siderial time given a date, time, and longitude in degrees.  The
+date and (optional) time are specified as described previously.  The longitude
+may be given as a constant or using the observatory database function
+as shown in the examples.  The returned value is a sexagesimal
+string with two decimals in the seconds.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_precess">precess (ra, dec, epoch1, epoch2)</A></B></DT>
+<! Sec='Functions' Level=0 Label='precess' Line='precess (ra, dec, epoch1, epoch2)'>
+<DD>Precess coordinates from one epoch to another.  The ra is the
+right ascension in hours, the dec in the declination in degrees,
+and the epochs are in years.  This function returns a formated string with
+the precessed right ascension, declination, and epoch.  Numerical
+values for the right ascension and declination are obtained with the
+functions ra_precess and dec_precess.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_ra_precess">ra_precess (ra, dec, epoch1, epoch2)</A></B></DT>
+<! Sec='Functions' Level=0 Label='ra_precess' Line='ra_precess (ra, dec, epoch1, epoch2)'>
+<DD>Precess a right ascension from one epoch to another.  The ra is the
+input right ascension in hours, the dec is the declination in degrees,
+and the epochs are in years.  Because a function can return only one
+value there is a second function to return the precessed declination.
+The returned value is a sexagesimal string with two decimals in the seconds.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_dec_precess">dec_precess (ra1, dec1, epoch1, epoch2)</A></B></DT>
+<! Sec='Functions' Level=0 Label='dec_precess' Line='dec_precess (ra1, dec1, epoch1, epoch2)'>
+<DD>Precess a declination from one epoch to another.  The ra is the
+input right ascension in hours, the dec is the declination in degrees,
+and the epochs are in years.  Because a function can return only one
+value there is a second function to return the precessed right ascension.
+The returned value is a sexagesimal string with two decimals in the seconds.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_arcsep">arcsep (ra1, dec1, ra2, dec2)</A></B></DT>
+<! Sec='Functions' Level=0 Label='arcsep' Line='arcsep (ra1, dec1, ra2, dec2)'>
+<DD>Compute the separation between two spherical coordinates.  The parameters
+ra1 and ra2 are coordinates in hours (right ascension, longitude, etc.)
+and the dec1 and dec2 parameters are coordinates in degrees (declination,
+latitude, etc.).  The computed value is returned in seconds of arc.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_airmass">airmass (ra, dec, st, latitude)</A></B></DT>
+<! Sec='Functions' Level=0 Label='airmass' Line='airmass (ra, dec, st, latitude)'>
+<DD>Compute an airmass given right ascension in hours, declination in
+degrees, sideral time in hours, and latitude in degrees.  The latitude
+is often specified using the observatory database function as shown
+in the examples.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_eairmass">eairmass (ra, dec, st, exptime, latitude)</A></B></DT>
+<! Sec='Functions' Level=0 Label='eairmass' Line='eairmass (ra, dec, st, exptime, latitude)'>
+<DD>Compute an "<TT>effective</TT>" airmass given right ascension in hours, declination
+in degrees, beginning sideral time in hours, exposure time in seconds, and
+latitude in degrees.  The The latitude is often specified using the
+observatory database function as shown in the examples.  The effective
+airmass is based on a Simpson's rule weighting of the beginning, middle,
+and ending airmass (with no provision for paused exposure).  The weights
+are:
+<P>
+<PRE>
+    effective = beginning + 4 * middle + ending
+</PRE>
+</DD>
+</DL>
+<P>
+</UL>
+<! EndSection:   'Functions'>
+<H2><A NAME="s_examples">Examples</A></H2>
+<! BeginSection: 'Examples'>
+<UL>
+<P>
+1. The <I>intype</I> and <I>skytype</I> parameters are used to select
+images from a list.  The expression is a boolean that is applied to
+an image to determine whether it is to be used or not.  For input
+images the most common type of selection is to select only one
+observational type.  This is the same as the <I>dtype</I> and
+<I>ftype</I> parameter and examples are found later.  But supposed
+one wants to process only those images which have NGC123 in the
+title:
+<P>
+<PRE>
+	title?="NGC123"
+</PRE>
+<P>
+To make the match case insensitive use the {} pattern matching
+characters.
+<P>
+Now suppose one wants to process only the observations made in
+the Ks filter where the filter string in the header is that
+shown in the example:
+<P>
+<PRE>
+	filter="Ks kp1234 K short filter"
+</PRE>
+<P>
+One can combine the booleans to:
+<P>
+<PRE>
+	title?="NGC123"&amp;filter="Ks kp1234 K short filter"
+</PRE>
+<P>
+2.  Selection and identifications of observational types is a common
+requirement.  Various observatories do this in diffent ways.  One
+common way is with a string keyword such as OBSTYPE.  The following
+matches when the image contains the keyword OBSTYPE with a value
+that contains the word "<TT>flat</TT>" while ignoring the case.
+<P>
+<PRE>
+	obstype?="{flat}"
+</PRE>
+<P>
+But suppose the type is encoded as observation code and codes 3 and
+4 indicated flat fields.
+<P>
+<PRE>
+	expcode=3|expcode=4
+</PRE>
+<P>
+Finally suppose the types are only identified by the user putting
+the word flat in the title.  The same expression as for OBSTYPE could
+be used with the keyword TITLE substituted.
+<P>
+3. The <I>imageid</I> and <I>filter</I> parameters are used to group
+images.  Typically these would have the same value for all data that
+fall into the group.  For instance if the keyword is AMPNUM to group
+images by amplifier it might be as follows.
+<P>
+<PRE>
+	ampnum
+</PRE>
+<P>
+The filters are sometimes identified by filter wheel numbers but sometimes
+they are identified by strings.  Now suppose it is possible that for
+some reason the same filter may have different names; say because it
+is manually entered by the observer.  Then one could use the STRMAP
+function to map the strings to the same short value.
+<P>
+<PRE>
+	strmap(filter,"H filter","H",
+	    "Filter H","H",
+	    "Filter 2","H",
+	    "J filter","J",
+	    "j","J",
+	    "K short", "Ks"
+	    "Kshort", "Ks)
+</PRE>
+<P>
+For a long expression like this it might be put in an @file.  In this
+expression the values, assuming there are no others, would be "<TT>H</TT>", "<TT>J</TT>", and
+"<TT>Ks</TT>" and the images would be grouped by these values even though there are
+several variants.
+<P>
+4. A bad pixel expression is used to identify bad pixels based on the
+pixel values.  The most common type of expression is a threshold for
+saturation.  Note that the bad pixel expression must evaluate to an
+integer code where zero is a good pixel and any other positive integer
+is a bad pixel.  A threshold saturation expression using a keyword
+"<TT>saturate</TT>" would be
+<P>
+<PRE>
+	$I &gt;= saturate ? 4 : 0
+</PRE>
+<P>
+A more complex expression might convert a saturation value given in
+electrons to data numbers based on the gain as in
+<P>
+<PRE>
+	$I*gain &gt;= saturate ? 4 : 0
+</PRE>
+<P>
+</UL>
+<! EndSection:    'Examples'>
+
+<! Contents: 'Introduction' 'Operands' 'Operators' 'Functions' 'Examples'  >
+
+</BODY>
+</HTML>

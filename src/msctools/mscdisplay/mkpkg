@@ -1,0 +1,44 @@
+# MSCDISPLAY
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	mscexam
+	$call	install
+	;
+
+relink:
+	$update	libpkg.a
+	$call	mscdisplay
+	;
+
+mscdisplay:
+	$set    LIBS1 = "-lnfe -lds -lxtools -lcurfit -lgsurfit"
+	$set	LIBS2 = "-lnlfit -liminterp -lncar -lgks -lllsq"
+
+	$call	starfocus@src
+	$omake	x_mscdisplay.x
+	$link x_mscdisplay.o src/starfocus/libpkg.a libpkg.a\
+	    $(LIBS1) $(LIBS2) -o xx_mscdisplay.e
+	;
+
+mscexam:
+	$set    LIBS1 = "-lnfe -lds -lxtools -lcurfit -lgsurfit"
+	$set	LIBS2 = "-lnlfit -liminterp -lncar -lgks -lllsq"
+
+	$call	mscexam@src
+	$omake	x_mscexam.x
+	$link x_mscexam.o src/imexam/libpkg.a libpkg.a ../libpkg.a\
+	    -lslalib $(LIBS1) $(LIBS2) -o xx_mscexam.e
+	;
+
+install:
+	$move	xx_mscdisplay.e nfebin$x_mscdisplay.e
+	$move	xx_mscexam.e nfebin$x_mscexam.e
+	;
+
+libpkg.a:
+	@src
+	;

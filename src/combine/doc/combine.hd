@@ -1,0 +1,10 @@
+# Help directory for COMBINE.
+
+revisions	sys=../Revisions
+
+cgroup		hlp=combine.hlp
+combine		hlp=combine.hlp
+dcombine	hlp=combine.hlp
+fcombine	hlp=combine.hlp
+scombine	hlp=combine.hlp
+zcombine	hlp=combine.hlp

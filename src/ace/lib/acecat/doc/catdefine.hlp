@@ -1,0 +1,71 @@
+.help catdefine Jan08 ace
+.ih
+SUMMARY
+The catalog definition facility is a mechanism for applications to allow
+users to define desired input and output catalog fields when creating a
+new catalog and when mapping fields in existing catalogs to those used
+by the application.
+.ih
+PARAMETER
+Tasks using the catalog definition facility provide a parameter, typically
+called something like \fIcatdef\fR, for defining catalog fields to be
+created or used by an application.  The parameter value is a string with
+three possible formats as identified by the leading character.
+
+.nf
+     @<filename> - a catalog definition file
+     =<fields>   - comma separated list of catalog fields
+     #<string>   - a catalog definition string
+.fi
+
+In addition, a value not beginning with @, =, or # is treated as a catalog
+definition filename and a null string uses the application default catalog
+fields and names.  See the task's parameter description for more details
+and variations to these formats.
+.ih
+DESCRIPTION
+A catalog definition provides a mapping between an application's view
+of a catalog and a user's desired input or output catalog.  For input
+or input and output to the same catalog this is simply about mapping
+the field names in the catalog to the fields used by the application.
+For creation of a new catalog the definitions define the desired fields,
+field names, and order.  Note that a new output catalog need only contain
+a subset of the fields available from the application.
+
+A catalog definiiton file has one or two columns.  The first column are
+field names used by the application.  The file need only contain the
+fields to be read or written.  The order can be that desired for a new
+output catalog.  If the catalog uses different field names or if a new
+output catalog is to be created with different names then the second
+column provides a translation.  An example is shown below.
+
+.nf
+    MAG
+    RA   RA_MEASURED
+    DEC  DEC_MEASURED
+.fi
+
+A new catalog will have the fields listed by the second column in the
+specified order.  With only a single field the the application and
+catalog names are the same; e.g.  MAG.
+
+A catalog definition string, beginning with '#', is basically equivalent
+to a disk file.  Note that newlines must be used to delimit the fields.
+In the previous example the string would be
+
+.nf
+    "#MAG\nRA RA_MEASURED\nDEC DEC+MEASURED"
+.fi
+
+A field list, beginning with '=', is a comma separated list of names which
+map to the application fields in an application order as described by the
+task help.  In other words it is simply a translation of the applications
+field names with no mapping, selection, or reordering.  For example, if
+the application expects to read RA, DEC, and MAG from a catalog and the
+input catalog contains "alpha", "delta", and "Vmag" (not necessarily in
+that order in the catalog) then the definition string would be "= alpha,
+delta, Vmag".  If the input catalog is a simple text file with no column
+definitions and the columns are in the order magnitude, right ascension,
+and declination the the string would be "= c2, c3, c1".
+
+.endhelp

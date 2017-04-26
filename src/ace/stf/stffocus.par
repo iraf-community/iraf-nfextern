@@ -1,0 +1,6 @@
+# STFFOCUS -- Determine best star focus.
+
+input,s,a,,,,"List of images"
+focus,s,h,"1x1",,,"Focus values"
+logfile,s,h,"logfile",,,"Logfile"
+graphcur,*gcur,h,"",,,"Graphics cursor input"

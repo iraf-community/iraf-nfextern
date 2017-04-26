@@ -1,0 +1,354 @@
+.help procexpr Feb07 "PROCTOOL Based Expressions"
+
+.sh
+Introduction
+
+A number of tasks are layered on the \fIproctool\fR expression processing
+task.  This task, and hence its derivatives, have many useful features not
+found other expression evaluation tasks such as \fIimexpr\fR and
+\fImskexpr\fR.  The basis of all thse tasks are expressions which use input
+image pixel and keyword values as operands to produce output images.  In the
+\fBproctool\fR based tasks expressions are also use in parameter values.
+This feature is used to set for parameters, select and group images, provide
+sort keys, evaluate exposure times, and define processing operations.  The
+expressions provide a great deal of flexiblity and accomodate data from
+different instruments within and between observatories.
+
+Expressions are specified by one of the following forms:
+
+.nf
+    (<expression>), !<expression>, %(<expression>), @(file), @!file
+.fi
+
+The last two cases read the expression from the specified file.
+A file is useful for long expressions which may include newlines.
+The '!<expression>' form is supported to be similar to other programs
+which use this to refer to the value of keyword, though the expression
+may be more complex than just a keyword.  In the task many parameters may
+be specified as expressions or literal string or numeric values as well
+as filename templates.  The use of the '()' or '!' delimiters for literal
+string values avoids the need to quote them in a constant value expression
+and is needed to distinguish filename templates from expressions.
+Note that the ability to specify either a filename template or an
+expression allows providing explicit files to be used as well as
+specifying files by keywords.
+
+A feature of the proctool-based expressions is string substitution.
+Currently only one substitution, '\I', is defined and is only used by
+the tasks which have the \fIimageid\fR parameter.  The parameter is
+evaluate for each image and the value is substituted in everywhere
+the '\I' sequence is found.  The primary purpose of this is to
+generate different macro names for images identified by different
+header values.  In particular, this is useful for mosaic data,
+typically in MEF, where each image element needs a different
+expression.  This same effect might be achieved by using the keyword
+in the expression but this is tricky and limited in scope because
+of the need to combine literal strings with operands to form other
+literal strings for ultimate evaluation; multiple layers of quoting,
+string coersion, and concatenting is difficult.  Suffice it to
+say that the '\I' substitution method is simpler and less prone to error.
+
+The task also provides an expression database (not to be confused with
+the operation database which also defines expressions).  This includes
+all the same syntax and features described for
+.hr imexpr \fBimexpr\fR
+and the reader should consult the help
+for that task.  The expression database is used for very complex
+expressions with macro substitutions.
+
+In all but '%' form the
+expression database is applied to the expressions before any
+processing or evaluation is done.  The '%' form causes the initial
+expression to be evaluated first for each image and then the expression
+database is applied.  Note that the initial expression must evaluate to
+a string in this case.  The purpose of this special form is to allow
+macro function names to be created based on header keywords.
+
+It is important to realize the '%' form is not needed for expressions
+using header keywords as operands since these are evaluated for each
+image.  It is only the rare case where different user macros are needed
+for each image.  An example of this might be:
+
+.nf
+    %('myfunc'//str(imageid)//'($I,$L)')
+.fi
+
+which produces lc1($I,$L), lc2($I,$L), etc. for the images with "imageid"
+keyword having values 1, 2, etc.  This is an actual example for a
+linearity correction where the form of the correction is complex and
+different for different arrays in a mosaic.
+
+The expression syntax within the delimiters follows common algebraic and
+programming rules.  For the basics of expressions see
+.hr expressions \fBexpressions\fR.
+The discussion here describes the specifics of operands and special
+functions available in the processing task.
+
+.sh
+Operands
+
+There are two types of operands, pixel and keywords values, in
+expressions.  Both of these refer to images by the single letter
+operation code.  For instance, I refers to the image being processed,
+F to the flat field, D to the dark, etc.
+
+The pixel values are specified by the syntax $<image>.  For example $I
+refers to the input image data, $F refers to the flat field, etc.  However,
+$I is special in that as each operations is performed in specified order it
+refers to the current processed value.  For instance, if the first operation
+is "$I-$D", which is subtraction of a dark image, and the second operation
+is "$I/$F", which is division by a flat field image, then $I in the second
+operation is the value after the dark subtraction.
+
+The syntax allows referencing the third dimension of a three-dimensional
+image.  This is intended for operations where each pixel has multiple
+coefficients such as for a linearity correction.  The image code may be
+followed by a number which refers to the third dimension.  For example $L1
+and $L2 refer to values in a linearity correction image which match the
+image being processed in column and line but come from the first and second
+bands.
+
+To refer to the value of a keyword the syntax is <image>.<keyword>.  For
+example I.exptime refers to the value of the EXPTIME keyword in the header
+of the input image.  If no image is specified then the keyword is from the
+input image.
+
+There are some special operands that relate to standard elements of
+an image and may not be the same as the FITS keywords.  These are
+
+.nf
+	title - title of the exposure
+	naxis - number of axes
+	naxis1 - number of pixel along the first axis
+	naxis2 - number of pixel along the second axis
+.fi
+
+.sh
+Functions
+
+A number of standard intrinsic functions are recognized within
+expressions (
+.hr expressions \fBexpressions\fR.
+Many of these may not be useful in
+the context of the processing expressions but are part of the language.
+
+There are a number of additional functions in addition to the intrinsic
+functions.  Two may be particularly useful for processing.  The "strmap"
+function maps arbitrary strings in keywords to the same value for grouping
+or to translate long strings to shorter strings.  This may be used to
+map dome flat on and off strings.  The "arcsep" function may be useful
+in identifying which exposures to use for sky.
+
+The other special functions provide astronomical features.  These are:
+
+.nf
+     substr - extract a substring
+     strmap - map a string to one of a set of new values
+     sexstr - convert a number to a sexagesimal string (xx:mm:ss.ss)
+      epoch - compute an epoch given a date and time
+     julday - compute a Julian day given a date and time
+        mst - compute a mean siderial time w/ date, time, and longitude
+ ra_precess - precess ra from one epoch to another
+dec_precess - precess dec from one epoch to another
+    airmass - compute airmass w/ ra, dec, siderial time, and latitude
+   eairmass - compute effective airmass given
+                ra, dec, siderial time, exposure time, and latitude
+      obsdb - get parameters from the observatory database
+.fi
+
+
+.ls substr (string, index1, index2)
+A substring is extracted between the two index values. The indices start
+with 1.
+.le
+.ls strmap (string, [oldstr, newstr, ...])
+The first argument is a reference string to be mapped.  Typically it
+would be a keyword operand whose value is to be mapped, though it can be any
+string valued expression including combinations of keyword values.  The
+oldstr and newstr arguments must occur in pairs; i..e the number of
+arguments must odd.  If the reference string value does not match any of
+the oldstr arguments the value of the function is the reference string.
+.le
+.ls sexstr (number), sexstr (number, digits)
+Convert a number to a sexagesimal string in the format X:MM:SS.SS.  There
+is an optional second argument (the default is 0) which is the number of
+decimal digits in the seconds field.
+.le
+.ls epoch (date[, ut])
+Compute an epoch given a date and time.  The date is a string in the
+format DD/MM/YY, YYYY-MM-DD, or YYYY-MM-DDTHH:MM:SS.
+Typically this argument will be the standard FITS
+keyword DATE-OBS.  Because of possible confusion of the hyphen with
+subtraction this keyword would be specified as @"date-obs".  The time
+argument is optional.  If it is not given the time from the date
+string will be used and if absent a time of 0h is used.
+.le
+.ls julday (date[, ut])
+Compute a Julian day given a date and time.  The date and time are
+specified as described previously.
+.le
+.ls mst (date[, ut], longitude)
+Compute a mean siderial time given a date, time, and longitude in degrees.  The
+date and (optional) time are specified as described previously.  The longitude
+may be given as a constant or using the observatory database function
+as shown in the examples.  The returned value is a sexagesimal
+string with two decimals in the seconds.
+.le
+.ls precess (ra, dec, epoch1, epoch2)
+Precess coordinates from one epoch to another.  The ra is the
+right ascension in hours, the dec in the declination in degrees,
+and the epochs are in years.  This function returns a formated string with
+the precessed right ascension, declination, and epoch.  Numerical
+values for the right ascension and declination are obtained with the
+functions ra_precess and dec_precess.
+.le
+.ls ra_precess (ra, dec, epoch1, epoch2)
+Precess a right ascension from one epoch to another.  The ra is the
+input right ascension in hours, the dec is the declination in degrees,
+and the epochs are in years.  Because a function can return only one
+value there is a second function to return the precessed declination.
+The returned value is a sexagesimal string with two decimals in the seconds.
+.le
+.ls dec_precess (ra1, dec1, epoch1, epoch2)
+Precess a declination from one epoch to another.  The ra is the
+input right ascension in hours, the dec is the declination in degrees,
+and the epochs are in years.  Because a function can return only one
+value there is a second function to return the precessed right ascension.
+The returned value is a sexagesimal string with two decimals in the seconds.
+.le
+.ls arcsep (ra1, dec1, ra2, dec2)
+Compute the separation between two spherical coordinates.  The parameters
+ra1 and ra2 are coordinates in hours (right ascension, longitude, etc.)
+and the dec1 and dec2 parameters are coordinates in degrees (declination,
+latitude, etc.).  The computed value is returned in seconds of arc.
+.le
+.ls airmass (ra, dec, st, latitude)
+Compute an airmass given right ascension in hours, declination in
+degrees, sideral time in hours, and latitude in degrees.  The latitude
+is often specified using the observatory database function as shown
+in the examples.
+.le
+.ls eairmass (ra, dec, st, exptime, latitude)
+Compute an "effective" airmass given right ascension in hours, declination
+in degrees, beginning sideral time in hours, exposure time in seconds, and
+latitude in degrees.  The The latitude is often specified using the
+observatory database function as shown in the examples.  The effective
+airmass is based on a Simpson's rule weighting of the beginning, middle,
+and ending airmass (with no provision for paused exposure).  The weights
+are:
+
+.nf
+    effective = beginning + 4 * middle + ending
+.fi
+.le
+.ls obsdb (observatory, parameter)
+Return a value from the observatory database.  The observatory parameter is
+a observatory identification string as defined in the database.  Another
+special value is "observatory" which then follows a name resolution
+scheme.  The observatory database mechanism is described by the help topic
+.hr observatory \fBobservatory\fR.
+The parameter is a string given the quantity desired.
+Typically this would be "longitude" or "latitude" but there are other
+possible parameters.
+.le
+
+.sh Expression Database
+
+The expression database allows defining constants and user macro functions.
+This is described further for \fBimexpr\fR.
+
+.sh
+Examples
+
+1. The \fIintype\fR parameter is used to select
+images from a list.  The expression must produce a boolean value that is
+applied to an image to determine whether it is to be used or not.  For input
+images the most common type of selection is to select only one observational
+type.  This is similar to the \fIdtype\fR and \fIftype\fR parameters in
+a later example.  But supposed one wants to process only those
+images which have NGC123 in the title:
+
+.nf
+	(title?='NGC123')
+.fi
+
+To make the match case insensitive use the {} pattern matching
+characters.
+
+Now suppose one wants to process only the observations made in
+the Ks filter where the filter string in the header is that
+shown in the example:
+
+.nf
+	FILTER  = 'Ks kp1234 K short filter'
+.fi
+
+One can combine the booleans to:
+
+.nf
+	(title?='NGC123'&filter='Ks kp1234 K short filter')
+.fi
+
+2.  Selection and identifications of observational types is a common
+requirement.  Various observatories do this in diffent ways.  One
+common way is with a string keyword such as OBSTYPE.  The following
+matches when the image contains the keyword OBSTYPE with a value
+that contains the word 'flat' while ignoring the case.
+
+.nf
+	(obstype?='{flat}')
+.fi
+
+Suppose the type is encoded as observation code and codes 3 and
+4 indicated flat fields.
+
+.nf
+	(expcode=3|expcode=4)
+.fi
+
+Finally suppose the types are only identified by the user putting
+the word flat in the title.  The same expression as for OBSTYPE could
+be used with the keyword TITLE substituted.
+
+3. The \fIimageid\fR and \fIfilter\fR parameters are used to group
+images.  Typically these would have the same value for all data that
+fall into the group.  For instance if the keyword is AMPNUM to group
+images by amplifier it might be as follows.
+
+.nf
+	(ampnum)
+.fi
+
+The filters are sometimes identified by filter wheel numbers but sometimes
+they are identified by strings.  Now suppose it is possible that for
+some reason the same filter may have different names; say because it
+is manually entered by the observer.  Then one could use the STRMAP
+function to map the strings to the same short value.  The reference
+
+.nf
+	@(maps.dat)
+.fi
+
+where the file maps.dat contains
+
+.nf
+	strmap(filter,"H filter","H",
+	    "Filter H","H",
+	    "Filter 2","H",
+	    "J filter","J",
+	    "j","J",
+	    "K short", "Ks"
+	    "Kshort", "Ks)
+.fi
+
+maps multiple values of the FILTER keyword to the same logical filter,
+"H", "J", and "Ks" in this case.   During processing the images would be
+grouped and matched by these values even though there are several variants.
+
+.sh
+SEE ALSO
+
+.hr expressions \fBexpressions\fR
+.hr imexpr \fBimexpr\fR
+
+.endhelp

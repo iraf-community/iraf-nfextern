@@ -1,0 +1,4 @@
+pefunc.x
+doc/procexpr.hlp
+    The 'substr' function was not correctly implemented or documented.
+    Valdes: Mon Apr  9 14:36:51 MST 2012

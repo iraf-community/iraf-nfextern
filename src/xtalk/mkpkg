@@ -1,0 +1,45 @@
+# Make Crosstalk Tools.
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$update	libpkg.a
+	$call	xtalk
+	;
+
+install:
+	$move	xx_xtalk.e nfebin$x_xtalk.e
+	;
+
+xtalk:
+	$omake	x_xtalk.x
+	$link	x_xtalk.o libpkg.a -lxtools -lcurfit -lgsurfit \
+		-liminterp -o xx_xtalk.e
+	;
+
+generic:
+	$set	GEN = "$$generic -k"
+
+	$ifolder (xtalk.x, xtalk.gx)
+	    $(GEN) xtalk.gx -o xtalk.x $endif
+	;
+
+libpkg.a:
+	$ifeq (USE_GENERIC, yes) $call generic $endif
+
+	ccdsection.x	<ctype.h>
+	mapio.x		<error.h> <imhdr.h>
+        mgs.x           <error.h> <imhdr.h> <imio.h> <math/gsurfit.h>
+	mim.x           <error.h> <imhdr.h> <imset.h> <math/iminterp.h>
+
+	t_xtalkcor.x	<error.h> <imhdr.h> <imset.h> <time.h>
+	t_xtcoeff.x	<error.h> <fset.h> <gset.h> <imhdr.h> <mach.h>\
+			<math/iminterp.h> <pkg/gtools.h>
+	xtalk.x		<imhdr.h>
+	;

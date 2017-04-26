@@ -1,0 +1,41 @@
+270c270
+< 				next
+---
+> 			        next
+386,387c386,387
+< int	i, j, n, nalloc, id, fd
+< pointer	sp, fname, name, label, entry
+---
+> int	i, j, n, lenindexid, nalloc, id, fd
+> pointer	sp, indexid, fname, name, label, entry
+391c391
+< int	xt_txtopen(), fscan(), nscan(), strncmp(), ctoi(), stridxs()
+---
+> int	xt_txtopen(), fscan(), nscan(), strlen(), strncmp(), ctoi(), stridxs()
+408a409
+> 	call salloc (indexid, SZ_FNAME, TY_CHAR)
+412a414,416
+> 
+> 	call strcpy ("ID_", Memc[indexid], SZ_FNAME)
+> 	lenindexid = strlen (Memc[indexid])
+429c433,438
+< 	    if (strncmp (Memc[name], "ID_", 3) != 0)
+---
+> 	    if (streq (Memc[name], "INDEXID")) {
+> 		call gargwrd (Memc[indexid], SZ_FNAME)
+> 		lenindexid = strlen (Memc[indexid])
+> 		next
+> 	    }
+> 	    if (strncmp (Memc[name], Memc[indexid], lenindexid) != 0)
+496c505
+< 	    sym = stenter (stp1, Memc[name+3], ENTRY_LEN)
+---
+> 	    sym = stenter (stp1, Memc[name+lenindexid], ENTRY_LEN)
+498c507
+< 	    call strcpy (Memc[name+3], ENTRY_NAME(sym), ENTRY_DLEN)
+---
+> 	    call strcpy (Memc[name+lenindexid], ENTRY_NAME(sym), ENTRY_DLEN)
+526c535
+< 		call strcpy (Memc[name+3], CAT_NAME(cat,id), CAT_SLEN)
+---
+> 		call strcpy (Memc[name+lenindexid], CAT_NAME(cat,id), CAT_SLEN)

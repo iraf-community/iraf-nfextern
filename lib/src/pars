@@ -1,0 +1,5 @@
+#meftest.fitsfiles = "/Users/valdes/iraf/Test/NFFocus/pix[0]"
+meftest.fitsfiles = "/Users/valdes/iraf/Test/NFFocus/test06_cat.fits"
+#meftest.fitsfiles = "/iraf/iraf/dev/pix.imh"
+meftest.exttype = ""
+meftest.extnames=""

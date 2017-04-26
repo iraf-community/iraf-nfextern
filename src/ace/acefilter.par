@@ -1,0 +1,15 @@
+# ACEFILTER
+
+images,f,a,,,,"List of images"
+icatalogs,s,h,"!catalog",,,"List of input catalogs"
+ocatalogs,s,h,"+new_cat",,,"List of output catalogs"
+nmaxrec,i,h,INDEF,,,"Maximum number of output records"
+iobjmasks,s,h,"",,,"List of input object masks"
+oobjmasks,s,h,"",,,"List of output object masks"
+catfilter,s,h,"",,,"Output catalog filter"
+logfiles,s,h,"",,,"List of log files"
+verbose,i,h,0,0,,"Verbose level"
+extnames,s,h,"",,,"Extension names"
+omtype,s,h,"all","boolean|numbers|bboolean|bnumbers|all",,"Object mask type"
+catomid,s,h,"NUM",,,"Catalog field containing the object mask id number"
+update,b,h,no,,,"Update mask and catalog in image?"

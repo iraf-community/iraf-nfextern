@@ -1,0 +1,174 @@
+.help catrrecs Jun03 acecat
+.ih
+NAME
+catrrecs -- read records
+.ih
+SYNOPSIS
+catrrecs (cat, filt, id)
+
+.ih
+ARGUMENTS
+.ls cat (I)
+Catalog pointer pointer.  If NULL the procedure returns immediately without
+an error.
+.le
+.ls input, output (I)
+Input and output catalog names.  Either may be null strings.  Both may be
+null for internal use of the catalog routines.  If only an input catalog
+is specified then the catalog is treated as READ_ONLY.  If only an output
+catalog is specified then it considered a NEW_FILE.  If the input and output
+catalog names are exactly the same then the catalog is treated as
+READ_WRITE.  Finally if different input and output names are used the
+input is opened READ_ONLY and the output is created as a NEW_COPY.
+.le
+.ls catdef
+Catalog definition file.  This defines the catalog fields which will be read
+or written.  Note that the application may use an internal record structure
+which includes more fields than that input or output catalog.  The catalog
+definition file also provides a translation between the field names in
+the catalog and in the application.  The format for this file is described
+in the CATDEF section.
+.le
+.ls structdef
+File defining the application catalog record structure.  Normally this
+will be the same include file used by the application.  In other words,
+the ACECAT library is configured at runtime to support the application
+record structure.  The required format for this file is described in the
+STRUCTDEF section.  If no structure definition file is specified but
+an input catalog is specified then the catalog record structure is used.
+Applications which are prepared for arbitrary record structures using
+generic field references might use this option.
+.le
+.ls ufunc
+Pointer to external function to be applied on output to create additional
+catalog fields from the internally defined record.  For instance this
+may be used to compute a cartesian distance given fields for the distances
+along axes.  This is decribed in the UFUNC section.
+.le
+.ih
+DESCRIPTION
+This routines reads records from a catalog.  Any pre-existing records
+are first freed.  The records may be indexed by the row or by an integer
+field.  The advantage of using a catalog field for indexing is to allow
+the application to quickly retrieve records using the field.  For instance,
+if the catalog contains an object:w
+In the latter case there may null records.
+
+If the catalog pointer is NULL or if no input table has been defined then
+the procedure returns immediately without an error.  In the case where a
+catalog is defined but not a table any prexisting records are freed.
+
+This routine defines the input and output catalogs and the mapping between
+external catalogs and the application records structure.
+.ih
+CATDEF
+The CATDEF argument is a whitespace list of file name containing translations between external
+field names and the fields expected by the application.  This file would
+normally be user specified at runtime, though an application itself might
+create this information at runtime.  There filename may have several
+forms:
+
+.nf
+    <fields>  - list of catalog fields
+    @<filename> - a catalog definition disk file
+    #<string> - a catalog definition string file
+    "" - a null string uses the application record structure
+.fi
+
+The first case of <fields> is a list of catalog field names.  There is no
+translation applied in this case so the names must be in the order set by
+the application in the STRUCTDEF file.  For example, if the application
+defines a structure with RA, DEC, and MAG and an input catalog contains
+"alpha", "delta", and "Vmag" (not necessarily in that order in the catalog)
+then the CADEF string would be "alpha delta Vmag".  If the input catalog is
+a simple text file with no column definitions and the columns are in the
+order magnitude, right ascension, and declination the the string would be
+"c2 c3 c1".
+
+The second case of a catalog definition file, specified by the filename
+with a prefixed '@', consists of one or two columns.  The first column
+are names defined by the structure definition file.  The file need only
+contain the fields to be read or written.  The order can be that
+desired for a new output catalog.  If the catalog uses different
+field names or if a new output catalog is to be created with different
+names then the second column provides a translation.  In the previous
+example the file might be
+
+.nf
+    MAG
+    RA   RA_MEASURED
+    DEC  DEC_MEASURED
+.fi
+
+A new catalog will have the fields listed by the second column in that
+order.  The first field with use the same name as the application; i.e.
+MAG.  For input the catalog columns will be translated to the structure
+definition values.
+
+The third case allows an application to create a string with the same
+information as the disk file.  Note that newlines must be used to
+delimit the fields.  In the previous example the string would be
+
+.nf
+    "#MAG\nRA RA_MEASURED\nDEC DEC+MEASURED"
+.fi
+
+where catdef is the variable name.  The argument would then be given
+as "#catdef".  One way this string might be created in an application,
+particularly for many lines, is using STROPEN and normal formated
+I/O.  CATOPEN uses STROPEN (after detecting and skipping the leading
+"#" to read the information in the same way as a normal file.
+
+The last case of a null string defines the catalogs to be in exactly
+the same structure as the application sets with the structure definition
+file.  In the example the application will read a catalog with the
+field names MAG, RA, and DEC and will create an output catalog with
+those fields and in that order (if creating a new catalog).
+
+.ih
+STRUCTDEF
+The structure definition file defines the record structure shared between
+the ACECAT routines and the application.  For convenience the file is
+define such that the same file may be used both by the application when
+compiling and by ACECAT at runtime.  The format of the file is
+shown in the following example.  The file is "catdemo.h".
+
+.nf
+    # This file defines the object parameters.
+
+    define  ID_RA             0 # r "" ""               "RA"
+    define  ID_DEC            1 # r "" ""               "DEC"
+    define  ID_MAG            2 # r "" ""               "MAG"
+
+    # These are optional application macros.
+
+    define      OBJ_RA          OBJR($1,ID_RA)
+    define      OBJ_DEC         OBJR($1,ID_DEC)
+    define      OBJ_MAG         OBJR($1,ID_MAG)
+.fi
+
+Only the first three defines actually constitute the structure definition
+for ACECAT.  The other lines illustrate how the structure definitions can
+be used in an application specific include file.
+
+The lines whose first word (words may be surrounded by any number of spaces
+and tabs), is "define" and whose second word begins with "ID_" define a
+structure field.  The field name is what follows the "ID_".  The case is
+not significant.  The next word is a integer index (starting with zero)
+into the catalog record pointers.  Ne next word must be "#".  The next
+four fields specify the data type, units, print format, and description.
+Except for the data type these are optional.
+
+Numeric data types are defined by the first character of the string.  The
+numeric types are 'i' for integer, 'r' for real, and 'd' for double.
+The precision is host dependent but in general the integer and real are
+32 bit and the double is 64 bit.  The other data type is a character
+string which is specified by an integer value giving the maximum number
+of characters allowed.
+
+The format may be the usual SPP format as well as some extensions allowed
+by the TABLES library upon which the ACECAT library is based.
+
+.ih
+SEE ALSO
+acecat

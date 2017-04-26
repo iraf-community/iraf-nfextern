@@ -1,0 +1,178 @@
+.help acexymatch Aug03 ace
+.ih
+NAME
+acexymatch -- match image catalogs with astrometric catalogs
+.ih
+SYNOPSIS
+An image catalog of detected sources is matched with an astrometric catalog
+of celestial coordinates.  An initial WCS mapping image pixel coordinates to
+celestial coordinates is required and once the objects are matched the
+WCS may be updated.  Errors in the initial WCS are expected to be primarily
+a zero point offset with possibly a small rotation about the tangent point.
+.ih
+USAGE	
+acexymatch imcats refcats
+.ih
+PARAMETERS
+.ls imcats
+List of image catalogs containing pixel coordinates, celestial coordinates
+(hours and degrees), or both for objects detected in the image.  Magnitudes
+may also be included as an aid to the algorithm
+.le
+.ls refcats
+List of reference catalogs containing celestial coordinates (hours and
+degrees) for objects in field of view of the image.  Magnitudes may also be
+included as an aid to the algorithm.  The reference catalog may include a
+larger field than the image.  The number of reference catalogs must match
+the number of image catalogs, in which case they are matched in order,
+or only a single catalog may be specified to apply to all image catalogs.
+.le
+
+.ls mosaic = no
+Are the image catalogs all part of a single mosaic exposure?  If "yes"
+the WCS are assumed to have a common tangent point and the WCS update
+will be a global linear correction (offset, scale, and rotation in each
+axis) across all the WCS.
+.le
+.ls imwcs = ""
+List of image WCS for the image catalogs.  The names may be of an image
+or a catalog whose header contains the WCS.  If no name is specified the
+image catalog must contain the WCS.  When the image catalog contains
+celestial coordinates they must be related to the pixel coordinates through
+the WCS.  The list must be null, specify a single WCS for all image catalogs,
+or match the list of image catalogs.
+.le
+.ls imcatdef = "", refcatdef = ""
+Image and reference catalog definitions.  The application expects fields
+named "RA", "DEC", "MAG", "X", and "Y".  The catalog definition string
+may be a whitespace separated list of corresponding field names in the
+order just given.  Dummy field names may be used for non-existent fields.
+For simple ascii tables without any column definitions use "C1", "C2", etc.
+Field names may also be associated using "@<file>", where the file contains
+two columns with the application field name in the first column and the
+catalog field name in the second.
+.le
+.ls imfilter = "", reffilter = ""
+Image and reference catalog filters.  The filters are used to select a
+subset of the catalog records to use.  The filters are boolean expressions
+using the application field names as variables.  See ACEFILTER for
+a complete syntax.
+.le
+
+The following parameters are for a coarse correlation search with large
+offsets but small rotation.
+
+.ls nsearch = 50
+Maximum number of positions to use in search.  If this is zero then the
+coarse search is skipped and the coordinates are assumed to be close enough
+to centroid directly on the objects.  If the coarse search is selected then
+this number should not be too large, otherwise the execution time will
+become long.
+.le
+.ls search = 0.
+Translation search radius in arcsec.  If this is zero then the coarse
+serach is skipped and the coordinates are assumed to be close enough to
+centroid directly.  This defines how far from the initial coordinates to
+search using the \fInsearch\fR objects.  It should be just large enough to
+include the expected error in the initial coordinates.
+.le
+.ls rsearch = 0.
+Rotation search radius in degrees.  This defines a range of rotations about
+the current tangent point that might be needed to find the correlation match.
+The correlation algorithm only works with small rotations or order a
+degree.
+.le
+
+The follwoing parameters are for the fine centroiding and coordinate
+solution based on the centroiding.
+
+.ls nfit = 4
+The minimum number of sources which must be found and centroided for an
+acceptable coordinate fit.  If the value is negative then this is the
+maximum number of objects which failed to be found for an acceptable
+solution.
+.le
+.ls rms = 2.
+The maximum RMS in arcsec for an acceptable solution. 
+.le
+.ls maxshift = 5
+Maximum centering shift in arcsec when centroiding.  Sources that produce
+centroids (from the \fBcenter\fR task) that differ from the initial
+position by more than this amount are considered to have failed to be
+centroided.
+.le
+.ls fitgeometry = "general" (shift|xyscale|rotate|rscale|rxyscale|general)
+Fitting geometry for the coordinate adjustment.  This should normally be
+"general" to all allow for all effects of atmospheric refraction.  The
+other options are only used when looking for specific effects.
+.le
+.ls reject = 3.
+Iterative rejection sigma for fitting the position residuals as a function
+of arcsec from the field tangent point.
+.le
+.ls update = yes
+Update the coordinate system in the mosaic exposures?  If the value is no then
+the input data is not modified.  This option might be used just to check
+the coordinate system.  If the the value is yes and the fit satisfies the
+parameters defining an acceptable solution the coordinate system will be
+updated if \fIinteractive\fR=no, otherwise there is a query whether to
+accept the solution and update the input data.
+
+.le
+.ls interactive = yes
+Is this task to be run interactively?  If yes then the fitting can be
+examined and adjusted interactively if the \fIfit\fR parameter is yes and
+the final solution will be printed followed by a query to accept the
+solution provided the \fIupdate\fR parameter is yes.
+.le
+.ls fit = yes
+Do the coordinate fitting interactively?  This required the \fIinteractive\fR
+parameter to be yes.  If the fitting is done interactively the \fBgeomap\fR
+task used to do the fitting will be executed interactively.  The graphical
+fitting is exited using the 'q' key.  See the help for \fBgeomap\fR
+for more on the interactive fitting.
+.le
+.ls verbose = yes
+Verbose output?  This determines whether various terminal output is
+produced.
+.le
+.ls listcoords = yes
+List centroiding results for all sources in verbose mode?
+.le
+.ls graphics = "stdgraph"
+Graphics device for the interactive fitting.
+.le
+.ls cursor = ""
+Graphics cursor input for the interactive fitting.  The default null
+string value selects the graphics window cursor.
+.le
+
+.ls accept = yes
+This is a query parameter when \fIupdate\fR and \fIinteractive\fR are yes.
+You are queried after printing the statistics of the coordinate fit whether
+to accept the solution and update the coordinate system of the mosaic
+exposure.
+.le
+.ih
+DESCRIPTION
+A list of reference celestial coordinates, either from an astrometry
+catalog or measured from a reference image, for stars in the field is
+matched against objects in the mosaic data.  A linear relation between the
+observed positions and the reference coordinates is fit.  The relation may
+include a zero point shift, scale change, and axis rotation for both
+coordinate axes.  The removes pointing errors, rotation errors, and
+atmospheric refraction effects.  The fit is used to update the image world
+coordinate system to register the WCS to the input coordinate system.
+
+A full description of this task remains to be written.
+.ih
+EXAMPLES
+.ih
+REVISIONS
+.ls ACEXYMATCH August 2003
+.le
+.le
+.ih
+SEE ALSO
+msccmatch
+.endhelp

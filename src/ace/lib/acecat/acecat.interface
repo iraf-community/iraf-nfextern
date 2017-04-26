@@ -1,0 +1,47 @@
+INTRODUCTION
+
+The ACECAT library provides structured access to catalogs or tables.
+
+PUBLIC ROUTINES
+
+Catalog Access and Header
+
+	catopen (cat, input, output, catdef, structdef, ufunc)
+	catclose (cat)
+
+	catgets (cat, param, value, maxchar)
+	catgeti (cat, param, value)
+
+	catputs (cat, param, value)
+	catputr (cat, param, value)
+
+Object Records
+
+	catrobjs (cat, filt)
+	catrobj (cat, obj, row)
+	pointer = catgobj (cat, num)
+
+	catwobjs (cat)
+	catwobj (cat, obj, row, magzero)
+
+catcreate (cat)
+catdefine (tbl, mode, catdef)
+catdump (cat)
+bool = filter (obj, filt)
+filt_op (obj, name, o)
+filt_func (obj, func, args, nargs, o)
+pointer = cathead (cat)
+pointer	= catnext (cat, obj)
+catshape (obj, a, b, theta, elong, ellip, r, cxx, cyy, cxy,
+catwcs (cat, im)
+
+PRIVATE ROUTINES
+
+catrhdr (cat)
+catwhdr (cat, im)
+
+pointer = mkimhdr (ndim, len_hdr)
+im2tb (im, tp)
+tb2im (tp, im)
+
+

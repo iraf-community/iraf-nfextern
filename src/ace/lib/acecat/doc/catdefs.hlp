@@ -1,0 +1,71 @@
+.help catdefs Mar07 "Astronomical Cataloging Environment"
+.ih
+SUMMARY
+The catalog definition facility provides a parameter and mechanism for
+applications to allow users to define desired output catalog fields
+when creating a new catalog and for mapping fields in existing catalogs
+to those used by the application.
+.ih
+PARAMETER
+Task using the catalog definition facility may have a parameter,
+often called \fIcatdefs\fR, for defining catalogs.  The parameter is
+a string with three formats identified by the leading character.
+
+.nf
+     <filename> - a catalog definition file
+      #<string> - a catalog definition string
+      =<fields> - list of catalog fields
+.fi
+
+A null string uses the applications default catalog fields and names.
+See the task's parameter description for more details and variations to
+these formats. 
+.ih
+DESCRIPTION
+A catalog definition provides a mapping between an application's view
+of a catalog and a user's desired input or output catalog.  For input
+or input and output to the same catalog this is simply about mapping
+the field names in the catalog to the fields used by the application.
+For output of a new catalog the definitions provide the desired fields,
+field names, and order.  Note that a new output catalog need only contain
+a subset of the fields available from the application.
+
+The first case consists of a catalog definition file
+with one or two field names.  The first column
+are field names used by the application.  The file need only
+contain the fields to be read or written.  The order can be that
+desired for a new output catalog.  If the catalog uses different
+field names or if a new output catalog is to be created with different
+names then the second column provides a translation.  In the previous
+example the file might be
+
+.nf
+    MAG
+    RA   RA_MEASURED
+    DEC  DEC_MEASURED
+.fi
+
+A new catalog will have the fields listed by the second column in that
+order.  The first field with use the same name as the application; i.e.
+MAG.  For input the catalog columns will be translated to the structure
+definition values.
+
+The second case allows an application to create a string with the same
+information as the disk file.  Note that newlines must be used to
+delimit the fields.  In the previous example the string would be
+
+.nf
+    "#MAG\nRA RA_MEASURED\nDEC DEC+MEASURED"
+.fi
+
+The third format is a list of catalog field names which must be in the same
+order and number as the application uses.  In other words it is simply a
+translation of the applications field names with no mapping, selection,
+or reordering.  For example, if the application defines a expects to read
+RA, DEC, and MAG and an input catalog contains "alpha", "delta", and "Vmag"
+(not necessarily in that order in the catalog) then the definition string
+would be "= alpha delta Vmag".  If the input catalog is a simple text file
+with no column definitions and the columns are in the order magnitude,
+right ascension, and declination the the string would be "= c2 c3 c1".
+
+.endhelp

@@ -1,0 +1,7 @@
+# Help directory for the ODI package.
+
+$doc		= "odi$doc/"
+
+odireformat	hlp=doc$odireformat.hlp,	src=odireformat.cl
+mkpodimef	hlp=doc$mkpodimef.hlp,		src=mkpodimef.cl
+chskywcs	hlp=doc$chskywcs.hlp,		src=chskywcs.cl

@@ -1,0 +1,13 @@
+	  cgroup - Group exposures
+         combine - Combine exposures
+        dcombine - Combine dark exposures
+        fcombine - Combine flat exposures
+         nffocus - Determine best focus from NEWFIRM exposures
+     nflinearize - Linearize NEWFIRM exposures
+          nflist - List image parameters as derived by nfproc
+       nfpermask - Create persistence masks (TBD)
+          nfproc - Apply instrumental calibrations
+       nfsatmask - Create saturation masks
+        nfsetsky - Pair exposures for pairwise sky subtraction
+        nfskysub - Subtract sky
+	   nfwcs - Derive WCS for NEWFIRM exposures (TBD)

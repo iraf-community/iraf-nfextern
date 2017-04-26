@@ -1,0 +1,238 @@
+.help mskmerge Nov08 msctools
+.ih
+NAME
+mskmerge -- Merge multiple masks into a single mask
+.ih
+USAGE
+mskmerge image masks output
+.ih
+SYNOPSIS
+\fBMSKMERGE\fR is a convenient tool for merging multiple masks into a single
+mask.  It provides a number of methods for defining the output mask value
+given the input mask values.  This task supports registering the input masks
+to an input image and produces an output mask matching the input image.  It
+also supports data in multi-extension format (MEF) FITS files.
+.ih
+PARAMETERS
+.ls image
+Input image associated with the masks.  The image may be a single
+simple image or a multi-extension format (MEF) FITS file.  The
+masks are matched to the image (see \fBpmmatch\fR) and the output mask
+will be in the same format; i.e. MEF if the input is MEF.  Keywords
+in the image(s) may also be used to define the masks to be merged and
+the \fIkey\fR parameter may be used to add or update a keyword with
+the output mask name.
+.le
+.ls masks
+List of masks to be merged.  Masks in the list may be specifed as
+"!<keyword>" or "(<keyword>)", where <keyword> is a keyword in the
+input image, to use the mask pointed to by the keyword.  The order
+of the list matters in some cases.
+.le
+.ls output
+Output mask to be created.  The output file must not exist or a
+warning or error will result.  The output mask will be MEF if the
+input is MEF with extensions for each image extension in the input.
+If an empty string is specified only log output will be produced.
+.le
+.ls key = ""
+Keyword to be added or updated in the input image with the name of the
+associated output mask.  If an empty string is given then no keyword
+is added.  Note that to add a keyword requires write access to the
+input image.
+.le
+.ls method = "map" (map|min|max|add|or)
+Method for merging the masks.  The details of each method are given
+the DESCRIPTION.
+.le
+.ls mapto = "1"
+List of mask values to be used by the "map" merging method.  The list
+associates a value with each mask.  If the list is shorter than the
+mask list then the last value is used for the remaining masks.  If it
+longer the trailing values are ignored.  If an empty list is given it
+defaults to 1.  The elements of the list are either integers or the
+special character '$'.  See the discussion for more.
+.le
+.ls imageid = ""
+Keyword for matching masks to the input image(s).  All masks to be
+merged for a particular input image must have the same value for this
+string.  This applies to both single and MEF data but is intended
+primarily to match extensions.  Often the value would be "extname" to
+match by extension name.
+.le
+.ls logfiles = "STDOUT"
+List of output log files.  The special name "STDOUT" is used to write
+to the terminal.
+.le
+.ls erraction = "warn", (warn|error|quit)
+Action to be taken when an trapped error is encountered.  The
+\fIwarn\fR issues a warning to the terminal and processing continues
+with the next image.  When \fIerror\fR is specified the task exits
+when an error occurs (skipping any remaining input images).  In
+scripts that do not trap errors, an error action will typically
+terminate the script as well.  The last option of \fIquit\fR is like
+an error except that is does not terminate any calling script.
+.le
+.ih
+DESCRIPTION
+\fBMSKMERGE\fR is a convenient tool for merging multiple masks into a
+single mask.  It provides a number of methods for defining the output
+mask value given the input mask values at each pixel.  This task supports
+registering the input masks to an input image and produces an output
+masks matching the input image.  It also supports data in
+multi-extension format (MEF) FITS files for the input and output.
+
+This task requires an input image, \fIimage\fR, to define the size
+and format of the output mask.  It also may be used to select masks
+identified by keyword values and to add or update a keyword with the
+new merged mask.  The \fIkey\fR parameter specifies the keyword to
+place in the input image containing the name of the output maskk.
+
+The masks are specified by a list.  As with all IRAF file lists this
+may be a comma-separated list, a file containing the mask names, a
+filename template matched against the current directory, or any
+comma-separated combination of these.  This task also supports
+keywords whose value is the mask by specifying the keyword either
+with a leading '!' within
+parentheses.  The example below shows a complex combination of
+all of these.
+
+.nf
+    masks="a,(bpm),!obm,c*,@d"
+        where d is a file containing filenames
+.fi
+
+The masks are matched to the input image in pixel or world
+coordinates.  This is described by the topic \fBpmmatch\fR.  The
+default is to match in pixel space where the mask is padded with zero
+values if it is smaller or trimmed of higher rows or columns if it
+bigger.
+
+The masks are associated with the input image by the parameter
+\fIimageid\fR.  This is a keyword whose value is the same in both
+the image and the masks.  This might have a use for simple images but
+it is important for multi-extension format (MEF) FITS data.
+When the input image is MEF then the masks files will usually be in a
+matching MEF format (though in pixel list format).  The extensions are
+matched to the image extensions using the \fIimageid\fR parameter.
+
+The \fIlogfile\fR parameter is a list of files to write log
+information.  Typically this is specified as "STDOUT" to write to the
+terminal.  If no logfile is specified then there will be no output.
+The logout has a task banner, shows the input image or image extension
+with the expression used, and the assignment of masks as operands.
+The expression indicates the function used which begins with "msk" and
+is followed by the method.  For all but the map method the function
+operands are simply $A, $B, etc. and the following lines shows the
+relation between the operand and the mask.  The alphabetical order
+indicates the order of the masks which will be in the order of the
+mask list.  For MEF the extension name will be shown as well.  The map
+method has pairs of operands.  The first of the pair is a mask operand
+as before and the second is the mapto value.  If the mapto used a '$'
+the operand will be the same as the mask operand to indicate any value
+in the mask will be passed on to the output.
+
+As a technical note, this task is related to the more general
+task \fIaimexpr\fR.  The log out indicating functions and operands
+shows how that task might be used to merge masks more generally with
+a somewhat different parameter structure.  As note before,
+\fBmskmerge\fR is designed to be simpler and more convenient than
+\fBaimexpr\fR for the purpose of merging masks.  We can also note that
+the tasks \fBmskexpr\fR or even \fBimexpr\fR could also be used but
+are not as flexible nor do they support MEF format.
+
+The output mask is specified by the \fIoutput\fR parameter.  If it is
+a null string then only log output is produced.  This can be useful to
+check how the masks are assigned when matching by the \fIimageid\fR
+parameter.
+
+
+\fBMerging Methods\fR
+
+.ls map
+Each input mask is assigned an output mask value.  The masks may use
+the same value or different values.  For each pixel the input
+masks are examined in list order.  The first non-zero mask value
+encountered outputs the mask value assigned to that mask.  This is
+independent of the input mask value other than requiring that it be
+non-zero.  If all input masks have zero values then the output is
+zero.
+
+The values are assigned to the mask list by a matching list specified
+by the \fImapto\fR parameter.  The list may be shorter than the mask
+list in which case the last value is assigned to all the remaining
+masks.  If the list is empty a value of 1 is assumed.  This logic
+means that an empty list may be used to produce an boolean mask (0 and
+1 values), a single value may be used to produce an output mask with 0
+and the specified value, or some more complex mapping.  An intuitve
+mapping might be "1,2,3,.." to assign a value based on the order of
+the input lists.
+
+The list may also contain the special value '$' instead of a number.
+This means that the value from the mask is used.  As with numbers this
+may be used alone to cause the first non-zero mask value to be used
+regardless of value.
+.le
+
+.ls min
+The minimum non-zero value in the input masks forms the output value.
+If all input values are zero then the output is zero.  In this method
+lower input mask values have higher priority for the output mask.
+.le
+
+.ls max
+The maximum non-zero value in the input masks forms the output value.
+If all input values are zero then the output is zero.  In this method
+higher input mask values have higher priority for the output mask.
+value.
+.le
+
+.ls add
+The input mask values are added to form the output values.
+.le
+
+.ls or
+The input mask values are bitwise or'ed to form the output values.
+This is useful for bitfield masks.
+.le
+.ih
+EXAMPLES
+1. Merge bad pixel, saturation, persistence, and object masks.
+Use the codes already in the first three and set all object pixels
+to 9.  The masks are defined in the image header.
+
+.nf
+    cl> mskmerge obj123 !bpm,!spm,!ppm,!obm obj123_bspo key=bspom\
+    >>> method="map" mapto=$,$,$,9
+.fi
+
+2. Merge three bitfield masks for data in MEF.  First list to check
+what will be done.
+
+.nf
+    cl> mskmerge obj123 maskA123,maskB123,maskC123 "" \
+    >>> method="or" imageid=extname
+    Nov  6 19:36 MSKMERGE
+    obj123[im1]: Expression = mskor($A,$B,$C)
+    $A = maskA123[im1]
+    $B = maskB123[im1]
+    $C = maskC123[im1]
+    obj123[im2]: Expression = mskor($A,$B,$C)
+    $A = maskA123[im2]
+    $B = maskB123[im2]
+    $C = maskC123[im2]
+    cl> mskmerge obj123 maskA123,maskB123,maskC123 obj123_dq \
+    >>> method="or" imageid=extname logfile=""
+.fi
+
+3. Make a boolean mask from 5 masks.  Use one of the masks for the
+reference image.
+
+.nf
+    cl> mskmerge mask1 @masks.list Mask
+.fi
+
+.ih
+SEE ALSO
+aimexpr, mskexpr, imarith, imfunction, imcombine, pmmatch, expressions
+.endhelp

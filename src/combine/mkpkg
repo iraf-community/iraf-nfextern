@@ -1,0 +1,37 @@
+# Make COMBINE Package.
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$iffile (lib$libimc.a)
+	    $set LIBS1 = "-lnfe -limc -lxtools -lcurfit -lsurfit -lgsurfit"
+	    $set LIBS2 = "-liminterp -lnlfit -lslalib -lncar -lgks"
+	$else
+	    $set LIBS1 = "-lnfe -lxtools -lcurfit -lsurfit -lgsurfit"
+	    $set LIBS2 = "-liminterp -lnlfit -lslalib -lncar -lgks"
+	$endif
+	$update libpkg.a
+	$omake	x_combine.x
+	$link x_combine.o libpkg.a $(LIBS1) $(LIBS2) -o xx_combine.e
+	;
+
+install:
+	$move	xx_combine.e nfebin$x_combine.e
+	;
+
+libpkg.a:
+	$ifnfile (lib$libimc.a)
+	    @src
+	$endif
+
+	expr.x		<ctype.h> <evvexpr.h> <lexnum.h>
+	icmefscale.x	<imhdr.h> src/icombine.com src/icombine.h
+	t_combine.x	<error.h> <imhdr.h> <mach.h> <pmset.h>\
+			src/icombine.com src/icombine.h
+	;

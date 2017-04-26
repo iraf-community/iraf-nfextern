@@ -1,0 +1,49 @@
+# Make PROCTOOL.
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$update	libpkg.a
+	$call	proctool
+	;
+
+install:
+	$move	xx_proctool.e nfebin$x_proctool.e
+	;
+
+proctool:
+	$omake	x_proctool.x
+	$link	x_proctool.o libpkg.a -lnfe -lasttools -lxtools -lcurfit\
+		-liminterp -o xx_proctool.e
+	;
+
+libpkg.a:
+	astfunc.x	<evvexpr.h> <lexnum.h> <mach.h> <math.h> <time.h>
+	exprdb.x	<ctype.h> ost.h prc.h
+	ie.x		<ctotok.h> <ctype.h> <error.h> <fset.h> gettok.h
+	mravr.x		<mach.h>
+	ost.x		<error.h> <imhdr.h> <mach.h> ost.h par.h per.h pi.h\
+			<pkg/gtools.h> prc.h sky.h
+	par.x		ost.h par.h
+	pefunc.x	<evvexpr.h> <mach.h> prc.h
+	peget.x		<ctype.h> <evvexpr.h> <imhdr.h> <lexnum.h> ost.h par.h\
+			pi.h prc.h
+	pi.x		<error.h> <imhdr.h> ost.h par.h per.h pi.h prc.h sky.h
+	prclog.x	pi.h prc.h <time.h>
+	prcsteps.x	ost.h par.h pi.h prc.h
+	prc.x		ost.h par.h pi.h prc.h
+	proctool.x	<error.h> <evvexpr.h> <imhdr.h> <imio.h> ost.h par.h\
+			pi.h prc.h
+	setexpr.x	<ctype.h> gettok.h pi.h
+	setimage.x	<error.h> ost.h par.h pi.h prc.h
+	setmef.x	<error.h> <imhdr.h> <imio.h> par.h pi.h prc.h
+	t_aimexpr.x	<error.h> ost.h par.h prc.h
+	t_mskmerge.x	<error.h> ost.h par.h prc.h
+	t_proctool.x	<error.h> ost.h par.h prc.h
+	;

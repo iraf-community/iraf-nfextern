@@ -1,0 +1,11 @@
+# Help directory for NEWFIRM.
+
+revisions	sys=../Revisions
+
+nffocus		hlp=nffocus.hlp, src=../nffocus.cl
+nfgroup		hlp=nfgroup.hlp, src=../nfgroup.cl
+nflinearize	hlp=nflinearize.hlp, src=../nflinearize.cl
+nflist		hlp=nflist.hlp, src=../nflist.cl
+nfproc		hlp=nfproc.hlp
+nfskysub	hlp=nfskysub.hlp, src=../nfskysub.cl
+nfwcs		hlp=nfwcs.hlp, src=../nfwcs.cl

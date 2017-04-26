@@ -1,0 +1,54 @@
+.help output Nov08 proctool
+.ih
+NAME
+output -- Output parameters
+.ih
+PARAMETERS
+.ls output
+List of output files, a pattern based on the input filenames, or an
+expression.  An expression begins with '(' and evaluates to a filename.
+If it is not an expression then '+' characters in the string identify a
+pattern where each '+ is replaced with the input filename excluding any
+path and extension.  If the value is neither an expression or pattern then
+it is a list which must match the input list.  Note that a list can be
+an image template which also includes a replacement syntax (see example
+2 of \fBimrename\fR).  The output file structure will be the same as the
+input structure such that a simple image will produce a single output
+raster and input MEF files will produce output MEF files with the same
+extension names.  If the MEF input has non-image extensions they will
+be ignored and excluded from the output.  If the output type is a mask
+(see \fIouttype\fR) the extensions will be PLIO extensions.  Masks must
+be extensions so for single image input the output is an MEF with one
+PLIO extension with extension name "pl".
+.le
+.ls outtype = ""
+Output type which is one of:
+
+.nf
+    image - real image raster
+    mask -  PLIO extension(s)
+    list - log output only
+    vlist - more verbose log output only
+.fi
+
+For masks the type string may be "mask <keyword>" where the second
+word is a keyword to be updated or added to the input image containing
+the name of the mask image.  This allows later refering to the associated
+mask by a keyword reference.
+.le
+.ls logfiles = "STDOUT"
+List of logfiles for recording processing information.  The special value
+"STDOUT" may be used to write to the terminal and multiple files may be
+specified to tee the output to more than one file.  The output is appended
+to any existing output.
+.le
+
+.sh
+DESCRIPTION
+
+.ih
+SEE ALSO
+.nf
+procexpr, ccdred.ccdproc, mscred.ccdproc, quadred.ccdproc, fixpix, icfit
+.fi
+.endhelp

@@ -1,0 +1,171 @@
+.help acetvmark Sep07 ace
+.ih
+NAME
+acetvmark -- display images with catalog overlays
+.ih
+SYNOPSIS
+.ih
+USAGE	
+acetvmark image frame
+.ih
+PARAMETERS
+.ls image
+Image with catalog(s) or object mask(s) to be overlayed.  The image
+may be a single image or multi-extension format (MEF) file.
+.le
+.ls frame = 1
+Display frame to be used.
+.le
+.ls catalog = "!catalog"
+Input catalog defining sources to be overlayed.  A keyword pointer or
+substitution patterns may be used in addtion to any other IRAF list format.
+The catalog need not have been produced by ACE and may be any format
+supported by the \fBtables\fR package.  However, if an object mask is to be
+overlayed the catalog must contain a field, specified by the
+\fIacefilter.catomid\fR parameter, with the object mask identification
+numbers.
+.le
+.ls fields = "ra,dec"
+Fields defining the source coordinates and an optional third field for
+a label.  The label is used only for the \fItvmark\fR overlays.
+The coordinates may be world coordinates (with right ascension in
+hours if using an RA axis type) or in physical or logical pixel
+coordinates.  The order of the coordinate elements must be pixel
+column and line or celestial longitude and latitude. 
+Note that for simple text files the fields names
+are "c1", "c2", etc.
+.le
+.ls catfilter = ""
+Catalog filter expression.  If no expression is given then all input
+catalog records are selected.  An expression must evaluate to a boolean
+value.  Operands are case sensitive catalog field names.  Field names
+are those defined by the \fBtables\fR package.  In particular, simple
+text fields may be used as input catalogs and the field names are
+"c1", "c2", etc.
+.le
+.ls wcs = "world" (logical|physical|world)
+Input coordinate type.  The input coordinates must be transformed to
+image pixel coordinates for the overlay.  If the coordinates are in
+image pixel coordinates the value "logical" is used.  The "physical"
+type is used for pixel coordinates where either the image has been
+transformed from the catalog image or the catalog was created in
+physical coordinates.  The "world" coordinate type is based on the
+world coordinate system (WCS) defined in the image.  This is typically
+right ascension and declination but other types maybe used as well.
+Note that right ascension coordinates must be in hours.
+.le
+.ls extnames = ""
+List of extension name patterns for MEF files.  Note the patterns must
+match the entire name.
+.le
+.ls mark = "circle"
+The overlay mark type.  The type "objmask" invokes \fBacedisplay\fR
+and all other types invokes \fBtvmark\fR.  The options are:
+.ls objmask
+Object mask isophote overlays.
+.le
+.ls point
+A point.  To ensure legibility \fIpoint\fR is actually a square dot whose
+size is specified by \fIpointsize\fR.
+.le
+.ls plus
+A plus sign.  The shape of the plus sign is determined by the raster font
+and its size is specified by \fItxsize\fR.
+.le
+.ls cross
+An x.  The shape of the x is determined by the raster font and its size is
+is specified by \fItxsize\fR.
+.le
+.ls circle
+A set of concentric circles whose radii are specified by the \fIradii\fR
+parameter.  The radii are in image pixel units.  If the magnifications
+used by display are not equal in x and y circles will become ellipses
+when drawn.
+.le
+.ls rectangle
+A set of concentric rectangles whose lengths and width/length ratio are
+specified by the \fIlengths\fR parameter.  The lengths are specified in
+image pixel units.  If the magnifications used by the display are not
+equal in x and y then squares will become rectangles when drawn.
+.le
+.ls none
+No mark used to mark only labels.
+.le
+.le
+.ls radii = "0"
+If the default mark type is "circle" than concentric circles of radii
+"r1,r2,...rN" are drawn around each selected point.
+.le
+.ls lengths = "0"
+if the default mark type is "rectangle" then concentric rectangles of
+length and width / length ratio "l1,l2,...lN ratio" are drawn around
+each selected point.  If ratio is not supplied, it defaults to 1.0
+and squares are drawn.
+.le
+.ls font = "raster"
+The name of the font.  At present only a simple raster font is supported.
+.le
+.ls color = 255
+The numerical value or  color of the marks drawn.  Any number between 0 and
+255 may be specified.  The meaning of the color is device dependent.  In the
+current version of the IRAF display servers (XIMTOOL and DS9) numbers
+between 202 and 217 may be used to display graphics colors.  The current
+color assignments are summarized later in this help page.
+.le
+.ls label = no
+Label the marked coordinates with the string in the third field.
+\fIlabel\fR overrides \fInumber\fR.
+.le
+.ls number = no
+Label the marked objects with their sequence number in the coordinate
+list.
+.le
+.ls nxoffset = 0, nyoffset = 0
+The x and y offset in display pixels of the numbers to be drawn.
+Numbers are drawn by default with the lower left corner of the first
+digit at the coordinate list position.
+.le
+.ls pointsize = 3
+The size of the default mark type "point". Point size will be rounded up
+to the nearest odd number.
+.le
+.ls txsize = 1
+The size of text, numbers and the plus and cross marks to be written.
+The size is in font units which are 6 display pixels wide and 7 display 
+pixels high.
+.le
+.le
+.ih
+DESCRIPTION
+This task overlays object mask isophotes or marks for objects in a
+catalog.  It makes use of \fBacedisplay\fR and \fBtvmark\fR for
+displaying overlays as well as \fBacefilter\fR for selecting objects.
+While the catalogs and object masks are often created by \fBace\fR package
+tasks it is possible to use any file that the \fBtables\fR package
+supports which includes simple text files.
+
+The specified catalog is first filtered using the \fIcatfilter\fR
+expression.  The expression may be a null string to select all records
+in the catalog.  If the \fImark\fR parameter selects "objmask" the
+object mask associated with the catalog or image is filtered for
+overlaying.
+
+If the \fImark\fR parameter is "objmask" then the image and (possibly
+filtered) object mask are display using \fBacedisplay\fR.   Most of
+that task's current hidden parameters are used.
+
+For any other mark type the image is first display with \fBacedisplay\fR
+without an object mask overlay.  Then \fBtvmark\fR is invoked to draw the
+desired marks.  In this case the (possibly filtered) catalog coordinates
+selected by the \fIfields\fR parameter are extracted (using \fBtdump\fR) and
+converted to pixel coordinates in the image as defined by the \fIwcs\fR.
+
+For more on the display options see the help for \fBacedisplay\fR
+and for the marking options see the help for \fBtvmark\fR.
+
+.ih
+EXAMPLES
+.ih
+SEE ALSO
+acedisplay, acefilter, tvmark, tables
+.endhelp

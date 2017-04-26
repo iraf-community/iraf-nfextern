@@ -1,0 +1,156 @@
+.help nflist Jan09 newfirm
+.ih
+NAME
+nflist -- List information about NEWFIRM data
+.ih
+USAGE   
+nflist input
+.ih
+PARAMETERS
+.ls input			
+List of NEWFIRM MEF files or image extensions.
+.le
+.ls obstype = "" (dark|flat|sky|object)
+Select a data with a particular OBSTYPE keyword value.  The value may
+be a substring of the keyword value.  Case and whitespace are ignored.
+.le
+.ls showops = no
+Show operations to be performed based on the current \fBnfproc\fR
+settings.
+.le
+.ih
+DESCRIPTION
+NFLIST list information about the NEWFIRM data in the input list.  When
+\fIshowops\fR is no a single line is printed for each image in the input
+list (where input MEF files are expanded into their consitutent images).
+When it is yes the various processing options set for \fBnfproc\fR are
+applied against any processing history in the image headers to indicate
+what operations would be performed by \fBnfproc\fR.
+
+The line with the image name has the format
+
+.nf
+    imagename[obstype][imageid][filter][exptime][flags]
+.fi
+
+where obstype is the logical NFPROC observation type (dark, fflat, gflat,
+sky, and object), imageid is the value of the IMAGEID keyword,
+filter is the abbreviated version of the FILTER keyword, exptime is
+the exposure time, and flags are processing history flags from the
+PROCDONE keyword.
+
+There are two primary purposes for this task, to give an expanding
+description of the data and to check if NFPROC recognizes the important
+parameters needed for processing.  Note that another useful task checking
+and organizing data is \fBnfgroup\fR.
+
+When the input list is very large, say from a directory of data for a
+whole night or set of nights, no output will appear until every image
+is read and so may appear to be stuck.  To speed this up or just to
+reduce the output, a list selecting only a single array (image extension)
+may be used.
+
+This task is a simple script using \fBnfproc\fR in list only output mode.
+.ih
+EXAMPLES
+
+The dataset consists of 35 NEWFIRM exposures in 9 sequences.
+This is the same example dataset illustrating \fBnfgroup\fR.
+There are two dark sequences of different exposure times, one dome flat
+sequence that cycles through two filters, and 6 object sequences in
+two filters.  The science sequences are a combination of offset skys and
+on-field object exposures in an SOOS pattern.
+
+1.  List all files but use an image extension to reduce the list and time.
+
+.in 4
+.nf
+newfirm> nflist nftest*[im1]
+Jan 27  8:13 nflist
+nftest01.fits[im1][dark][1][][5.0][]
+nftest05.fits[im1][dark][1][][60.0][]
+nftest03.fits[im1][dark][1][][5.0][]
+nftest04.fits[im1][dark][1][][60.0][]
+nftest06.fits[im1][dark][1][][60.0][]
+nftest02.fits[im1][dark][1][][5.0][]
+nftest07.fits[im1][fflat][1][J][5.0][]
+nftest09.fits[im1][fflat][1][J][5.0][]
+nftest08.fits[im1][fflat][1][J][5.0][]
+nftest10.fits[im1][fflat][1][Ks][5.0][]
+nftest12.fits[im1][fflat][1][Ks][5.0][]
+nftest11.fits[im1][fflat][1][Ks][5.0][]
+nftest20.fits[im1][sky][1][J][60.0][]
+nftest13.fits[im1][sky][1][J][60.0][]
+nftest16.fits[im1][sky][1][J][60.0][]
+nftest17.fits[im1][sky][1][J][60.0][]
+nftest24.fits[im1][sky][1][J][60.0][]
+nftest21.fits[im1][sky][1][J][60.0][]
+nftest25.fits[im1][sky][1][Ks][60.0][]
+nftest28.fits[im1][sky][1][Ks][60.0][]
+nftest36.fits[im1][sky][1][Ks][60.0][]
+nftest33.fits[im1][sky][1][Ks][60.0][]
+nftest29.fits[im1][sky][1][Ks][60.0][]
+nftest32.fits[im1][sky][1][Ks][60.0][]
+nftest19.fits[im1][object][1][J][60.0][]
+nftest14.fits[im1][object][1][J][60.0][]
+nftest18.fits[im1][object][1][J][60.0][]
+nftest15.fits[im1][object][1][J][60.0][]
+nftest22.fits[im1][object][1][J][60.0][]
+nftest23.fits[im1][object][1][J][60.0][]
+nftest27.fits[im1][object][1][Ks][60.0][]
+nftest26.fits[im1][object][1][Ks][60.0][]
+nftest35.fits[im1][object][1][Ks][60.0][]
+nftest34.fits[im1][object][1][Ks][60.0][]
+nftest30.fits[im1][object][1][Ks][60.0][]
+nftest31.fits[im1][object][1][Ks][60.0][]
+.fi
+.in -4
+
+
+2.  Limit the list to flat fields.
+
+.in 4
+.nf
+newfirm> nflist nftest*[im1] obstype='flat'
+Jan 27  8:16 nflist
+nftest07.fits[im1][fflat][1][J][5.0][]
+nftest09.fits[im1][fflat][1][J][5.0][]
+nftest08.fits[im1][fflat][1][J][5.0][]
+nftest10.fits[im1][fflat][1][Ks][5.0][]
+nftest12.fits[im1][fflat][1][Ks][5.0][]
+nftest11.fits[im1][fflat][1][Ks][5.0][]
+.fi
+.in -4
+
+
+3.  Show the operations to be done.  This depends on the settings of nfproc.
+
+.in 4
+.nf
+newfirm> nflist nftest*[im1] obstype='flat' show+
+Jan 27  8:19 nflist
+nftest07.fits[im1][fflat][1][J][5.0][]
+nftest07.fits[im1]: Fixpix $I
+$M = nfdat$bpm20090125[im1]
+nftest09.fits[im1][fflat][1][J][5.0][]
+nftest09.fits[im1]: Fixpix $I
+$M = nfdat$bpm20090125[im1]
+nftest08.fits[im1][fflat][1][J][5.0][]
+nftest08.fits[im1]: Fixpix $I
+$M = nfdat$bpm20090125[im1]
+nftest10.fits[im1][fflat][1][Ks][5.0][]
+nftest10.fits[im1]: Fixpix $I
+$M = nfdat$bpm20090125[im1]
+nftest12.fits[im1][fflat][1][Ks][5.0][]
+nftest12.fits[im1]: Fixpix $I
+$M = nfdat$bpm20090125[im1]
+nftest11.fits[im1][fflat][1][Ks][5.0][]
+nftest11.fits[im1]: Fixpix $I
+$M = nfdat$bpm20090125[im1]
+.fi
+.in -4
+
+.ih
+SEE ALSO
+nfproc, nfgroup
+.endhelp

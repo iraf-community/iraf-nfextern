@@ -1,0 +1,34 @@
+# Make ACEPROTO.
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+relink:
+	$update libpkg.a
+	$call aceproto
+	;
+
+aceproto:
+	$omake	x_aceproto.x
+	$iffile (lib$libtbtables.a)
+	    $link x_aceproto.o libpkg.a \
+	        -lacecat -ltbtables -lxtools -o xx_aceproto.e
+	$else
+	    $link x_aceproto.o libpkg.a -lacecat -lxtools -o xx_aceproto.e
+	$endif
+	;
+
+install:
+	$move	xx_aceproto.e nfebin$x_aceproto.e
+	;
+
+libpkg.a:
+	acecluster.x	ac.h <acecat.h>
+	t_acecluster.x	ac.h <error.h> <acecat.h>
+	t_acepairs.x	ap.h ap0.h ap1.h ap2.h ap3.h ap4.h <error.h> <acecat.h>
+	;

@@ -1,0 +1,6 @@
+#!/bin/csh -f
+#
+# ACEDIFF -- Call the acediff task in the ACE package.
+
+set noglob
+${nfextern}bin${arch}/x_ace.e acediff $*

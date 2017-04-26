@@ -1,0 +1,6 @@
+#!/bin/csh -f
+#
+# ACESEGMENT -- Call the acesegment task in the ACE package.
+
+set noglob
+${nfextern}bin${arch}/x_ace.e acesegment $*

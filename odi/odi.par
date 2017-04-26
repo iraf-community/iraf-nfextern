@@ -1,0 +1,4 @@
+# ODI Package Parameters.
+
+im_bufsize,r,h,0.065536,0.001024,,Image I/O buffer size (in Mbytes)
+version,s,h,"V0.5: 20120913"

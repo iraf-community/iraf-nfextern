@@ -1,0 +1,206 @@
+                Instrument Data Handling System
+            Top Level Work Breakdown and Development Plan
+			FV: Nov 4, 2004
+
+This document describes the high level pieces of a data handling system for
+NOAO telescope instruments.  These pieces become parts of a high level work
+breakdown for two specific instruments, the Mosaic cameras and NEWFIRM.
+Each of these work breakdown elements is a subproject in its own right with
+an assigned team.  Each team provides further work breakdown and milestones
+and target dates.  This is a divide and conquer approach where each level
+gives people the freedom and responsibility to develop a description and
+progress measurement plan appropriate for them and which they will be asked
+to report against to higher level management.
+
+The next two sections describe the high level elements of an instrument
+data handling system as applicable to NOAO.  The elements are separated
+into two groups, data flow elements which are somewhat instrument specific
+and generic infrastructure.
+
+1. INSTRUMENT DATA HANDLING SYSTEM: DATA FLOW ELEMENTS
+
+1.1 DATA CAPTURE SYSTEM
+
+In our context the data capture system (DCS) is the interface between the
+instrument acquisition system and the data handling system.  The DCS may
+be a special interface component but it is sometimes bundled with other
+logical functions such as observer control of the instrument (e.g. ICE).
+Note that we have also been calling this piece the DHS but DCS is a
+clearer description of the functionality required.
+
+1.2 QUICK LOOK TOOLS
+
+Quick look tools provide nearly immediate feedback about the last captured
+exposure.  There are also specialize tools such as for focus
+determination.  The general quick look  may consist of simply displaying
+the image during or after the exposure completes.  The quick look
+operations may involve some on-the-fly calibrations as is done with the
+Mosaic cameras.  In most current NOAO systems the quick look piece is
+simply a "postproc" command that is some script calling the astronomor
+environment toolbox.  The script typically logs the exposure, displays the
+exposure (possibly with on-the-fly calibration), and directs a copy of the
+disk image to a backup system (STB).  For NEWFIRM we would like to do more
+than just automatic display.
+
+1.3 ASTRONOMER ENVIRONMENT AND TOOLBOX
+
+The astronomer environment and toolbox consists of the software and command
+environment available to the observer to evaluate the exposures.  In most
+NOAO systems the environment is an IRAF environment (command language and
+XImtool) and possibly additional tools like IDL.  The toolbox is typically
+IRAF packages with one package being specific to the type of data.  For
+example, for the Mosaic cameras the environment is IRAF with XImtool and
+the primary toolbox is MSCRED.
+
+1.4 QUICK REDUCE PIPELINE
+
+This is automatic pipeline processing of one or more exposures to remove
+many of the instrumental features to facilitate scientific evaluation of
+the data.  This pipeline includes data quality evaluations.  A quick reduce
+pipeline may actually be fairly sophisticated and could be used by the
+observer to feed data to some project specific pipeline such as asteroid
+searches.  Currently there are no NOAO developed quick reduce pipelines
+other than the Mosaic on-the-fly calibration during display which is
+defined here as quick look.
+
+1.5 SCIENCE PIPELINE
+
+This is an automatic pipeline that processes the exposures to science
+quality data products.  The distinctions between the quick reduce pipeline
+and the science pipeline are 1) the science pipeline may run during the day
+(or even longer) after the data are acquired and 2) additional calibrations
+and processing are performed that are too slow quick user feedback or
+require the whole night's data are included.
+
+The science pipeline(s) may be developed or evolved in phases with
+phase 1 being basic instrumental calibrations and possibly stacking.
+Further phases may include detection of sources, particularly time
+variable sources.
+
+
+2. INSTRUMENT DATA HANDLING SYSTEM: INFRASTRUCTURE PIECES
+
+In addition to the data flow and science processing pieces there are some
+infrastructure pieces that need to be part of the data handling system.
+These are intended to be reusuable pieces for many instruments or
+applications outside of the instrument data handling system.
+
+2.1 DISPLAY INFRASTRUCTURE
+
+Image display is a core piece of infrastructure.  NOAO provides display
+servers (XImtool) and display interactions (IMEXAM, FOCUS, ISM plugins).
+Different instruments may require additional functionality such as mosaic
+tilings, on-the-fly calibration during display, and rapid display.
+For NEWFIRM the latter is an issue.  The display infrastructure may also
+be tied in with the quick look part of the data flow as well as being
+part of the astronomer environment.
+
+2.2 DATA TRANSPORT INFRASTRUCTURE
+
+This is needed to robustly transport data to data storage and science
+pipelines.  It may also be involved in data mirroring and client
+subscription services.
+
+2.3 DATA STORAGE INFRASTRUCTURE
+
+Data storage is often also refered as archiving.  But for the purposes of
+instrument data handling one may just think of getting the data to a long
+term safe store that is accessible by higher level archival functions and
+pipelines.  The quick look, quick reduce pipelines, astronomer access
+during the observations may provide their own data storage and not depend
+on this infrastructure component.
+
+2.4 PIPELINE INFRASTRUCTURE
+
+This is a major and distinctly separate component in the data handling
+system.  This piece of infrastructure has many elements such as sequencing
+data reduction operations, providing control, providing operator
+interfaces, messaging, and monitor GUIs.  The piece is distinct from the
+science pipeline in that the science pipeline uses the infrastructure and
+data reduction toolbox to process input data to science quality data
+products.
+
+2.5 ARCHIVE (INTERFACE)
+
+An archive is major component of a data handling system as well as serving
+data and metadata to various customers.  It is such a large component with
+multiple applications and usersthat its role in this discussion of
+instrument data handling system will be view simply as the consumer of
+instrument data from the data handling system.  In this view the impact of
+this in the development of the DHS is in components having to do with data
+delivery from the DCS and the science pipeline.
+
+
+3. DEVELOPMENT PLAN FOR THE NOAO PIPELINE TEAM
+
+We will base our development plans around the above major structural
+elements.  Since we are interested in developing a comprehensive DHS for
+two major NOAO instruments, the Mosaic cameras and NEWFIRM, we will
+approach the infrastructure elements as common to both and the data
+handling elements as customized for each instrument.  Describing both
+instruments in the same way is useful, keeping in mind that many of the
+pieces for the Mosaic camera data handling system are already finished and
+in regular use.
+
+Table 1 gives a top level work breadown structure for the pipeline team.
+The development concept is that each of pieces is a subproject with an
+assigned team.  My proposed team assignments is shown with the first entry
+being the suggested subteam lead.
+
+
+    Table 1: Top Level Work Breakdown Structure
+
+    DISPLAY INFRASTRUCTURE              FV/MF/MM
+    DATA TRANSPORT INFRASTRUCTURE       ?
+    DATA STORAGE INFRASTRUCTURE ?
+    PIPELINE INFRASTRUCTURE             FP/BT/FV
+    ARCHIVE     (INTERFACE)             BT
+
+    MOSAIC DATA CAPTURE SYSTEM  MF/FV   (DONE)
+    MOSAIC QUICK LOOK TOOLS             MF/FV   (DONE)
+    MOSAIC ASTRONOMER ENVIRONMENT
+        AND TOOLBOX (MSCRED)    FV      (DONE)
+    MOSAIC QUICK REDUCE PIPELINE        FV/RS
+    MOSAIC SCIENCE PIPELINE             FV/RS
+
+    NEWFIRM DATA CAPTURE SYSTEM MM/MF
+    NEWFIRM QUICK LOOK TOOLS    FV
+    NEWFIRM ASTRONOMER ENVIRONMENT
+        AND TOOLBOX (IRRED)             FV
+    NEWFIRM QUICK REDUCE PIPELINE       RS/FV/FP
+    NEWFIRM SCIENCE PIPELINE            FP/FV/RS
+
+   BT - Brian Thomas,     FP - Francesco Pierfederici, FV - Frank Valdes
+   MF - Mike Fitzpatrick, MM - Michelle Miller,        RS - Rob Swaters
+
+
+To track progress on this WBS I propose that each subteam: 
+
+    - write a brief description of the goals and functionality
+    - decompose into subunits
+        - if multiple members identify lead
+    - define milestones for the subunits (see below)
+	- one milestone is the start of work
+    - provide target dates for the milestones
+
+We will setup a Twiki site as an option for the distributed teams to
+develop the 
+
+
+3.1 MILESTONES
+
+Each subteam can define the subunit milestones as you see fit.  One standard
+milestone is the start of the work.  You can use
+the NEWFIRM WBS
+(http://www.noao.edu/iraflocal/Projects/Newfirm/nfwbs0411.pdf) for ideas
+but you are not bound to follow that particular breakdown.
+
+I can think of two approaches.  One is a breakdown into specification,
+design, implementation, documentation, and testing much like the NEWFIRM
+WBS.  The other is into versions; toy, prototype, alpha, beta, etc.  In the
+latter approach it is important that each version is described in terms of
+level of functionality, documentation, and testing, and required feedback
+and need for integration.  This has the advantage that various elements
+proceed in parallel but are expected to reach some defined state (a
+version) at some point.
+

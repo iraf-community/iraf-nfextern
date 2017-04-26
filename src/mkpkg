@@ -1,0 +1,12 @@
+# Make the NFEXTERN tasks.
+
+update:
+	$call lacecat@ace/lib/acecat/
+	$call update@ace
+	$call update@proctool
+	$call update@combine
+	$call update@msctools
+	$call update@dimsum
+	$call update@imedit
+	$call update@xtalk
+	;

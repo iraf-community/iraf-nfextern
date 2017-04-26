@@ -1,0 +1,91 @@
+.help biasfit Mar05 noao.imred.irred
+.ih
+NAME
+biasfit -- Bias fitting parameter set for IRPROC
+.ih
+SYNOPSIS
+.ih
+HIGHLIGHTS
+.ih
+USAGE	
+biasfit
+.ih
+PARAMETERS
+.ls function = "legendre" (legendre|chebyshev|spline1|spline3)
+The bias vector fitting function specified by one of the following values.
+
+.nf
+     legendre - legendre polynomial
+    chebyshev - chebyshev polynomial
+      spline1 - linear spline
+      spline3 - cubic spline
+.fi
+.le
+.ls order = 1
+Number of polynomial terms or spline pieces in the bias fit.
+.le
+.ls sample = "*"
+Sample points to use in the bias fit.  The string "*" specified all
+points otherwise an \fBicfit\fR range string is used.
+.le
+.ls naverage = 1
+Number of points to average or median to form fitting points.  Positive
+numbers specify averages and negative numbers specify medians.
+.le
+.ls niterate = 1
+Number of rejection interations to remove deviant points from the bias fit.
+If 0 then no points are rejected.
+.le
+.ls low_reject = 3., high_reject = 3.
+Low and high sigma rejection factors for rejecting deviant points from the
+bias fit.
+.le
+.ls grow = 0.
+One dimensional growing radius for rejection of neighbors to deviant points.
+.le
+
+When fit interactively the following graphics parameters are used.
+
+.ls graphics = "stdgraph"
+Interactive graphics output device.  Normally this is "stdgraph" to
+use the standard interactive graphics device.
+.le
+.ls cursor = ""
+Graphics cursor input.  Normally this is the null string, "", to read
+the standard cursor device.
+.le
+DESCRIPTION
+If an bias correction is specified (\fIoverscan\fR
+parameter) then the image section (\fIbiassec\fR parameter) defines
+the bias region.
+
+The other averages the bias along the lines
+make a bias vector, fits a smoothing function to the vector,
+and then evaluate and then evaluates the smooth function at each readout
+line or column.
+
+The line-by-line determination provides an mean, median, or
+mean with the minimum and maximum values excluded.  The median
+is lowest value of the middle two when the number of bias columns
+is even rather than the mean.
+
+The smoothed bias vector determination uses the \fBicfit\fR options
+including interactive fitting.  The fitting function is generally either a
+constant (polynomial of 1 term) or a high order function which fits the
+large scale shape of the bias vector.  Bad pixel rejection is also
+available to eliminate cosmic ray events.  The function fitting may be done
+interactively using the standard \fBicfit\fR iteractive graphical curve
+fitting tool.  Regardless of whether the fit is done interactively, the
+bias vector and the fit may be recorded for later review in a metacode
+plot file named by the parameter \fIirred.plotfile\fR.  The mean value of
+the bias function is also recorded in the image header and log file.
+.ih
+EXAMPLES
+.ih
+REVISIONS
+.ih
+SEE ALSO
+.nf
+icfit
+.fi
+.endhelp

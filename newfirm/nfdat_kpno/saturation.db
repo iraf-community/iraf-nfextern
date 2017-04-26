@@ -1,0 +1,48 @@
+# Expression describing saturation level in NEWFIRM. For more details,
+# see linearity.db.
+
+# Interval (seconds) between detector reset and first pixel readout
+TR0=		0.0346
+# Minimum interval (seconds) between end of 1 CDS readout and start of
+# another
+TR1=		0.0568
+# Requested exposure time (from image header EXPTIME keyword)
+TX=		b.exptime
+# Number of Fowler Samples (from image header FSAMPLE keyword)
+NFS=		b.fsample
+# Number of Digital Averages (from image header DIGAVGS keyword)
+NDA=		b.digavgs
+# Number of coadds (from image header NCOADD keyword)
+NCA=		b.ncoadd
+# Requested exposure time per read (from image header EXPCOADD keyword)
+TX1=		b.expcoadd
+# True linearized saturation threshold
+SAT=		b.saturate
+
+# Reset-to-1st-read time functions for four NEWFIRM detectors.  
+tcds		((NDA==1) ? 0.56 : 0.564+0.148*NDA)
+
+# Baseline time constant for reset-to-1st-read, as a function of the
+# single CDS read time (tcds) and the number of Fowler Samples (NFS):
+tr0		(TR0+(tcds+TR1)*(NFS-1)/2)
+
+# Functions to compute the reset-to-1st-readout time interval as a
+# function of pixel position. 
+# For SN019 = im1, SE quadrant
+tr1		(tr0+tcds*(J/2048.))
+# For SN022 = im2, SW quadrant
+tr2		(tr0+tcds*(2049.-I)/2048.)
+# For SN013 = im3, NE quadrant
+tr3		(tr0+tcds*(I/2048.))
+# For SN011 = im4, NW quadrant
+tr4		(tr0+tcds*(2049.-J)/2048.)
+
+# Counts per read
+ct1=		(a/NCA)
+# Saturation per read/sampling
+satrs=		(SAT/(NFS*NCA))
+
+sat1(a,b,c)	(a==1 ? 1 : b>NFS*NCA*satrs*(1-tr1/(tr1+TX1))+c*satrs**2*(1-(tr1/(tr1+TX1))**2) ? 3 : 0)
+sat2(a,b,c)	(a==1 ? 1 : b>NFS*NCA*satrs*(1-tr2/(tr2+TX1))+c*satrs**2*(1-(tr2/(tr2+TX1))**2) ? 3 : 0)
+sat3(a,b,c)	(a==1 ? 1 : b>NFS*NCA*satrs*(1-tr3/(tr3+TX1))+c*satrs**2*(1-(tr3/(tr3+TX1))**2) ? 3 : 0)
+sat4(a,b,c)	(a==1 ? 1 : b>NFS*NCA*satrs*(1-tr4/(tr4+TX1))+c*satrs**2*(1-(tr4/(tr4+TX1))**2) ? 3 : 0)

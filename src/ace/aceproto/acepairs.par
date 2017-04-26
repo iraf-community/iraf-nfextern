@@ -1,0 +1,20 @@
+# Parameters for ACEPAIRS
+
+icats,s,a,,,,List of input catalogs
+ocats,s,a,,,,List of output single source catalogs
+pcats,s,a,,,,List of output pair catalogs
+icatdef,s,h,"",,,Input catalog definitions
+ocatdef,s,h,"",,,Output catalog definitions
+pcatdef,s,h,"",,,Output catalog definitions
+filter,s,h,"",,,Input catalog filter
+iwindow,i,h,4,,,Image pairing window
+minsep,r,h,10.,,,Minimum sep or rate
+maxsep,r,h,50.,,,Maximum sep or rate
+minrate,r,h,10.,,,Minimum sep or rate
+maxrate,r,h,50.,,,Maximum sep or rate
+maxdm,r,h,0.5,,,Maximum mag difference (deg)
+maxdw,r,h,1.,0.,,Max FWHM difference
+maxde,r,h,0.15,0.,,Max ellip difference
+maxdp,r,h,5.,,,Max PA difference (deg)
+type,s,h,"general","general|image|moving",,Pairing type?
+wempty,b,h,no,,,Write empty catalogs?

@@ -1,0 +1,41 @@
+# Help directory for the NFEXTERN packages.
+
+$libnfe		= "./lib/src/doc/"
+$ace		= "./ace/"
+$newfirm	= "./newfirm/"
+$odi		= "./odi/"
+$nfdoc		= "./newfirm/doc/"
+$msctools	= "./msctools/"
+$dimsum		= "./dimsum/"
+$nfesrc		= "./src/"
+
+# Define help files for the packages.
+
+ace		men = ace$ace.men,
+		hlp = ..,
+		pkg = ace$ace.hd,
+		src = ace$ace.cl
+
+newfirm		men = newfirm$newfirm.men,
+		hlp = ..,
+		pkg = nfdoc$newfirm.hd,
+		src = newfirm$newfirm.cl
+
+msctools	men = msctools$msctools.men,
+		hlp = ..,
+		pkg = msctools$msctools.hd,
+		src = msctools$msctools.cl
+
+odi		men = odi$odi.men,
+		hlp = ..,
+		pkg = odi$odi.hd,
+		src = odi$odi.cl
+
+dimsum		men = dimsum$dimsum.men,
+		hlp = ..,
+		pkg = dimsum$dimsum.hd,
+		src = dimsum$dimsum.cl
+
+nfesrc		pkg = nfesrc$nfesrc.hd
+
+libnfe		pkg = libnfe$libnfe.hd

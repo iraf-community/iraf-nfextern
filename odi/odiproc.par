@@ -1,0 +1,64 @@
+# ODIPROC parameters
+
+input,s,a,"",,,"List of input ODI directories"
+output,s,h,"",,,"List of output ODI directories or files"
+outtype,s,h,"ota","ota|image|mef",,"Output type (ota|image|mef)"
+list,b,h,no,,,"List only?"
+verbose,b,h,yes,,,"Verbose output?"
+logfiles,s,h,"logfile",,,"List of output logfiles
+
+# Processing switches and order:"
+trim,b,h,yes,,,"T: Trim?"
+fixpix,b,h,no,,,"X: Fix bad pixels by interpolation?"
+biascor,b,h,yes,,,"B: Bias correction?"
+saturation,b,h,no,,,"M: Saturation?"
+zerocor,b,h,yes,,,"Z: Zero correction?"
+darkcor,b,h,no,,,"D: Dark correction?"
+flatcor,b,h,yes,,,"F/G: Flat correction?"
+replace,b,h,no,,,"R: Replace pixels?"
+normalize,b,h,no,,,"N: Normalize?"
+merge,b,h,no,,,"Merge cells?
+
+# Processing parameters:"
+bpm,s,h,"",,,"List of bad pixel masks or expression (file)"
+obm,s,h,"(objmask)",,,"List of object masks or expression (file)"
+trimsec,s,h,"[1:480,9:494]",,,"Trim section or expression (section)"
+biassec,s,h,"[481:536,*]",,,"Bias section or expression (section)"
+satexpr,s,h,"",,,"Saturation expression (numeric)"
+satimage,s,h,"",,,"Saturation image or expression (file)"
+zeros,s,h,"",,,"List of zero images or expression (file)"
+darks,s,h,"",,,"List of dark images or expression (file)"
+flats,s,h,"",,,"List of flat images or expression (file)"
+flatexpr,s,h,"",,,"Alternate flat field expression (numeric)"
+repexpr,s,h,"",,,"Replacement expression (numeric)"
+repimage,s,h,"",,,"Replacement image or expression (file)
+"
+btype,s,h,"fit",,,"Bias type code expression (string)"
+bfunction,s,h,"legendre",,,"Bias function expression (string)"
+bsample,s,h,"*",,,"Bias sample expression (string)"
+border,s,h,"1",,,"Bias order expression (numeric)"
+bnaverage,s,h,"1",,,"Bias average/median expression (numeric)"
+bniterate,s,h,"1",,,"Bias rejection iterations expression (numeric)"
+bhreject,s,h,"3.",,,"Bias high rejection expression (numeric)"
+blreject,s,h,"3.",,,"Bias low rejection or expression (numeric)"
+bgrow,s,h,"0.",,,"Bias grow rejection radius expression (numeric)
+
+# Selection, grouping, keyword expressions:"
+intype,s,h,"",,,"Input selection expression (boolean)"
+ztype,s,h,"(zero)",,,"Zero selection expression"
+dtype,s,h,"(dark)",,,"Dark selection expression"
+ftype,s,h,"(flat)",,,"Flat selection expression"
+imageid,s,h,"(fppos//extname)",,,"Image ID expression"
+filter,s,h,"(filter)",,,"Filter expression"
+exptime,s,h,"(exptime)",,,"Exposure time expression (numeric)
+
+# Miscellaneous"
+override,b,h,no,,,"Override previous processing?"
+copy,b,h,no,,,"Copy if no processing required?"
+erraction,s,h,"warn","error|warn",,"Error action code"
+gdevice,s,h,"stdgraph",,,"Graphics device"
+gcursor,s,h,"",,,"Graphics cursor"
+gplotfile,s,h,"",,,"Graphics plot file"
+taskname,s,h,"",,,"Task name for logging
+"
+explist,*struct,h

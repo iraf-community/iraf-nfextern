@@ -1,0 +1,91 @@
+---+ NEWFIRM Quick Look Environment Functionality
+---+++Francisco Valdes
+---+++February 7, 2005
+
+---++ Introduction
+
+The quick look functionality of the NEWFIRM Data Handling System (NDHS)
+provides interaction and evaluation with the data during immediately after
+an exposure is completed.  This interaction is divided into two components
+or enviroments defined by the time scales and generality of interactions.
+The quickest look is provided by a specialized user interface coupled
+closely to the real-time data capture system.  This is what is refered to
+as the Quick Look Environment (QLE).  On a somewhat longer time scale a
+general image processing interface allows the astronomer to apply a
+wide-range of tools, including personal tools and scripts, to the exposures
+provided as FITS files.  This latter functionality is refered to as the
+Astronomer Environment Toolkit (AET).  This document discusses the Quick
+Look Environment while the Astronomer Environment Toolkit is described in a
+separate document.
+
+The  Quick Look Environment presents information to the astronomer through
+one or more graphical user interfaces (GUI).  The GUIs provide a limited
+set of data quality assessments and displays.  The astronomer may interact
+with the data through the specific functionality provided by the GUI
+interface.  The key distinction of this environment is that the data are in
+an internal format which can only be interacted with through the GUIs.
+
+---++ Relationship with Earlier Analysis
+
+The purpose and key data quality assessment functions have been described
+in the document "NEWFIRM Data Handlng System: Quick Look Functionality"
+(http:www.noao.edu/iraflocal/Projects/Newfirm/quicklook.pdf) by Lindsey
+Davis.  The main refinement from that document is in the concepts outlined
+in the section "Observer's Toolkit".  That section deals with the
+interaction of the astronomer with the data as distinct from the automated
+functions.  As noted earlier, the interactions with the data are divided
+into two environments; the specialized functionality of the Quick Look
+Environment GUIs and the general purpose Astronomenr Environment Toolkit.
+
+
+---++ Requirements
+
+The following provide a draft list requirements on the functionality of the
+two main QLE GUIs providing image display and keyword, data quality,
+parameter monitoring and trending.
+
+---++++ QLE IMAGE DISPLAY
+
+The QLE image display GUI shall:
+
+   * display a portion of the raw exposure within ?3? seconds of exposure end
+   * display raw mosaic exposure as a tile in a single frame buffer
+     (a la mscdisplay)
+   * apply on-the-fly (OTF) calibration during display including
+      * a UI to toggle OTF calibration
+      * bias subtraction using the reference pixel data
+      * sky subtraction from preceeding ?1-N? exposures
+      * apply a pre-defined OTF flat field
+   * cycle through ?N? frame buffers during automatic display
+   * allow display of only a subset of data selected by detector and by section
+   * provide button or simple UI to lock frame buffer(s) from automatic reuse
+   * provide cursor tracking interaction with
+      * pixel and celestial coordinates
+      * pixel values (raw and OTF calibrated)
+   * provide easy interactive 
+      * greyscale stretch
+      * zoom and pan
+   * provide inspection using the cursor position for
+      * line and column cuts
+   * provide inspection using the cursor position and a small box to
+      * set box size with the cursor and with a form
+      * compute mean and std dev in the box
+      * print pixel values in the box
+      * display the data in the box as a contour plot
+      * display the data in the box as a surface plot
+      * display the marginal averages as line and column plots
+      * compute the marginal centroid
+      * display a radial profile and FWHM estimate about centroid
+
+
+---++++ QLE PARAMETER MONITOR GUI
+
+The QLE parameter monitor GUI shall:
+
+   * display a table of selected numeric parameter values available at
+     the "close" of exposure
+   * allow selection of table entries to expand into time series plot
+   * all setting of alarm thresholds by
+      * explicit user input values
+      * moving sigma thresholds
+   * visually notify the user when alarm thresholds are exceeded

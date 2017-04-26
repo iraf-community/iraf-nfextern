@@ -1,0 +1,89 @@
+.help acequantities Mar07 "Catalog Quantities"
+
+.sh
+Introduction
+
+The Astronomical Cataloging Environment provides a number of quantities
+which may be evaluated for detected sources.  Whether they are
+recorded in a catalog and what fields names are used is generally set
+by the user through the
+.hr catdef \fBcatdef\fR
+configuration file mechanism.  In
+this section all the currently available quantities are described using the
+standard application names.  There may be new quantities introduced
+in the future.
+
+For discussion the quantities are grouped into four sections;
+.hr #s_reference \fBreference\fR,
+.hr #s_astrometric \fBastrometric\fR,
+.hr #s_photometric \fBphotometric\fR,
+and
+.hr #s_morphological \fBmorphological\fR.
+
+In the discussion we use some terms as 
+
+.ls image
+The term image is used to refer to the image from which the sources
+were detected and quantities derived using the pixel values and header
+information.
+.le
+.ls X
+The letter X is used to refer to a pixel position in the image along
+the first image axis.  This is equivalent to the term image column.
+.le
+.ls Y
+The letter Y is used to refer to positions in the image along
+the second image axis.  This is equivalent to the term image line or
+row.
+.le
+.ls parent
+There is a stage of source detection that separates two or more new sources
+from previous sources.  When this happens the source from which the new
+sources are separated is called a parent.
+.le
+.ls children
+There is a stage of source detection that separates two or more new
+sources from previous sources.  When this happens the new sources are
+called children.  A source may be both a child and a parent since the
+splitting process is iterative.
+.le
+.ls single
+A source is called single if it has no children.  A single source may
+or may not have parents.
+.le
+.ls merged
+A source is called merged if it has children.  A merged source may
+or may not have parents.
+.le
+
+.sh
+Reference
+
+Reference quantities are those which identify sources, apart from position,
+or set flags about the source.
+
+.ls NUM, PNUM
+When sources are detected in an image an integer sequence number, starting
+with eleven, is assigned to the NUM quantity.  This number is only unique
+within a particular detection execution.  Sources are detected by scanning
+through an image line-by-line in increasing
+.hr #l_Y \fIY\fR
+order.  A number is first
+assigned when a line no longer contains a pixel for a source.  Therefore the
+number is generally correlated with the maximum
+.hr #l_Y \fIY\fR
+pixel position in a
+source.
+
+There is a another detection phase where merged sources are separated.
+When a merged source is separated into two or more new sources these
+\fL(parent) are assigned numbers continuing on from the last original
+detection number.  The source number of the \fL(parent) is assigned to the
+PNUM quantity.  Sources which are not children of any parent have a
+PNUM value of zero.
+.le
+
+.ih
+Astrometric
+
+.endhelp

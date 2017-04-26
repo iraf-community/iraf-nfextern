@@ -1,0 +1,280 @@
+.help nfgroup Jan09 newfirm
+.ih
+NAME
+nfgroup -- Group NEWFIRM data in list files
+.ih
+USAGE   
+nfgroup input output
+.ih
+PARAMETERS
+.ls input			
+List of NEWFIRM MEF files or image extensions.
+.le
+.ls output			
+Rootname for output group list files.  This may be a null string.
+.le
+.ls select = ""
+Selection on the input list.  This expression must evaluate to a boolean
+result.
+.le
+.ls mef = yes
+Output MEF names rather than expanded image extensions.  The input list 
+would normally be a list of MEF files.
+.le
+.ls imageid = yes
+Group by the IMAGEID keyword.  This is equivalent to grouping by
+image extensions.  The IMAGEID value is appended to the output rootname
+for each group.  This parameter is ignored if \fImef\fR=yes.
+.le
+.ls obstype = no
+Group by the OBSTYPE keyword.  The value with whitespace removed is appended
+to the output rootname for each group.
+.le
+.ls filter = yes
+Group by the first word of the FILTER keyword.  The first word of the
+filter string is appended to the output rootname for each group.
+.le
+.ls seqnum = no
+Group by the SEQNUM keyword.  The value is appended to the output rootname
+for each group.
+.le
+.ls exptime = no
+Group by the EXPTIME keyword.  The exposure time is appended to the output
+rootname for each group.
+.le
+.ls mjd = no, mjdgap = INDEF
+Group by by the MJD-OBS value where groups are separated by the \fImjdgap\fR
+interval.  Note that MJD-OBS is in days but the gap is specified in seconds.
+A sequential integer component is appended to the output rootname for each
+group.
+.le
+.ih
+DESCRIPTION
+\fBNFGROUP\fR separates an input list of NEWFIRM exposures into groups of
+sublists with various common keyword values.  The sublists would
+typically be used as input to other tasks.  It is a specialized
+version of the \fBcgroup\fR task.
+
+The input list is normally the MEF exposure files with multiple image
+extensions for each array.  If \fImef\fR=yes the output lists will also
+be the MEF file names otherwise the expanded image extensions will be
+produced.  Note that with image extensions whether they are all put
+into the same group or different groups depends on the setting of the
+\fIimageid\fR parameter.
+
+The various parameters select keywords for grouping the input.  These are
+the commonly required groupings for NEWFIRM data.  When a grouping
+is selected a string is appended to the specified output rootname.
+In some cases it is the keyword value, with whitespace removed [obstype,
+seqnum, exptime], in others it is the first word of the value [filter],
+and finally it is an integer index starting from 1 [mjd].  The
+following shows the structure of the output names where only those
+selected are used and any leading, trailing underscores are removed
+and multiple underscores are reduced to single underscores.
+
+.nf
+[output]_[obstype]_[filter]_[seqnum]_[exptime]_[mjdgroup]_[imageid].list
+.fi
+
+The \fImjd\fR option in not directly based on the value.  The MJD-OBS
+values are sorted and the list is broken into groups when successive
+values differ by more than the \fImjdgap\fR value.  Each group is then
+assigned an integer index value starting from 1.  Note that the gap is
+specified in seconds though the keyword values are in days.
+
+The sequence number and MJD groupings provide similar capabilities.
+The sequence number is preferred as that is more closely related to
+the way the data was taken with the NEWFIRM Observation Control System
+(NOCS).  However, in some cases it might be desirable to identify new
+"sequences" based on have contiguous times.
+
+In addition to the output lists this task prints the assignments
+to the standard output.
+
+.ih
+EXAMPLES
+
+These examples use a dataset with 35 NEWFIRM exposures in 9 sequences.
+There are two dark sequences of different exposure times, one dome flat
+sequence that cycles through two filters, and 6 object sequences in
+two filters.  The science sequences are a combination of offset skys and
+on-field object exposures in an SOOS pattern.
+
+1. Group the MEF files by observation type, filter (the default), and
+sequence number.
+
+.in 4
+.nf
+cl> nfgroup nftest* example1 obstype+ seqnum+
+nftest01.fits -> example1_dark_Dark_120.list
+nftest02.fits -> example1_dark_Dark_120.list
+nftest03.fits -> example1_dark_Dark_120.list
+nftest04.fits -> example1_dark_Dark_121.list
+nftest05.fits -> example1_dark_Dark_121.list
+nftest06.fits -> example1_dark_Dark_121.list
+nftest07.fits -> example1_domeflat_J_122.list
+nftest08.fits -> example1_domeflat_J_122.list
+nftest09.fits -> example1_domeflat_J_122.list
+nftest10.fits -> example1_domeflat_Ks_122.list
+nftest11.fits -> example1_domeflat_Ks_122.list
+nftest12.fits -> example1_domeflat_Ks_122.list
+nftest13.fits -> example1_sky_J_123.list
+nftest16.fits -> example1_sky_J_123.list
+nftest14.fits -> example1_object_J_123.list
+nftest15.fits -> example1_object_J_123.list
+nftest17.fits -> example1_sky_J_124.list
+nftest20.fits -> example1_sky_J_124.list
+nftest18.fits -> example1_object_J_124.list
+nftest19.fits -> example1_object_J_124.list
+nftest21.fits -> example1_sky_J_125.list
+nftest24.fits -> example1_sky_J_125.list
+nftest22.fits -> example1_object_J_125.list
+nftest23.fits -> example1_object_J_125.list
+nftest25.fits -> example1_sky_Ks_126.list
+nftest28.fits -> example1_sky_Ks_126.list
+nftest26.fits -> example1_object_Ks_126.list
+nftest27.fits -> example1_object_Ks_126.list
+nftest29.fits -> example1_sky_Ks_127.list
+nftest32.fits -> example1_sky_Ks_127.list
+nftest30.fits -> example1_object_Ks_127.list
+nftest31.fits -> example1_object_Ks_127.list
+nftest33.fits -> example1_sky_Ks_128.list
+nftest36.fits -> example1_sky_Ks_128.list
+nftest34.fits -> example1_object_Ks_128.list
+nftest35.fits -> example1_object_Ks_128.list
+.fi
+.in -4
+
+2. Group only by sequence number.
+
+.in 4
+.nf
+cl> nfgroup nftest* example2 filter- seqnum+
+nftest01.fits -> example2_120.list
+nftest02.fits -> example2_120.list
+nftest03.fits -> example2_120.list
+nftest04.fits -> example2_121.list
+nftest05.fits -> example2_121.list
+nftest06.fits -> example2_121.list
+nftest07.fits -> example2_122.list
+nftest08.fits -> example2_122.list
+nftest09.fits -> example2_122.list
+nftest10.fits -> example2_122.list
+nftest11.fits -> example2_122.list
+nftest12.fits -> example2_122.list
+nftest13.fits -> example2_123.list
+nftest14.fits -> example2_123.list
+nftest15.fits -> example2_123.list
+nftest16.fits -> example2_123.list
+nftest17.fits -> example2_124.list
+nftest18.fits -> example2_124.list
+nftest19.fits -> example2_124.list
+nftest20.fits -> example2_124.list
+nftest21.fits -> example2_125.list
+nftest22.fits -> example2_125.list
+nftest23.fits -> example2_125.list
+nftest24.fits -> example2_125.list
+nftest25.fits -> example2_126.list
+nftest26.fits -> example2_126.list
+nftest27.fits -> example2_126.list
+nftest28.fits -> example2_126.list
+nftest29.fits -> example2_127.list
+nftest30.fits -> example2_127.list
+nftest31.fits -> example2_127.list
+nftest32.fits -> example2_127.list
+nftest33.fits -> example2_128.list
+nftest34.fits -> example2_128.list
+nftest35.fits -> example2_128.list
+nftest36.fits -> example2_128.list
+.fi
+.in -4
+
+3. Select the dark observations and group by exposure time.
+
+.in 4
+.nf
+cl> nfgroup nftest* example3 sel="obstype='dark'" filt- exp+
+nftest01.fits -> example3_5.list
+nftest02.fits -> example3_5.list
+nftest03.fits -> example3_5.list
+nftest04.fits -> example3_60.list
+nftest05.fits -> example3_60.list
+nftest06.fits -> example3_60.list
+.fi
+.in -4
+
+4. Break up a sequence into extensions and group by sky or object.  In this
+example we use the output of a previous grouping as an input @file.
+
+.in 4
+.nf
+cl> nfgroup @example2_128.list example4 mef- obstype+ seqnum+
+nftest33.fits[1] -> example4_sky_Ks_128_1.list
+nftest36.fits[1] -> example4_sky_Ks_128_1.list
+nftest33.fits[2] -> example4_sky_Ks_128_2.list
+nftest36.fits[2] -> example4_sky_Ks_128_2.list
+nftest33.fits[3] -> example4_sky_Ks_128_3.list
+nftest36.fits[3] -> example4_sky_Ks_128_3.list
+nftest33.fits[4] -> example4_sky_Ks_128_4.list
+nftest36.fits[4] -> example4_sky_Ks_128_4.list
+nftest34.fits[1] -> example4_object_Ks_128_1.list
+nftest35.fits[1] -> example4_object_Ks_128_1.list
+nftest34.fits[2] -> example4_object_Ks_128_2.list
+nftest35.fits[2] -> example4_object_Ks_128_2.list
+nftest34.fits[3] -> example4_object_Ks_128_3.list
+nftest35.fits[3] -> example4_object_Ks_128_3.list
+nftest34.fits[4] -> example4_object_Ks_128_4.list
+nftest35.fits[4] -> example4_object_Ks_128_4.list
+.fi
+.in -4
+
+5. Note that single images/extensions may be used.  To avoid a trailing
+underscore the default mef=yes should be used.
+
+.in 4
+.nf
+cl> nfgroup nftest*[im2] example5 obstype+ seqnum+
+nftest01.fits[2] -> example5_dark_Dark_120.list
+nftest02.fits[2] -> example5_dark_Dark_120.list
+nftest03.fits[2] -> example5_dark_Dark_120.list
+nftest04.fits[2] -> example5_dark_Dark_121.list
+nftest05.fits[2] -> example5_dark_Dark_121.list
+nftest06.fits[2] -> example5_dark_Dark_121.list
+nftest07.fits[2] -> example5_domeflat_J_122.list
+nftest08.fits[2] -> example5_domeflat_J_122.list
+nftest09.fits[2] -> example5_domeflat_J_122.list
+nftest10.fits[2] -> example5_domeflat_Ks_122.list
+nftest11.fits[2] -> example5_domeflat_Ks_122.list
+nftest12.fits[2] -> example5_domeflat_Ks_122.list
+nftest13.fits[2] -> example5_sky_J_123.list
+nftest16.fits[2] -> example5_sky_J_123.list
+nftest14.fits[2] -> example5_object_J_123.list
+nftest15.fits[2] -> example5_object_J_123.list
+nftest17.fits[2] -> example5_sky_J_124.list
+nftest20.fits[2] -> example5_sky_J_124.list
+nftest18.fits[2] -> example5_object_J_124.list
+nftest19.fits[2] -> example5_object_J_124.list
+nftest21.fits[2] -> example5_sky_J_125.list
+nftest24.fits[2] -> example5_sky_J_125.list
+nftest22.fits[2] -> example5_object_J_125.list
+nftest23.fits[2] -> example5_object_J_125.list
+nftest25.fits[2] -> example5_sky_Ks_126.list
+nftest28.fits[2] -> example5_sky_Ks_126.list
+nftest26.fits[2] -> example5_object_Ks_126.list
+nftest27.fits[2] -> example5_object_Ks_126.list
+nftest29.fits[2] -> example5_sky_Ks_127.list
+nftest32.fits[2] -> example5_sky_Ks_127.list
+nftest30.fits[2] -> example5_object_Ks_127.list
+nftest31.fits[2] -> example5_object_Ks_127.list
+nftest33.fits[2] -> example5_sky_Ks_128.list
+nftest36.fits[2] -> example5_sky_Ks_128.list
+nftest34.fits[2] -> example5_object_Ks_128.list
+nftest35.fits[2] -> example5_object_Ks_128.list
+.fi
+.in -4
+
+
+.ih
+SEE ALSO
+cgroup (under combine), nflist, mscextensions
+.endhelp

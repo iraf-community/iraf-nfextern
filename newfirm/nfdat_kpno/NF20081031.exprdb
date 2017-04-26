@@ -1,0 +1,214 @@
+# Database of expression evaluation functions for NEWFIRM.
+#
+# V081031: Initial version
+
+# USAGE ------------------------------------------------------------------------
+#
+# This section gives an example of usage for applying a linearity correction
+# to a NEWFIRM exposure.  The functions defined below, following the
+# derivations of Dickinson (2008), are given for each array in NEWFIRM
+# using an appended index where
+#
+#	 1: For SN019 = im1, SE quadrant
+#	 2: For SN022 = im2, SW quadrant
+#	 3: For SN013 = im3, NE quadrant
+#	 4: For SN011 = im4, NW quadrant
+#
+# There are also some array constants and internal functions that are not
+# generally referenced directly by users.  The goal is to make a
+# complex calibration be simple to use in various expression evaluation
+# tasks (imexpr, mskexpr, and nfproc).  If the constants are refined,
+# new versions of this file may be made available.  However, the formulations
+# primariy depend on two free parameters, a linearity coefficient and
+# a saturation.  Recommended values for these parameters, which may
+# eventually be defined for each pixel in calibration images, can be
+# provided without changing this file.
+#
+# The example here shows using the general imexpr task to correct
+# dark subtracted non-linear counts to linear counts.
+#
+# For the four NEWFIRM detectors (in extensions 1,2,3,4), the format
+# of the imexpr call is (e.g.):
+# imexpr "nm1(a,b)" out.fits[im1,append] image.fits[im1] lincoeff.fits[im1]
+#     exprdb=NF20081031.exprdb
+# imexpr "nm2(a,b)" out.fits[im2,append] image.fits[im2] lincoeff.fits[im2]
+#     exprdb=NF20081031.exprdb
+# imexpr "nm3(a,b)" out.fits[im3,append] image.fits[im3] lincoeff.fits[im3]
+#     exprdb=NF20081031.exprdb
+# imexpr "nm4(a,b)" out.fits[im4,append] image.fits[im4] lincoeff.fits[im4]
+#     exprdb=NF20081031.exprdb
+#
+# where (e.g.) out.fits is the result of the operation, a linearized
+# version of the image, i.e., where the original signal level has
+# been corrected for nonlinearity.  a=image.fits[im1] is the image
+# being corrected (in this example, one extension of an MEF),
+# b=lincoeff.fits[im1] is either an array of linearity coefficients
+# (again, in this example, one extension of an MEF), or a single
+# constant coefficient to be used for all pixels in the array
+# This example shows building up a new MEF by repeated appending.
+# One could also create separate images for each array.
+
+# GLOSSARY ---------------------------------------------------------------------
+# 
+# CDS: correlated double sampling, the way NEWFIRM controllers measure counts
+# DA: digital average
+# FS: fowler sample
+# CA: coadd 
+
+# CONSTANTS --------------------------------------------------------------------
+
+# Timing constants in seconds.
+
+#	TR0: interval between reset and first pixel readout
+#	TR1: minimum interval between end of CDS readout and the next
+#	TR2: readout time for one CDS with one DA.
+#	TR3: overhead for each DA (see below).
+
+TR0=		0.0346
+TR1=		0.0568
+TR2=		0.564
+TR3=		0.148
+
+
+# EXPOSURE KEYWORD PARAMETERS --------------------------------------------------
+
+# This database is intended for use with the tasks imexpr, mskexpr, and nfproc.
+# Uncomment the appropriate keyword operand declarations.
+
+# ti: exposure time per read
+# te: total exposure time (from image header EXPTIME keyword)
+# NDA: Number of Digital Averages (from image header DIGAVGS keyword)
+# NFS: Number of Fowler Samples (from image header FSAMPLE keyword)
+# NCA: Number of coadds (from image header NCOADD keyword)
+
+# For imexpr:
+#ti=		a.expcoadd
+#te=		a.exptime
+#NDA=		a.digavgs
+#NFS=		a.fsample
+#NCA=		a.ncoadd
+
+# For mskexpr:
+#ti=		i.expcoadd
+#te=		i.exptime
+#NDA=		i.digavgs
+#NFS=		i.fsample
+#NCA=		i.ncoadd
+
+# For nfproc:
+ti=		expcoadd
+te=		exptime
+NDA=		digavgs
+NFS=		fsample
+NCA=		ncoadd
+
+NCNF		(NCA*NFS)
+
+# MACROS -----------------------------------------------------------------------
+
+#	tcds: time for a single CDS readout of the detector as function NDA
+#	tr0: reset-to-1st-read for single CDS and number of NFS
+
+tcds		((NDA==1) ? TR2 : TR2+TR3*NDA)
+tr0		(TR0+(tcds+TR1)*(NFS-1)/2)
+
+# Functions to compute the reset-to-1st-readout time interval as a
+# function of pixel position.  The four functions 'tr?' are used for
+# the four NEWFIRM arrays, and take the detector readout orientations
+# into account, based on the array configuration and FITS format used
+# in 2008A.  Note that this will be different for 2007B data, where
+# the arrangement of the detectors in the FITS images was different.
+
+tr1		(tr0+tcds*(J/2048.))
+tr2		(tr0+tcds*(2049.-I)/2048.)
+tr3		(tr0+tcds*(I/2048.))
+tr4		(tr0+tcds*(2049.-J)/2048.)
+
+tt1		(tr1+ti)
+tt2		(tr2+ti)
+tt3		(tr3+ti)
+tt4		(tr4+ti)
+
+# FUNCTIONS --------------------------------------------------------------------
+
+# The functions here are called by expression evaluator tasks that support
+# expression databases.  The arguments are replaced by task operands.  The
+# operands may be constants, keywords, or images.  The arguments and functions
+# follow the equations in Dickinson (2008).
+#
+#	No: raw counts (always an image operand)
+#	Nd: raw dark counts (image operand or rough constant bias)
+#	Nm: non-linear counts after dark subtraction (always and image operand)
+#	L: linearity coefficient (image operand, keyword, or constant)
+#	S: true "total" linear saturation (for single coadd and fowler sample)
+#
+#	r:  estimated count rate (true counts/second)
+#	nm: linearized counts
+#	Ns: saturation in non-linear counts
+#	ns: saturation in linear counts
+#
+# The functions are a minimal set.  Users may copy this file and extend
+# them in the expression database or simply build higher level functions
+# in the task expression; e.g.
+#
+#	a>ns1(b,c/(a.ncoadd*a.fsample) ? 1 : 0
+#	a>ns1(b,c/NFNC) ? 1 : 0
+#
+# for saturation in linearized data where a is the linearized image operand,
+# b is the linearity coefficient, and c is the saturation in linearized
+# counts for the exposure (i.e. not corrected to a single coadd and
+# fowler sample.
+#
+# RAW DATA:
+#
+# Depending on the reduction strategy it might be desirable to do things
+# starting with raw counts and possibly use a rough threshold for saturation
+# or persistence masking.  Rather than have explicit functions, though you
+# are free to define one, apply the dark subtraction in the arguments; e.g.
+#
+#	issat1((a-b),a.lincoeff,10000) ? 1 : 0
+#	issat1((a-321),a.lincoeff,10000) ? 1 : 0
+#
+# where a=No is the image operand refering to the raw data and b=Nd is an
+# image operand for a dark, and 321 is an approximate bias for a rough
+# estimate (which may be sufficient for persistence or saturation).
+#
+# PERSISTENCE:
+#
+# Use the boolean saturation with a fraction of the saturation; e.g.
+#
+#	issat((a-321),a.lincoeff,0.8*b) ? 1 : 0
+#
+# where a=No is raw counts and b is an imexpr operand giving the
+# the true total linear saturation.
+
+# Estimated count rate r (NCA=1, NFS=1) given non-linear counts Nm.
+r1(Nm,L)	((sqrt(ti**2+4.*(Nm/NCNF)*L*(tt1**2-tr1**2))-ti)/(2.*L*(tt1**2-tr1**2)))
+r2(Nm,L)	((sqrt(ti**2+4.*(Nm/NCNF)*L*(tt2**2-tr2**2))-ti)/(2.*L*(tt2**2-tr2**2)))
+r3(Nm,L)	((sqrt(ti**2+4.*(Nm/NCNF)*L*(tt3**2-tr3**2))-ti)/(2.*L*(tt3**2-tr3**2)))
+r4(Nm,L)	((sqrt(ti**2+4.*(Nm/NCNF)*L*(tt4**2-tr4**2))-ti)/(2.*L*(tt4**2-tr4**2)))
+
+# Linear counts (nm) given non-linear counts (Nm).
+nm1(Nm,L)	real(NCNF*ti*r1(Nm,L))
+nm2(Nm,L)	real(NCNF*ti*r2(Nm,L))
+nm3(Nm,L)	real(NCNF*ti*r3(Nm,L))
+nm4(Nm,L)	real(NCNF*ti*r4(Nm,L))
+
+# Saturation in non-linear counts (Nm).
+Ns1(L,S)	real(NCNF*(S*(1-tr1/tt1)+L*S**2*(1-(tr1/tt1)**2))
+Ns2(L,S)	real(NCNF*(S*(1-tr2/tt2)+L*S**2*(1-(tr2/tt2)**2))
+Ns3(L,S)	real(NCNF*(S*(1-tr3/tt3)+L*S**2*(1-(tr3/tt3)**2))
+Ns4(L,S)	real(NCNF*(S*(1-tr4/tt4)+L*S**2*(1-(tr4/tt4)**2))
+
+# Saturation in linearized counts (nm).
+ns1(S)		real(NCNF*S/(1+tr1/ti))
+ns2(S)		real(NCNF*S/(1+tr2/ti))
+ns3(S)		real(NCNF*S/(1+tr3/ti))
+ns4(S)		real(NCA*NFS*S/(1+tr4/ti))
+
+# Boolean saturation from non-linear counts (Nm).
+issat1(Nm,L,S)	(Nm>=Ns1(L,S))
+issat2(Nm,L,S)	(Nm>=Ns2(L,S))
+issat3(Nm,L,S)	(Nm>=Ns3(L,S))
+issat4(Nm,L,S)	(Nm>=Ns4(L,S))
+

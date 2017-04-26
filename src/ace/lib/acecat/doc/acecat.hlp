@@ -1,0 +1,418 @@
+.help acecat Jun03 acecat
+.ih
+NAME
+acecat -- Astronomical Catalog Environment Catalog Interface Library
+.ih
+SYNOPSIS
+The ACECAT library is a structure oriented interface library layered on
+an enhanced TABLES package.
+.ih
+.ih
+DESCRIPTION
+The ACECAT library is a structure oriented interface library layered on
+the TABLES package.  The latter package provides access to tables in
+FITS binary tables, STSDAS tables, and text tables.  It is oriented around
+individual field access.  The ACECAT library provides a simplified application
+interface with a header layered on the IMIO keyword routines.
+
+Much of the flexibility of this interface comes from the use of the
+structure and catalog definition files.  The structure definition file
+is typically set by the application and is the same as the include file
+used by the application.  The catalog definitions are something typically
+left to the user.  There are several ways the catalog defintions may
+be given as described in the help for CATOPEN as well as illustrated in
+the examples below.
+
+.ih
+Catalog Formats
+The ASTCAT creates text files by default.  The explicit extensions
+".fits", and ".tab" create FITS binary tables and STSDAS tables
+respectively.
+
+As described for the TABLES package, a text file catalog has default
+columns "c1", "c2", etc. if column names are not defined by "#c"
+lines.
+
+.ih
+ASTCAT.H
+The public include file is shown below.
+
+.nf
+    # ACECAT.H -- Public catalog data structures and definitions.
+
+    # Catalog data structure.
+    #
+    # The record structure length is automatically set.
+
+    define  CAT_HDR    Memi[$1]    # Catalog header (IMIO)
+    define  CAT_RECS   Memi[$1+1]  # Array of records (ptr)
+    define  CAT_NRECS  Memi[$1+2]  # Number of records
+    define  CAT_RECLEN Memi[$1+3]  # Object record length
+    define  CAT_NF     Memi[$1+4]  # Number of fields in record
+    define  CAT_DEFS   Memi[$1+5]  # Pointer to array of defs
+
+    # Object record definitions.
+    #
+    # Reference to elements of the application defined
+    # record structure may be made with the generic REC[IRDC]
+    # macros or with the application defined macros;
+    # i.e. "define REC_X RECR($1,ID_X)" where ID_X is a structure
+    # offset into the record.
+
+    define  CAT_REC    Memi[CAT_RECS($1)+$2-1] # Record
+
+    define  RECI       Memi[$1+$2]        # Ref integer parameter
+    define  RECR       Memr[$1+$2]        # Ref real parameter
+    define  RECD       Memd[P2D($1+$2)]   # Ref double parameter
+    define  RECC       Memc[P2C($1+$2)]   # Ref char parameter
+
+    # The following may be used to reference the field definitions.
+
+    define  CAT_DEF    Memi[CAT_DEFS($1)+$2-1]      # Pointer defs
+
+    define  CAT_ID     Memi[CAT_DEF($1,$2)]         # Struc offset
+    define  CAT_TYPE   Memi[CAT_DEF($1,$2)+1]       # Data type
+    define  CAT_NAME   Memc[P2C(CAT_DEF($1,$2))+2]  # Name
+    define  CAT_UNITS  Memc[P2C(CAT_DEF($1,$2))+12] # Units
+    define  CAT_FORMAT Memc[P2C(CAT_DEF($1,$2))+22] # Format
+.fi
+
+CAT_HDR is a pointer to provide access to header keywords using the IMIO
+keyword database routines such as imget*, imadd*, imdelf, imput*, etc.
+
+CAT_RECS is an array of pointers to catalog records.  The number records
+is given by the CAT_NRECS reference, the length of the records in
+structure units is given by the CAT_RECLEN reference, and tne number
+of logical fields is given by the CAT_NF reference.  The record pointers
+may be accesses with the CAT_REC macro.
+
+CAT_DEFS is an array of field definition pointers.  The number of field
+definitions is given by the CAT_NF reference.  References to the elements
+of the field description are provided by CAT_ID, CAT_TYPE, CAT_NAME,
+CAT_UNITS, and CAT_FORMAT.  These take two arguments, the catalog pointer
+and the (one-indexed) field number.  The macro CAT_DEF returns the field
+definition pointer for an individual field.
+
+The elements or fields of a record are referenced by the REC[IRDC] macros.
+These take two values, a record pointer and a offset from the beginning
+of the record..  The offset values are set by the application structure
+defintions used in the CATOPEN call.  The application may choose to
+provide macros for the offsets for greater clarity in the application
+source code.  It is important to understand that the offsets are not
+necessarily sequential.  In particular, double data type fields increment
+by two and must have even offset values.  Character strings have
+a variable length with two characters per structure element.
+.ih
+EXAMPLES
+
+1. In this example the application defines records with an RA, Dec, and
+magnitude.  It creates a catalog with the user specified name.  The catalog
+format is set by the extension.  The user may also specify a catalog
+definition file to customize the output catalog.
+
+.nf
+    ----- example1.h ------------------------------------------------
+    # This file defines the object parameters.
+
+    define  ID_RA             0 # r "hr" "%11.2h"
+    define  ID_DEC            1 # r "deg" "%11.1h"
+    define  ID_MAG            2 # r "" ""
+
+    # These are optional application macros.
+
+    define	OBJ_RA		RECR($1,ID_RA)
+    define	OBJ_DEC		RECR($1,ID_DEC)
+    define	OBJ_MAG		RECR($1,ID_MAG)
+    ----- example1.x ------------------------------------------------
+    include	<acecat.h>
+    include	"example1.h"
+
+    define	STRUCTDEF	"example1.h"
+
+    procedure t_example1 ()
+
+    char	output[SZ_FNAME]
+    char	catdef[SZ_FNAME]
+    int	i
+    pointer	cat, hdr, rec
+
+    errchk	catopen, catcreate, catwrecs catclose
+
+    begin
+	    call clgstr ("output", output, SZ_FNAME)
+	    call clgstr ("catdef", catdef, SZ_FNAME)
+
+	    # Define the catalog.
+	    call catopen (cat, "", output, catdef, STRUCTDEF, NULL)
+
+	    # Do some stuff with the header.
+	    hdr = CAT_HDR(cat)
+	    call imastr (hdr, "KEY1", "This is a header keyword")
+
+	    # Allocate the entry records.
+	    CAT_NRECS(cat) = 10
+	    call calloc (CAT_RECS(cat), CAT_NRECS(cat), TY_POINTER)
+	    do i = 1, CAT_NRECS(cat)
+		call calloc (CAT_REC(cat,i), CAT_RECLEN(cat), TY_STRUCT)
+
+	    # Set the catalog records using the generic reference.
+	    do i = 1, CAT_NRECS(cat) {
+		rec = CAT_REC(cat,i)
+		RECR(rec,ID_RA) = 13. + i / 3600.
+		RECR(rec,ID_DEC) = 32. + i / 3600.
+		RECR(rec,ID_MAG) = 20 + i / 10.
+	    }
+
+	    # Alternatively use the application macros.
+	    do i = 1, CAT_NRECS(cat) {
+		rec = CAT_REC(cat,i)
+		OBJ_RA(rec) = 13. + i / 3600.
+		OBJ_DEC(rec) = 32. + i / 3600.
+		OBJ_MAG(rec) = 20 + i / 10.
+	    }
+
+	    # Create the catalog file, write the records,
+	    # and close the catalog.
+	    call catcreate (cat)
+	    call catwrecs (cat)
+	    call catclose (cat)
+    end
+    -----------------------------------------------------------------
+
+    cl> # No catalog defintion.
+    cl> example1 test ""
+    cl> head test
+    #c RA d %11.2h hr
+    #c DEC d %11.1h deg
+    #c MAG d %4.1f 
+    #k KEY1 = This is a header keyword
+    13:00:01.00  32:00:01.0 20.1
+    cl> # User specified names
+    cl> example1 test1 "myra mydec mymag"
+    cl> head test1
+    #c myra d %11.2h hr
+    #c mydec d %11.1h deg
+    #c mymag d %4.1f 
+    #k KEY1 = This is a header keyword
+    13:00:01.00  32:00:01.0 20.1
+    cl> # Definition file with alternate order and names.
+    cl> type example1.def
+    DEC     WCSDEC
+    RA      WCSRA
+    cl> example1 test2 @example1.def
+    cl> head test2
+    #c WCSDEC d %11.1h deg
+    #c WCSRA d %11.2h hr
+    #k KEY1 = This is a header keyword
+     32:00:01.0 13:00:01.00
+.fi
+
+
+2.  An input catalog is specified and the application fields, called
+N and X, are printed in sorted order with and without missing records
+shown.  This example illustrates the difference between accessing the
+records using CATHEAD and CATNEXT and through the record array.  It also
+shows the difference between reading records indexed by the row number and
+indexed by some other index in the catalog.  This example also illustrates
+use of a simple two column test file without any column information.
+
+2A. The include file, application code, and example input text catalog
+are shown below.
+
+.nf
+    ----- example2.h ------------------------------------------------
+    # This file defines the records.
+
+    define  ID_N            0 # i
+    define  ID_X            1 # i
+
+    # These are optional application macros.
+
+    define	REC_N		RECI($1,ID_N)
+    define	REC_X		RECI($1,ID_X)
+    ----- example2.x ------------------------------------------------
+    include	<acecat.h>
+    include	"example2.h"
+
+    procedure t_example2 ()
+
+    char	input[SZ_FNAME], str[SZ_LINE]
+    char	catdef[SZ_FNAME], structdef[SZ_FNAME]
+    char	recindex[SZ_FNAME], filter[SZ_LINE]
+    int	i, j, id
+    pointer	cat, hdr, rec
+
+    int	catgid()
+    pointer	cathead(), catnext()
+
+    errchk	catopen, catrhdr, catrrecs, catclose
+
+    begin
+	    call clgstr ("input", input, SZ_FNAME)
+	    call clgstr ("catdef", catdef, SZ_FNAME)
+	    call clgstr ("structdef", structdef, SZ_FNAME)
+	    call clgstr ("recindex", recindex, SZ_FNAME)
+	    call clgstr ("filter", filter, SZ_FNAME)
+
+	    # Open the input catalog.
+	    call catopen (cat, input, "", catdef, structdef, NULL)
+
+	    # Do some stuff with the header.
+	    hdr = CAT_HDR(cat)
+	    ifnoerr (call imgstr (hdr, "KEY1", str, SZ_LINE)) {
+		call printf ("KEY1 = %s\n")
+		    call pargstr (str)
+	    }
+
+	    # Read the records sorted by specified ID.
+	    id = catgid (cat, recindex)
+	    call catrrecs (cat, filter, id)
+
+	    # Print values using CATHEAD/CATNEXT.
+	    # Use the field definitions to define the type.
+
+	    printf ("# CATHEAD/CATNEXT ORDER\n")
+	    i = 1
+	    for (rec=cathead(cat); rec!=NULL; rec=catnext(cat,rec)) {
+		call printf ("%2d: ")
+		    call pargi (i)
+		i = i + 1
+		do j = 1, CAT_NF(cat) {
+		    switch (CAT_TYPE(cat,j)) {
+		    case TY_INT:
+			call printf ("%3d ")
+			    call pargi (RECI(rec,CAT_ID(cat,j)))
+		    case TY_REAL:
+			call printf ("%g ")
+			    call pargr (RECR(rec,CAT_ID(cat,j)))
+		    case TY_DOUBLE:
+			call printf ("%g ")
+			    call pargd (RECD(rec,CAT_ID(cat,j)))
+		    default:
+			call printf ("%s ")
+			    call pargstr (RECC(rec,CAT_ID(cat,j)))
+		    }
+		}
+		call printf ("\n")
+	    }
+	    call printf ("\n")
+
+
+	    # Print in index order and use application definitions.
+	    printf ("# INDEX ORDER\n")
+	    do i = 1, CAT_NRECS(cat) {
+		call printf ("%2d: ")
+		    call pargi (i)
+		rec = CAT_REC(cat,i)
+		if (rec == NULL)
+		    call printf ("---\n")
+		else {
+		    call printf ("%3d %3d \n")
+			call pargi (REC_N(rec))
+			call pargi (REC_X(rec))
+		}
+	    }
+
+	    # Finish up.
+	    call catclose (cat)
+    end
+    ----- ex2 -------------------------------------------------------
+    1	1
+    2	5
+    3	4
+    4	9
+    5	2
+    -----------------------------------------------------------------
+.fi
+
+2B. In this example no structure or catalog definition is given.  In this
+case the record structure is determined from the catalog.  For a text
+file without column information the columns have names c1 and c2.  No
+index field is specified so the records are read indexed by the row number.
+
+.nf
+     cl> example2 ex2 "" "" "" ""
+     # CATHEAD/CATNEXT ORDER
+     1:   1   1 
+     2:   2   5 
+     3:   3   4 
+     4:   4   9 
+     5:   5   2 
+
+     # INDEX ORDER
+     1:   1   1 
+     2:   2   5 
+     3:   3   4 
+     4:   4   9 
+     5:   5   2 
+.fi
+
+2C. In this case the application include file defines the record struction,
+the catalog definition assigns the first column to X and the second to N
+and the catalog is read indexed by N.  Since the first column is the same
+as the row number there is no apparent difference from the previous
+example.
+
+.nf
+     cl> example2 ex2 example2.h "c1 c2" "N" "N>2"
+     # CATHEAD/CATNEXT ORDER
+     1:   3   4 
+     2:   4   9 
+     3:   5   2 
+
+     # INDEX ORDER
+     1: ---
+     2: ---
+     3:   3   4 
+     4:   4   9 
+     5:   5   2 
+.fi
+
+2D.  This is like the previous case except that the records are indexed
+by the X column which contains gaps and is in a different order than
+the first column.
+
+.nf
+     cl> example2 ex2 example2.h "c1 c2" "X"
+     # CATHEAD/CATNEXT ORDER
+     1:   1   1 
+     2:   5   2 
+     3:   3   4 
+     4:   2   5 
+     5:   4   9 
+
+     # INDEX ORDER
+     1:   1   1 
+     2:   5   2 
+     3: ---
+     4:   3   4 
+     5:   2   5 
+     6: ---
+     7: ---
+     8: ---
+     9:   4   9 
+.fi
+
+2E. This is the previous example but now the catalog defintion is used
+to assign column 2 to N and column 1 to X.  So sorting by X is not
+like sorting by N in example 2C.
+
+.nf
+     cl> example2 ex2 example2.h "c2 c1" "X"
+     # CATHEAD/CATNEXT ORDER
+     1:   1   1 
+     2:   5   2 
+     3:   4   3 
+     4:   9   4 
+     5:   2   5 
+
+     # INDEX ORDER
+     1:   1   1 
+     2:   5   2 
+     3:   4   3 
+     4:   9   4 
+     5:   2   5
+.fi
+
+.ih
+SEE ALSO

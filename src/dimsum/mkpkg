@@ -1,0 +1,27 @@
+# Make the DIMSUM Package
+
+$call   relink
+$exit
+
+update:
+        $call   relink
+        $call   install
+        ;
+
+
+relink:
+        $set    LIBS = "-lxtools"
+        $update libpkg.a
+        $omake  x_dimsum.x
+        $link   x_dimsum.o libpkg.a $(LIBS) -o xx_dimsum.e
+        ;
+
+install:
+        $move   xx_dimsum.e nfebin$x_dimsum.e
+        ;
+
+libpkg.a:
+	maskinterp.x	<imhdr.h>
+	t_avshift.x
+	mptools.x	<ctype.h> <imhdr.h> <imset.h> <pmset.h> <error.h>
+        ;

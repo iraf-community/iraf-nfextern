@@ -1,0 +1,18 @@
+input,s,a,,,,List of input matched catalogs
+output,s,a,,,,List of output matched catalogs
+wcs,s,h,"",,,List of WCS images
+catdef,s,h,"",,,Catalog definitions
+filter,s,h,"",,,Catalog filter
+all,b,h,no,,,Combine all catalogs for a single WCS?
+fitgeometry,s,h,"general","shift|xyscale|rotate|rscale|rxyscale|general",,Fitting geometry
+reject,r,h,3.,,,Fitting rejection limit (sigma)
+interactive,b,h,yes,,,Interactive?
+graphics,s,h,"stdgraph",,,Graphics device
+cursor,s,h,"",,,Graphics cursor
+rms,r,h,2.,0.,,Maximum fit RMS to accept (arcsec)
+ra,r,h,0.,,,RA of tangent point (hours)
+dec,r,h,0.,,,Dec of tangent point (degrees)
+ngrid,i,h,100,,,Number of constraining grid points
+erraction,s,h,"abort", "abort|warn",,Action on error
+logfiles,f,h,"logfile",,,Logfile
+verbose,b,h,yes,,,Verbose?

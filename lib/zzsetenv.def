@@ -1,0 +1,17 @@
+# Global environment definitions
+
+reset	acelib		= nfextern$src/ace/lib/
+reset	acesrc		= nfextern$src/ace/
+reset	combine		= nfextern$src/combine/
+reset	irproc		= nfextern$src/irproc/
+reset	mscsrc		= nfextern$src/msctools/
+reset	imesrc		= nfextern$src/imedit/
+reset	stfsrc		= nfextern$src/starfocus/
+reset	xtsrc		= nfextern$src/xtalk/
+
+reset	nfebin		= "nfextern$bin(arch)/"
+reset	acebin		= "nfebin$"
+reset	nfelib		= "nfextern$lib/"
+reset	pkglibs		= "nfebin$,nfelib$,noao$bin(arch)/,tables$bin(arch)/,tables$lib/,acelib$,fitsutil$bin(arch)/,fitsutil$lib/"
+
+keep

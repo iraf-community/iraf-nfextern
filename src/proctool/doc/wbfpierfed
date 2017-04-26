@@ -1,0 +1,275 @@
+From fpierfed@noao.edu Mon May 24 17:19:52 2004
+From: Francesco Pierfederici <fpierfed@noao.edu>
+Subject: Re: Workbreak down input
+Date: Mon, 24 May 2004 17:19:49 -0700
+To: Frank Valdes <valdes@noao.edu>
+
+
+Hi Frank,
+
+This is a first estimate on times for NEWFIRM. In all the cases where a  
+written document is likely to be produced, I tried to take delays in  
+having everybody to agree into consideration.
+
+I am aware that the effort required is overestimated in some areas and  
+underestimated in others. But I feel that the total time is  
+approximately right.
+
+What do you think?
+
+
+Cheers
+Francesco
+
+
+Tucson, May 24-25 2004
+
+What        Who     How Long (days)
+Pipeline                                 |FP|>315|
+     PL Design                            |FP|145|
+         Data Products Spec.              |FP|5|
+         Meta-data Spec.                  |FP|10|
+         Algorithm Spec.                  |FP|15|
+         Calibration Product Spec.        |FP|10|
+         Archive ICD                      |FP|10|
+         Quick-Reduce Spec.               |FP|10|
+         QR/AE ICD                        |FP|10|
+         Develop DQA metrics              |FP|10|
+         Database Design                  |FP|10|
+             E-R Diagram                  |FP|5|
+             Schema                       |FP|5|
+         PL UI Spec.                      |FP|40|
+             PL GUI Functional Desc.      |FP|10|
+             PL GUI Prototype             |FP|10|
+             QR GUI Functional Desc.      |FP|10|
+             QR GUI Prototype             |FP|10|
+         Exception Handling Spec.         |FP|10|
+     PL Implementation                    |FP|>115|
+         Data Simulator                   RS ???
+         Processing Modules               |FP|40|
+         PL Infrastructure                |FP|10|
+         Calibration Database             |FP|10|
+         Monitor/Control GUIs             |FP|20|
+         Calibration File PL              |FP|10|
+         Processing Reports               |FP|10|
+         DQA Utilities Development        RS ???
+         Quick-Reduce Configurator        |FP|5|
+         PL Build/Config Tools            |FP|10|
+     PL Testing                           |FP|50|
+         Develop Test Data                |FP|15|
+         PL Unit Testing                  |FP|15|
+         PL Throughput Testing            |FP|20|
+     PL Delivery                          |FP|5|
+
+
+
+
+
+
+On May 24, 2004, at 1:07 PM, Frank Valdes wrote:
+
+> Hi,
+>
+> Below is a text file of the workbreak down tasks based on Dick's
+> chart.  What we need to do is guesstimate the number of (full-time)
+> days for each task.  Remember this is mostly to placate the managers
+> and so don't spend too much effort in worrying about whether everything
+> makes sense or not (IMHO).  I have indicated a person for each task to
+> provide a time estimate.  This is NOT who will do the actual work.  If
+> you want to talk to the others or ask them to give you a number that is
+> fine.  Spend no more than a few hours on this!  I will deal with point
+> 3 below and interface with Dick.
+>
+> We can discuss this within the four of us for now.  I know there are a  
+> lot of
+> questions and that even some of the basic architecture questions are  
+> unclear.
+> But we need to minimize how much all of you spend on this project  
+> management
+> stuff so that you can do real work.  In my experience the best way to
+> work on a project like this is to (1) start in the middle at some point
+> where you have a good idea of what is needed and build out from there
+> and (2) have some data, such as from a simulator, that helps guide your
+> thinking.
+>
+> Frank
+>
+>> From Dick:
+>
+>>> 1. Is the full breadth of the work represented in the WBS, at least  
+>>> at the
+>>>    intended level of detail? Have we left anything out? What?
+>>>
+>>> 2. Is the work accurately represented? That is, are all elements  
+>>> accurately
+>>>    and unabiguously described? What changes would improve the  
+>>> description?
+>>>
+>>> 3. To the extent you can, please identify dependencies among the  
+>>> work items.
+>>>    That is, does any given task depend upon the completion of one or  
+>>> more
+>>>    other tasks? Some of the proposed dependencies are represented in  
+>>> the
+>>>    attached Gantt chart. Are they correct? We want to get the  
+>>> sequence of
+>>>    events right.
+>>>
+>>> 4. Please provide an estimate of the amount of effort you believe it  
+>>> will
+>>>    take to complete each work item for which you have, or might have,
+>>>    responsibility for carrying out. (And don't bother estimating a  
+>>> work
+>>>    item if you have no clue about it). Please do the best you can  
+>>> here, but
+>>>    don't agonize. These estimates will be used to baseline the  
+>>> schedule.
+>>>    Our mileage will vary. We mostly want to know the impact on the  
+>>> whole
+>>>    schedule if one or more items does not happen according to plan.
+>>>
+>>>    NOTE: provide your estimates assuming you (or whoever) will work  
+>>> 100%
+>>>    time on the tasks. The program allows for an explicit adjustment  
+>>> for
+>>>    workers who devote a fraction of time to each task.
+>
+>
+> ======================================================================= 
+> =========
+>    FP - Francesco Pierfederici
+>    FV - Frank Valdes
+>    GC - Greg Chisholm
+>    MM - Michelle Miller
+>    RS - Rob Swaters
+>
+>    AE - Astronomer Environment
+>   DHS - Data Handling System
+>   GUI - Graphical User Interface
+>   ICD - Interface Control Document
+>    NF - NEWFIRM
+>   OCS - Observation Contol System
+>    PL - Pipeline
+>    QL - Quick-Look
+>    QR - Quick-Reduce
+> QR/PL - Quick-Reduce Pipeline
+>    UI - User Interface
+>
+>                       +---------+-> AE/QL <- AE Toolkit
+>                       +-> QRPL -+
+>   Monsoon/OCS -> DHS -+-> Pipeline -> Archive
+>                       +-> Archive
+>
+> ======================================================================= 
+> =========
+>
+>                                             DAY
+> Data Handling System                    |MM|???|
+>     DHS Design                          |MM|???|
+>         Monsoon/OCS ICD                 |MM|???|
+>         Pipeline ICD                    |MM|???|
+>         Archive ICD                     |MM|???|
+>         AE/QL ICD                       |MM|???|
+>         DHS User Interface Spec.        |MM|???|
+>         DHS Static & Dynamic Model      |MM|???|
+>     DHS Implementation                  |MM|???|
+>         DHS Simulator                   |MM|???|
+>             DHS to QL/AE                |MM|???|
+>             DHS to Archive              |MM|???|
+>             DHS to QR & PL              |MM|???|
+>         DHS Infrastructure              |MM|???|
+>             Data Capture/FITS output    |MM|???|
+>         Archive Data Access             |MM|???|
+>         Pipeline Data Access            |MM|???|
+>         AE/QL Data Access               |MM|???|
+>         DHS UI development              |MM|???|
+>         DHS Build/Config. Tools         |MM|???|
+>     DHS Testing                         |MM|???|
+>         DHS Unit Test                   |MM|???|
+>         DHS Throughput Test             |MM|???|
+>     DHS Delivery                        |MM|???|
+> Pipeline                                |FP|???|
+>     PL Design                           |FP|???|
+>         Data Products Spec.             |FP|???|
+>         Meta-data Spec.                 |FP|???|
+>         Algorithm Spec.                 |FP|???|
+>         Calibration Product Spec.       |FP|???|
+>         Archive ICD                     |FP|???|
+>         Quick-Reduce Spec.              |FP|???|
+>         QR/AE ICD                       |FP|???|
+>         Develop DQA metrics             |FP|???|
+>         Database Design                 |FP|???|
+>             E-R Diagram                 |FP|???|
+>             Schema                      |FP|???|
+>         PL UI Spec.                     |FP|???|
+>             PL GUI Functional Desc.     |FP|???|
+>             PL GUI Prototype            |FP|???|
+>             QR GUI Functional Desc.     |FP|???|
+>             QR GUI Prototype            |FP|???|
+>         Exception Handling Spec.        |FP|???|
+>     PL Implementation                   |FP|???|
+>         Data Simulator                  |RS|???|
+>         Processing Modules              |FP|???|
+>         PL Infrastructure               |FP|???|
+>         Calibration Database            |FP|???|
+>         Monitor/Control GUIs            |FP|???|
+>         Calibration File PL             |FP|???|
+>         Processing Reports              |FP|???|
+>         DQA Utilities Development       |RS|???|
+>         Quick-Reduce Configurator       |FP|???|
+>         PL Build/Config Tools           |FP|???|
+>     PL Testing                          |FP|???|
+>         Develop Test Data               |FP|???|
+>         PL Unit Testing                 |FP|???|
+>         PL Throughput Testing           |FP|???|
+>     PL Delivery                         |FP|???|
+> Astronomer Environment                  |FV|???|
+>     AE Design                           |FV|???|
+>         AE Requirements                 |FV|???|
+>         AE Toolkit Spec.                |FV|???|
+>         AE User Interface Spec          |FV|???|
+>             AE GUI Functional Descr.    |FV|???|
+>             AE GUI Prototype            |FV|???|
+>     AE Implementation                   |FV|???|
+>         AE Toolkit                      |FV|???|
+>         Quick-Look Functionality        |FV|???|
+>         AE/QL interface                 |FV|???|
+>         Enhancements to Display Server  |FV|???|
+>         Environment Initialization Tool |FV|???|
+>     AE Testing                          |FV|???|
+>         Astronomer Feedback Tests       |FV|???|
+>     AE Delivery                         |FV|???|
+> Hardware                                |MM|???|
+>     Plan/Order Development H/W          |MM|???|
+>     Confgure Development H/W            |MM|???|
+>     Order NF proc. Cluster              |MM|???|
+>     Config NF proc cluster              |MM|???|
+> Calibration                             |RS|???|
+>     Calibration Protocol Spec.          |RS|???|
+>     Internal Ref File Generation        |RS|???|
+>     External Ref File Generation        |RS|???|
+> User Documentation                      |FV|???|
+>     AE/Mtn User Guide                   |FV|???|
+>     AE Toolkit Cookbook                 |FV|???|
+>     NEWFIRM Data Handbook               |FV|???|
+>     Instrument Manual contrib.          |FV|???|
+>     PL Operator Guide                   |FP|???|
+> System Testing                          |FV|???|
+>     Test Plan Document                  |FV|???|
+>     Operations Plan Document            |FV|???|
+>     System Integration                  |FV|???|
+>         S/W Deployment                  |FV|???|
+>         Integration Testing             |FV|???|
+>         Alpha Release                   |FV|???|
+>     Verification/Validation             |FV|???|
+>         V&V testing                     |FV|???|
+>         Beta Release                    |FV|???|
+> NEWFIRM First Light                     |FV|???|
+>
+---
+Francesco Pierfederici         <fpierfed@noao.edu>
+NOAO/AURA Inc.                http://www.noao.edu/staff/fpierfed/
+950 N. Cherry Ave.              Phone: +1 520 318 8402
+Tucson,  AZ 85719 USA       FAX:    +1 520 318 8360
+
+

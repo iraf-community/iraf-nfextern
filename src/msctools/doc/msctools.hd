@@ -1,0 +1,35 @@
+# Help directory for the MSCTOOLS tasks.
+
+revisions	sys=../Revisions
+
+#mkmsc		hlp=mkmsc.hlp,		src=../t_mkmsc.x
+mscarith	hlp=mscarith.hlp,	src=../mscarith.cl
+mscblkavg	hlp=mscblkavg.hlp,	src=../mscblkavg.cl
+msccmatch	hlp=msccmatch.hlp,	src=../t_msccmatch.x
+msccmd		hlp=msccmd.hlp,		src=../msccmd.cl
+#mscctran	hlp=mscctran.hlp
+mscdisplay	hlp=mscdisplay.hlp
+mimpars		hlp=mimpars.hlp
+#mscexamine	hlp=mscexamine.hlp
+mscextensions	hlp=mscextensions.hlp,	src=../t_mscext.x
+#mscfinder	hlp=mscfinder.hlp
+#mscfindgain	hlp=mscfindgain.hlp,	src=../mscfindgain.cl
+#mscfocus	hlp=mscfocus.hlp
+#mscgetcatalog	hlp=mscgetcatalog.hlp,	src=../mscgetcatalog.cl
+#mscguide	hlp=mscguide.hlp
+#mscimage	hlp=mscimage.hlp,	src=../mscimage.cl
+#mscimatch	hlp=mscimatch.hlp
+#mscjoin		hlp=mscjoin.hlp,	src=../mscjoin.cl
+#mscotfflat	hlp=mscotfflat.hlp,	src=../mscdisplay/mscotfflat.cl
+#mscpixarea	hlp=mscpixarea.cl,	src=../mscpixarea.cl
+#mscrfits	hlp=mscrfits.hlp
+#mscshutcor	hlp=mscshutcor.hlp,	src=../mscshutcor.cl
+#mscskysub	hlp=mscskysub.hlp
+#mscsplit	hlp=mscsplit.hlp,	src=../mscsplit.cl
+#mscstack	hlp=mscstack.hlp,	src=../mscstack.cl
+#mscstat		hlp=mscstat.hlp,	src=../mscstat.cl
+#msctvmark	hlp=msctvmark.hlp,	src=../msctvmark.cl
+#mscwcs		hlp=mscwcs.hlp,		src=../mscwcs.cl
+#mscwfits	hlp=mscwfits.hlp
+#msczero		hlp=msczero.hlp,	src=../msczero.cl
+#patfit		hlp=patfit.hlp,		src=../t_patfit.x

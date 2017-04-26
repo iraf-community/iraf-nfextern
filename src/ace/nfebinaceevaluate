@@ -1,0 +1,6 @@
+#!/bin/csh -f
+#
+# ACEEVALUATE -- Call the aceevaluate task in the ACE package.
+
+set noglob
+${nfextern}bin${arch}/x_ace.e aceevaluate $*

@@ -1,0 +1,18 @@
+imcats,s,a,,,,List of image catalogs
+imcatdef,s,h,"",,,Image catalog definitions
+imwcs,s,h,"",,,List of image WCS
+imfilter,s,h,"",,,Image catalog filter
+refcats,s,a,,,,List of reference catalogs
+refcatdef,s,h,"",,,Reference catalog definitions
+reffilter,s,h,"",,,Reference catalog filter
+matchcats,s,h,"",,,List of output matched catalogs
+mosaic,b,h,no,,,Catalogs all from a mosaic exposure?
+search,r,h,0.,0.,,Search radius (arcsec)
+rsearch,r,h,0.,0.,,Rotation search (deg)
+rstep,r,h,0.1,0.,,Rotation search step (deg)
+histimages,s,h,"",,,List of histogram images
+nim,i,h,1000,10,,Maximum image catalog objects to use
+nref,i,h,1000,10,,Maximum reference catalog objects to use
+fwhm,r,h,1.,0.,,FWHM of catalog sources (arcsec)
+match,r,h,2.,0.,,Matching distance (arcsec)
+verbose,b,h,no,,,Verbose output?

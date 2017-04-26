@@ -1,0 +1,104 @@
+### ACE test script
+
+## set pause = no
+cd ADASS
+del comb*,diff*,BVI*,mos???_*
+
+# Load packages.  NEWFIRM is needed for the COMBINE task.
+## package nfextern
+## package newfirm
+
+## clear
+# --- The ACE package ---
+# 
+# This package is a general and modern source detection and cataloging
+# environment.  It is integrated with IRAF and common formats (pixel masks,
+# MEF files, binary and text tables), though it can also be binary installed
+# for stand-alone use (no IRAF required).  It features useful functionality
+# for segmentation (such as sky maps and object masks) and cataloging.  It
+# supports single and aggregate catalogs and difference image cataloging.  It
+# is very flexible in its catalog formats.
+
+## package ace
+unlearn ace
+
+# Make demo data.
+#
+# This consists of three MEF files with two extensions.  
+# This demo uses MEF files to illustrated the ease of used ad support for
+# mosaics or collections of images.  Of course, ACE also works on single
+# images.
+
+mkacedata
+## dir
+
+## set pause=yes
+# Combine the three extensions.  This is to illustrate a common used case
+# of detection on a deeper reference image and then cataloging on
+# multiple images with the same segmentation.
+
+combine mos???.fits comb combine=median group="" exten=extname
+
+# Display the image data.
+#
+# ACEDISPLAY is a version of MSCDISPLAY configured for ACE segmentation
+# map overlays.
+
+acedisp comb 1
+
+# Create a catalog.
+#
+# The simplest application is to catalog sources in images.
+
+acecat comb.fits
+
+## dir comb*
+
+# Now when we display we can see the object isophotes.
+acedisp comb 2
+
+# Catalog definition file.
+#
+# The catalog output is very flexible with many parameters and any
+# expression or function of parameters.  This also sets the output
+# field names.
+
+## page acelib$catdef.dat
+## page acedemo$BVI.def
+
+# Make catalog from common segmentation.
+#
+# This is a common use case that uses a previous segmentation and
+# outputs a catalog with joined fields.
+
+aceeval mos???.fits comb_cat catalog=BVI_cat catdef=acedemo$BVI.def
+
+# A lot of catalog functionality is provided by the existing TABLES package.
+
+tlcol BVI_cat.fits[im1]
+## tedit BVI_cat.fits[im1]
+sgraph "BVI_cat.fits[im1] B-V V-I" point+
+
+# A related type of display is using filtering and marks.
+
+acetvmark mos001 frame=1 catfilt="abs(@'B-V')>1"
+acetvmark mos002 frame=2 catfilt="abs(@'B-V')>1"
+
+# The last example is difference image detection.  This supports integer
+# offset registration and independent handling of sky and sky sigma.
+# Currently the actual differencing is simple subtraction with now
+# PSF matching.
+
+acediff mos???.fits rimage=comb rfrac=0.2
+acetvmark mos001 frame=1
+mscarith mos001 - comb diff
+acetvmark diff frame=2
+
+# As a final demonstration we show ACE running without IRAF.
+
+imcopy comb[im1] comb1
+!acecatalog images=comb1.fits catalogs=comb1.cat objmasks='""'
+## !less comb1.cat
+
+# --- DONE ---
+

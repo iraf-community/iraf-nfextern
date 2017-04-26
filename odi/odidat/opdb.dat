@@ -1,0 +1,9 @@
+# ODI expression database.
+# Copy and modify this as desired.
+
+B	"overscan correction"	"($I-$B)"
+Z	"zero calibration"	"($I-$Z)"
+D	"dark calibration"	"($I-$D*(I.exptime/D.exptime))"
+F	"flat calibration"	"($I/max(0.1,$F))"
+N	"normalize"		"($I/flatmean)"
+R	"replace"		""

@@ -1,0 +1,44 @@
+# IRPROC parameter file
+
+input,s,a,"",,,List of images or socket list address
+output,s,a,"",,,List of output images or output pattern
+maskkey,s,h,"BPM",,,Keyword identifying bad pixel masks
+#outmasks,s,h,"",,,List of output bad pixel masks or output pattern
+logfile,f,h,"STDOUT",,,List of output logfiles.
+erraction,s,h,"warn","warn|abort",,Action to take on certain errors
+
+intype,s,h,"",,,Boolean keyword expression for input images to process
+dtype,s,h,"obstype?='*{dark}*'||obstype?='*{zero}*'",,,Boolean keyword expression for dark images
+ftype,s,h,"obstype?='*{flat}*'",,,Boolean keyword expression for flat field images
+skytype,s,h,"",,,Boolean keyword expression for sky images
+imageid,s,h,"imageid",,,String keyword expression for image groups
+filter,s,h,"filter",,,String keyword expression for filter groups
+sortkey,s,h,"mjd-obs",,,Numeric keyword expression for sorting
+exptime,s,h,"exptime",,,Numeric keyword expression for exposure time
+
+xtalkcor,b,h,no,,,Apply crosstalk correction?
+biascor,b,h,yes,,,Apply bias pixel correction?
+darkcor,b,h,yes,,,Apply dark image correction?
+lincor,b,h,yes,,,Apply linearity correction?
+flatcor,b,h,yes,,,Apply flat field correction?
+skysub,b,h,yes,,,Apply sky subtraction?
+#fixpix,b,h,yes,,,Fix bad pixels?
+trim,b,h,yes,,,Trim output region?
+
+dorder,s,h,"XBPT",,,Dark processing order
+forder,s,h,"XBPT",,,Flat field processing order
+order,s,h,"XBPT",,,Default processing order
+
+xtalkfile,s,h,"",,,Crosstalk file(s)
+linexpr,s,h,"",,,Linearity correction expression
+linimage,s,h,"",,,Linearity coefficient image
+biassec,s,h,"",,,Bias pixels image section
+biastype,s,h,"fit",,,Type of bias estimation
+biaspars,pset,h,"",,,Bias fitting parameters
+zero,s,h,"",,,Zero level calibration image
+dark,s,h,"",,,Dark count image(s)
+flat,s,h,"",,,Flat field image(s)
+sky,s,h,"",,,Sky image(s)
+skytype,s,h,"nearest",,,Type of sky subtraction
+skykey,s,h,"",,,Keyword identifying sky images
+trimsec,s,h,"",,,Trim data section

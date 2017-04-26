@@ -1,0 +1,319 @@
+# Database of expression evaluation functions for NEWFIRM.
+#
+# V081031: Initial version
+
+# TASK IMAGE KEYWORDS ----------------------------------------------------------
+
+# This database is intended for use with the tasks imexpr, mskexpr, and nfproc.
+# This is the only task dependent portion.  It defines the image operand for
+# keywords.  The three below are for imexpr, mskexpr, and nfproc respectively. 
+
+im=	a
+#im=	i
+#im=	I
+
+# USAGE ------------------------------------------------------------------------
+#
+# This section gives an example of usage for applying a linearity correction
+# to a NEWFIRM exposure.  The functions defined below, following the
+# derivations of Dickinson (2008), are given for each array in NEWFIRM
+# using an appended index where
+#
+#	 1: For SN019 = im1, SE quadrant
+#	 2: For SN022 = im2, SW quadrant
+#	 3: For SN013 = im3, NE quadrant
+#	 4: For SN011 = im4, NW quadrant
+#
+# There are also some array constants and internal functions that are not
+# generally referenced directly by users.  The goal is to make a
+# complex calibration be simple to use in various expression evaluation
+# tasks (imexpr, mskexpr, and nfproc).  If the constants are refined
+# new versions of this file may be made available.  However, the formulations
+# primariy depend on two free parameters, a linearity coefficient and
+# a saturation.  Recommended values for these parameters, which may
+# eventually be defined for each pixel in calibration images, can be
+# provided without changing these files.
+#
+# The example here shows using the general imexpr task to correct
+# dark subtracted non-linear counts to linear counts.
+#
+# For the four NEWFIRM detectors (in extensions 1,2,3,4), the format
+# of the imexpr call is (e.g.):
+# imexpr "nm1(a,b)" out.fits[im1,append]  a=image.fits[im1] b=lincoeff.fits[im1]
+#     exprdb=NF20081031.exprdb
+# imexpr "nm2(a,b)" out.fits[im2,append]  a=image.fits[im2] b=lincoeff.fits[im2]
+#     exprdb=NF20081031.exprdb
+# imexpr "nm3(a,b)" out.fits[im3,append]  a=image.fits[im3] b=lincoeff.fits[im3]
+#     exprdb=NF20081031.exprdb
+# imexpr "nm4(a,b)" out.fits[im4,append]  a=image.fits[im4] b=lincoeff.fits[im4]
+#     exprdb=NF20081031.exprdb
+#
+# where (e.g.) out.fits is the result of the operation, a linearized
+# version of the image, i.e., where the original signal level has
+# been corrected for nonlinearity.  a = image.fits[im1] is the image
+# being corrected (in this example, one extension of an MEF) b =
+# lincoeff.fits[im1] is either an array of linearity coefficients
+# (again, in this example, one extension of an MEF), or a single
+# constant coefficient to be used for all pixels in the array
+# This example shows building up a new MEF.  One could also create
+# separate images for each array.
+
+# GLOSSARY ---------------------------------------------------------------------
+# 
+# CDS: correlated double sampling, the way NEWFIRM controllers measure counts
+# DA: digital average
+# FS: fowler sample
+# CA: coadd 
+
+# CONSTANTS --------------------------------------------------------------------
+
+# Timing constants in seconds.
+
+#	TR0: interval between reset and first pixel readout
+#	TR1: minimum interval between end of CDS readout and the next
+#	TR2: readout time for one CDS with one DA.
+#	TR3: overhead for each DA (see below).
+
+TR0=		0.0346
+TR1=		0.0568
+TR2=		0.564
+TR3=		0.148
+
+# Default coefficients.
+
+L1=	(-6.123E-6)
+L2=	(-7.037E-6)
+L3=	(-5.404E-6)
+L4=	(-5.952E-6)
+
+S1=	10000
+S2=	10000
+S3=	10000
+S4=	10000
+
+
+# EXPOSURE KEYWORD PARAMETERS --------------------------------------------------
+
+# ti: exposure time per read
+# te: total exposure time (from image header EXPTIME keyword)
+# NDA: Number of Digital Averages (from image header DIGAVGS keyword)
+# NFS: Number of Fowler Samples (from image header FSAMPLE keyword)
+# NCA: Number of coadds (from image header NCOADD keyword)
+
+#ti=		im.expcoadd
+#te=		im.exptime
+#NDA=		im.digavgs
+#NFS=		im.fsample
+#NCA=		im.ncoadd
+#NCNF		(NCA*NFS)
+
+ti=		expcoadd
+te=		exptime
+NDA=		digavgs
+NFS=		fsample
+NCA=		ncoadd
+NCNF		(NCA*NFS)
+
+# MACROS -----------------------------------------------------------------------
+
+#	tcds: time for a single CDS readout of the detector as function NDA
+#	tr0: reset-to-1st-read for single CDS and number of NFS
+
+tcds		((NDA==1) ? TR2 : TR2+TR3*NDA)
+tr0		(TR0+(tcds+TR1)*(NFS-1)/2)
+
+# Functions to compute the reset-to-1st-readout time interval as a
+# function of pixel position.  The four functions 'tr?' are used for
+# the four NEWFIRM arrays, and take the detector readout orientations
+# into account, based on the array configuration and FITS format used
+# in 2008A.  Note that this will be different for 2007B data, where
+# the arrangement of the detectors in the FITS images was different.
+
+tr1		(tr0+tcds*(J/2048.))
+tr2		(tr0+tcds*(2049.-I)/2048.)
+tr3		(tr0+tcds*(I/2048.))
+tr4		(tr0+tcds*(2049.-J)/2048.)
+
+tt1		(tr1+ti)
+tt2		(tr2+ti)
+tt3		(tr3+ti)
+tt4		(tr4+ti)
+
+# FUNCTIONS --------------------------------------------------------------------
+
+# The functions here are called by expression evaluator tasks that support
+# expression databases.  The arguments are replaced by task operands.  The
+# operands may be constants, keywords, or images.  The arguments and functions
+# follow the equations in Dickinson (2008).
+#
+#	No: raw counts (always an image operand)
+#	Nd: raw dark counts (image operand or rough constant bias)
+#	Nm: non-linear counts after dark subtraction (always and image operand)
+#	L: linearity coefficient (image operand, keyword, or constant)
+#	S: true "total" linear saturation (for single coadd and fowler sample)
+#
+#	r:  estimated count rate (true counts/second)
+#	nm: linearized counts
+#	Ns: saturation in non-linear counts
+#	ns: saturation in linear counts
+#
+# The functions are a minimal set.  Users may copy this file and extend
+# them in the expression database or simply build higher level functions
+# in the task expression; e.g.
+#
+#	a>ns1(b,c/(a.ncoadd*a.fsample) ? 1 : 0
+#	a>ns1(b,c/NFNC) ? 1 : 0
+#
+# for saturation in linearized data where a is the linearized image operand,
+# b is the linearity coefficient, and c is the saturation in linearized
+# counts for the exposure (i.e. not corrected to a single coadd and
+# fowler sample.
+
+# Estimated count rate r (NCA=1, NFS=1) given non-linear counts Nm.
+r1(Nm,L)	((sqrt(max(0.,ti**2+4.*(Nm/NCNF)*L*(tt1**2-tr1**2)))-ti)/(2.*L*(tt1**2-tr1**2)))
+r2(Nm,L)	((sqrt(max(0.,ti**2+4.*(Nm/NCNF)*L*(tt2**2-tr2**2)))-ti)/(2.*L*(tt2**2-tr2**2)))
+r3(Nm,L)	((sqrt(max(0.,ti**2+4.*(Nm/NCNF)*L*(tt3**2-tr3**2)))-ti)/(2.*L*(tt3**2-tr3**2)))
+r4(Nm,L)	((sqrt(max(0.,ti**2+4.*(Nm/NCNF)*L*(tt4**2-tr4**2)))-ti)/(2.*L*(tt4**2-tr4**2)))
+
+# Linear counts (nm) given non-linear counts (Nm).
+nm1(Nm,L)	real(NCNF*ti*r1(Nm,L))
+nm2(Nm,L)	real(NCNF*ti*r2(Nm,L))
+nm3(Nm,L)	real(NCNF*ti*r3(Nm,L))
+nm4(Nm,L)	real(NCNF*ti*r4(Nm,L))
+
+# Saturation in non-linear counts (Nm).
+Ns1(L,S)	real(NCNF*(S*(1-tr1/tt1)+L*S**2*(1-(tr1/tt1)**2)))
+Ns2(L,S)	real(NCNF*(S*(1-tr2/tt2)+L*S**2*(1-(tr2/tt2)**2)))
+Ns3(L,S)	real(NCNF*(S*(1-tr3/tt3)+L*S**2*(1-(tr3/tt3)**2)))
+Ns4(L,S)	real(NCNF*(S*(1-tr4/tt4)+L*S**2*(1-(tr4/tt4)**2)))
+
+# Saturation in linearized counts (nm).  Note that the linearity coefficient is
+# an argument to make it the same as Ns but it is not used.
+ns1(L,S)	real(NCNF*S/(1+tr1/ti))
+ns2(L,S)	real(NCNF*S/(1+tr2/ti))
+ns3(L,S)	real(NCNF*S/(1+tr3/ti))
+ns4(L,S)	real(NCA*NFS*S/(1+tr4/ti))
+
+
+# PROCTOOL ---------------------------------------------------------------------
+
+# Proctool expressions.  This uses additional substitution features
+# in proctool (e.q. nfproc).  In particular, \I is replaced by the
+# value of the "imageid" parameter and {} are evaluated as expressions
+# that return a string which is then further macro expanded.  For
+# NEWFIRM the imageid parameter maps to the IMAGEID keyword which has
+# values 1, 2, 3, and 4 as defined above.  PROCTOOL sets the keyword
+# PROCDONE with certain flags which is what is used to conditionally
+# modify the macro selected.
+
+# irr and irs are builtin functions in proctool.  These result in improved
+# performance and shorter expanded expressions.  The commented out versions
+# use only expressions and might be useful to for testing and to see the
+# full expression in a verbose listing.
+
+# Linearity correction.
+
+#lin(L)				nm\I($I,L)
+lin(L)				real(NCNF*ti*irr($I/NCNF,L,ti,tr\I))
+
+# The following support every combination of bad pixel mask, object mask,
+# saturation mask, and persistence mask.  They are intended for use by
+# nfmask though users can call them directly from nfproc.  The bad pixel
+# and object masks add flags in the final mask and have priority over
+# saturation and persistence.  The bad pixel mask has priority over the
+# object mask.  The entry points check for prior linearization and call
+# either the linearize or non-linearized functions.
+
+# Saturation mask.
+sat(L,S,MS)			{procdone ?= 'L'?'satA':'satB'}
+satA(L,S,MS)			$I<ns\I(L,S)?0: MS
+#satB(L,S,MS)			$I<Ns\I(L,S)?0: MS
+satB(L,S,MS)			$I<NCNF*irs(L,S,ti,tr\I)?0: MS
+
+# Persistence mask.
+per(L,S,F,MP)			{procdone ?= 'L'?'perA':'perB'}
+perA(L,S,F,MP)			$P<ns\I(L,F*S)?0: MP
+#perB(L,S,F,MP)			$P<Ns\I(L,F*S)?0: MP
+perB(L,S,F,MP)			$P<NCNF*irs(L,F*S,ti,tr\I)?0: MP
+
+# Both saturation and persistence mask.  Saturation has priority.
+satper(L,S,F,MS,MP)		{procdone ?= 'L'?'spA1':'spB1'}
+spA1(L,S,F,MS,MP)		$I<ns\I(L,S)?spA2(L,S,F,MP): MS
+spA2(L,S,F,MP)			($P<ns\I(L,F*S)?0: MP)
+#spB1(L,S,F,MS,MP)		$I<Ns\I(L,S)?spB2(L,S,F,MP): MS
+spB1(L,S,F,MS,MP)		$I<NCNF*irs(L,S,ti,tr\I)?spB2(L,S,F,MP): MS
+#spB2(L,S,F,MP)			($P<Ns\I(L,F*S)?0: MP)
+spB2(L,S,F,MP)			($P<NCNF*irs(L,F*S,ti,tr\I)?0: MP)
+
+# Bad pixel and saturation mask.
+bsmask(L,S,MB,MS)		{procdone ?= 'L'?'bsA1':'bsB1'}
+bsA1(L,S,MB,MS)			$M==0?bsA2(L,S,MS): MB
+bsA2(L,S,MS)			($I<ns\I(L,S)?0: MS)
+bsB1(L,S,MB,MS)			$M==0?bsB2(L,S,MS): MB
+#bsB2(L,S,MS)			($I<Ns\I(L,S)?0: MS)
+bsB2(L,S,MS)			($I<NCNF*irs(L,S,ti,tr\I)?0: MS)
+
+# Object and saturation mask.
+osmask(L,S,MO,MS)		{procdone ?= 'L'?'osA1':'osB1'}
+osA1(L,S,MO,MS)			$M==0?osA2(L,S,MS): MO
+osA2(L,S,MS)			($I<ns\I(L,S)?0: MS)
+osB1(L,S,MO,MS)			$M==0?osB2(L,S,MS): MO
+#osB2(L,S,MS)			($I<Ns\I(L,S)?0: MS)
+osB2(L,S,MS)			($I<NCNF*irs(L,S,ti,tr\I)?0: MS)
+
+# Bad pixel and persistence mask.
+bpmask(L,S,F,MB,MP)		{procdone ?= 'L'?'bpA1':'bpB1'}
+bpA1(L,S,F,MB,MP)		$M==0?bpA2(L,S,F,MP): MB
+bpA2(L,S,F,MP)			($P<ns\I(L,F*S)?0: MP)
+bpB1(L,S,F,MB,MP)		$M==0?bpB2(L,S,F,MP): MB
+#bpB2(L,S,F,MP)			($P<Ns\I(L,F*S)?0: MP)
+bpB2(L,S,F,MP)			($P<NCNF*irs(L,F*S,ti,tr\I)?0: MP)
+
+# Object and persistence mask.
+opmask(L,S,F,MO,MP)		{procdone ?= 'L'?'opA1':'opB1'}
+opA1(L,S,F,MO,MP)		$M==0?opA2(L,S,F,MP): MO
+opA2(L,S,F,MP)			($P<ns\I(L,F*S)?0: MP)
+opB1(L,S,F,MO,MP)		$M==0?opB2(L,S,F,MP): MO
+#opB2(L,S,F,MP)			($P<Ns\I(L,S,F)?0: MP)
+opB2(L,S,F,MP)			($P<NCNF*irs(L,F*S,ti,tr\I)?0: MP)
+
+# Bad pixel, saturation, and persistence mask.
+bspmask(L,S,F,MB,MS,MP)		{procdone ?= 'L'?'bspA1':'bspB1'}
+bspA1(L,S,F,MB,MS,MP)		$M==0?bspA2(L,S,F,MS,MP): MB
+bspA2(L,S,F,MS,MP)		($I<ns\I(L,S)?bspA3(L,S,F,MP): MS)
+bspA3(L,S,F,MP)			($P<ns\I(L,F*S)?0: MP)
+bspB1(L,S,F,MB,MS,MP)		$M==0?bspB2(L,S,F,MS,MP): MB
+#bspB2(L,S,F,MS,MP)		($I<Ns\I(L,S)?bspB3(L,S,F,MP): MS)
+bspB2(L,S,F,MS,MP)		($I<NCNF*irs(L,S,ti,tr\I)?bspB3(L,S,F,MP): MS)
+#bspB3(L,S,F,MP)		($P<Ns\I(L,F*S)?0: MP)
+bspB3(L,S,F,MP)			($P<NCNF*irs(L,F*S,ti,tr\I)?0: MP)
+
+# Object, saturation, and persistence mask.
+ospmask(L,S,F,MO,MS,MP)		{procdone ?= 'L'?'ospA1':'ospB1'}
+ospA1(L,S,F,MO,MS,MP)		$O==0?ospA2(L,S,F,MS,MP): MO
+ospA2(L,S,F,MS,MP)		($I<ns\I(L,S)?ospA3(L,S,F,MP): MS)
+ospA3(L,S,F,MP)			($P<ns\I(L,F*S)?0: MP)
+ospB1(L,S,F,MO,MS,MP)		$O==0?ospB2(L,S,F,MS,MP): MO
+#ospB2(L,S,F,MS,MP)		($I<Ns\I(L,S)?ospB3(L,S,F,MP): MS)
+ospB2(L,S,F,MS,MP)		($I<NCNF*irs(L,S,ti,tr\I)?ospB3(L,S,F,MP): MS)
+#ospB3(L,S,F,MP)		($P<Ns\I(L,F*S)?0: MP)
+ospB3(L,S,F,MP)			($P<NCNF*irs(L,F*S,ti,tr\I)?0: MP)
+
+# Bad pixel, object, saturation, and persistence mask.
+allmask(L,S,F,MB,MO,MS,MP)	{procdone ?= 'L'?'bospA1':'bospB1'}
+bospA1(L,S,F,MB,MO,MS,MP)	$M==0?bospA2(L,S,F,MO,MS,MP): MB
+bospA2(L,S,F,MO,MS,MP)		($O==0?bospA3(L,S,F,MS,MP): MO)
+bospA3(L,S,F,MS,MP)		($I<ns\I(L,S)?bospA4(L,S,F,MP): MS)
+bospA4(L,S,F,MP)		($P<ns\I(L,F*S)?0: MP)
+bospB1(L,S,F,MB,MO,MS,MP)	$M==0?bospB2(L,S,F,MO,MS,MP): MB
+bospB2(L,S,F,MO,MS,MP)		($O==0?bospB3(L,S,F,MS,MP): MO)
+#bospB3(L,S,F,MS,MP)		($I<Ns\I(L,S)?bospB4(L,S,F,MP): MS)
+bospB3(L,S,F,MS,MP)		($I<NCNF*irs(L,S,ti,tr\I)?bospB4(L,S,F,MP): MS)
+#bospB4(L,S,F,MP)		($P<Ns\I(L,F*S)?0: MP)
+bospB4(L,S,F,MP)		($P<NCNF*irs(L,F*S,ti,tr\I)?0: MP)
+
+
+# Define flats with lamps on and off.
+
+fflat=		(noctyp?='{dflaton}'||(noctyp?='{dflat}'&&noclamp?='{on}'))
+gflat=		(noctyp?='{dflatoff}'||(noctyp?='{dflat}'&&noclamp?='{off}'))

@@ -1,0 +1,24 @@
+# Make the FINDER package
+
+$call	relink
+$exit
+
+update:
+	$call	relink
+	$call	install
+	;
+
+install:
+	$move	xx_finder.e nfebin$x_finder.e
+	;
+
+relink:
+	$update libpkg.a
+	$omake	x_finder.x
+	$link	x_finder.o libpkg.a -ltbtables -lxtools -o xx_finder.e
+	;
+
+libpkg.a:
+	@select
+	t_tpeak.x	<error.h> <fset.h> <imhdr.h> <mach.h> <tbset.h>
+	;

@@ -1,0 +1,114 @@
+<HTML>
+<BODY>
+<TABLE WIDTH="100%" BORDER=0><TR>
+<TD ALIGN=LEFT><FONT SIZE=4>
+<B>biaspars (Mar05)</B></FONT></TD>
+<TD ALIGN=CENTER><FONT SIZE=4>
+<B>irred</B>
+</FONT></TD>
+<TD ALIGN=RIGHT><FONT SIZE=4>
+<B>biaspars (Mar05)</B></FONT></TD>
+</TR></TABLE><P>
+<TITLE>biaspars</TITLE>
+<UL>
+</UL>
+<H2><A NAME="s_name">NAME</A></H2>
+<! BeginSection: 'NAME'>
+<UL>
+biaspars -- Bias vector fitting parameters
+</UL>
+<! EndSection:   'NAME'>
+<H2><A NAME="s_parameters">PARAMETERS</A></H2>
+<! BeginSection: 'PARAMETERS'>
+<UL>
+<DL>
+<DT><B><A NAME="l_function">function = "<TT>legendre</TT>" (legendre|chebyshev|spline1|spline3)</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='function' Line='function = "legendre" (legendre|chebyshev|spline1|spline3)'>
+<DD>Fitting function taken from the following list.
+<PRE>
+     legendre - legendre polynomial
+    chebyshev - chebyshev polynomial
+      spline1 - linear spline
+      spline3 - cubic spline
+</PRE>
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_order">order = 1</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='order' Line='order = 1'>
+<DD>Number of polynomial terms or spline pieces in the fit.  Note that an
+order of 1 is a constant when using a polynomial function.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_sample">sample = "<TT>*</TT>"</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='sample' Line='sample = "*"'>
+<DD>Sample lines to use in the fit.  The string "<TT>*</TT>" specifies all
+lines otherwise an <B>icfit</B> range string is used.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_naverage">naverage = 1</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='naverage' Line='naverage = 1'>
+<DD>Number of points to average or median to form fitting points.  Positive
+numbers specify averages and negative numbers specify medians.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_niterate">niterate = 1</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='niterate' Line='niterate = 1'>
+<DD>Number of rejection interations to remove deviant points from the overscan fit.
+If 0 then no points are rejected.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_low_reject">low_reject = 3., high_reject = 3.</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='low_reject' Line='low_reject = 3., high_reject = 3.'>
+<DD>Low and high sigma rejection factors for rejecting deviant points from the
+overscan fit.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_grow">grow = 0.</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='grow' Line='grow = 0.'>
+<DD>One dimensional growing radius for rejection of neighbors to deviant points.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_device">device = "<TT>stdgraph</TT>"</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='device' Line='device = "stdgraph"'>
+<DD>Graphics device for interactive fitting.  The string "<TT>stdgraph</TT>" selects
+the standard interactive grpahics device which is usually the graphics
+terminal.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_cursor">cursor = "<TT></TT>"</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='cursor' Line='cursor = ""'>
+<DD>Graphics cursor for interactive fitting.  The value "<TT></TT>" selects the
+standard graphics cursor.
+</DD>
+</DL>
+</UL>
+<! EndSection:   'PARAMETERS'>
+<H2><A NAME="s_description">DESCRIPTION</A></H2>
+<! BeginSection: 'DESCRIPTION'>
+<UL>
+The fitting of a bias vector obtained from a strip of bias pixels
+uses the <B>icfit</B> routines.  The fitting function is generally either a
+constant (polynomial of 1 term) or a high order function which fits the
+large scale shape of the bias vector as a function of image line.  Bad
+pixel rejection is also available to eliminate cosmic ray events.
+</UL>
+<! EndSection:   'DESCRIPTION'>
+<H2><A NAME="s_see_also">SEE ALSO</A></H2>
+<! BeginSection: 'SEE ALSO'>
+<UL>
+icfit
+</UL>
+<! EndSection:    'SEE ALSO'>
+
+<! Contents: 'NAME' 'PARAMETERS' 'DESCRIPTION' 'SEE ALSO'  >
+
+</BODY>
+</HTML>

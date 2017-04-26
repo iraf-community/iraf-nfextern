@@ -1,0 +1,16 @@
+? update
+? odi/odidat/BPM
+? src/irproc
+? src/starfocus
+? src/xtalk/icfit.h
+? src/xtalk/icfitr.x
+? src/xtalk/icfvshowr.x
+? src/xtalk/icgfitr.x
+? src/xtalk/icggraphr.x
+? src/xtalk/names.h
+M README
+M nfextern.par
+M doc/installation.hlp
+M newfirm/nffocus.cl
+M odi/chskywcs.cl
+M src/xtalk/t_xtcoeff.x

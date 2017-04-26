@@ -1,0 +1,8 @@
+icats,s,a,,,,List of input catalogs
+ocats,s,a,,,,List of output catalogs
+seps,s,a,,,,List of cluster separations
+mincluster,i,h,2,,,Minimum in cluster
+icatdef,s,h,"",,,Input catalog definitions
+ocatdef,s,h,"",,,Output catalog definitions
+ifilter,s,h,"",,,Input catalog filter
+ofilter,s,h,"",,,Output catalog filter

@@ -1,0 +1,39 @@
+# ACEEVALUATE
+
+images,f,a,,,,"List of input images"
+exps,s,h,"",,,"List of exposure maps"
+gains,s,h,"",,,"List of gain maps"
+extnames,s,h,"",,,"Extension names"
+logfiles,s,h,"",,,"List of log files"
+verbose,i,h,2,0,,"Verbose level
+
+# Cataloging"
+rcatalogs,s,a,"",,,"List of input reference catalogs"
+catalogs,s,h,"+_cat",,,"List of output catalogs"
+catdefs,s,h,"",,,"List of catalog definitions"
+catfilter,s,h,"",,,"Output catalog filter"
+order,s,h,"",,,"Ordering expression"
+nmaxrec,i,h,INDEF,,,"Maximum number of output records"
+magzero,s,h,"INDEF",,,"Magnitude zero point"
+fwhm,r,h,4,,,"Default FWHM (pix)"
+cafwhm,r,h,2,,,"Default circular ap diameter (FWHM)"
+gwtsig,r,h,"INDEF",,," Mag weighting PSF sigma (pix)"
+gwtnsig,r,h,"INDEF",,,"Centroid weighting scale (sigma)
+
+# Object masks"
+objmasks,s,h,"",,,"List of object masks"
+omtype,s,h,"all","boolean|numbers|bboolean|bnumbers|all",,"Object mask type
+
+# Sky"
+skies,s,h,"",,,"List of sky maps"
+sigmas,s,h,"",,,"List of sigma maps"
+fitstep,i,h,100,1,,"Line step for sky sampling"
+fitblk1d,i,h,10,,,"Block average for line fitting"
+fithclip,r,h,2.,,,"High sky clipping during 1D sky estimation"
+fitlclip,r,h,3.,,,"Low sky clippling during 1D sky estimation"
+fitxorder,i,h,1,1,,"Sky fitting x order"
+fityorder,i,h,1,1,,"Sky fitting y order"
+fitxterms,s,h,"half","none|full|half",,"Sky fitting cross terms"
+blkstep,i,h,1,0,,"Line step for sky sampling"
+blksize,i,h,-10,,,"Block size (+=pixels, -=blocks)"
+blknsubblks,i,h,2,1,,"Number of subblocks per axis"

@@ -1,0 +1,7 @@
+./mkpkg
+./fitsio/vms/mkpkg
+./fitsio/mkpkg
+./fitsio/fitssppb/mkpkg
+./fitsio/unix/mkpkg
+./selector/mkpkg
+./selector/generic/mkpkg

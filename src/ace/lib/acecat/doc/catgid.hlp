@@ -1,0 +1,31 @@
+.help catgid Jun03 acecat
+.ih
+NAME
+catgid -- convert field name to a structure offset ID
+.ih
+SYNOPSIS
+id = catgid (cat, name)
+
+.ih
+ARGUMENTS
+.ls cat (I)
+Catalog pointer.  If NULL an id of -1 is returned.
+.le
+.ls name (I)
+Application field name for which the ID is desired.  If the name is not
+found an id of -1 is returned.
+.le
+.ls id (function value)
+The structure offset ID for the requested field name.  A value of -1 is
+return if the field name cannot be found.
+.le
+.ih
+DESCRIPTION
+This function returns the structure offset ID corresponding to the application
+field name.  Note this is the name set by the application and not a field
+translation applied to an input or output catalog.  The ID is -1 if no
+match is made.  This procedure is primarily used by an application to allow
+user's to select a particular field by application name.
+.ih
+SEE ALSO
+acecat

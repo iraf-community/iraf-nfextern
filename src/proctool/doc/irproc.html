@@ -1,0 +1,1007 @@
+<HTML>
+<BODY>
+<TABLE WIDTH="100%" BORDER=0><TR>
+<TD ALIGN=LEFT><FONT SIZE=4>
+<B>irproc (Mar05)</B></FONT></TD>
+<TD ALIGN=CENTER><FONT SIZE=4>
+<B>irred</B>
+</FONT></TD>
+<TD ALIGN=RIGHT><FONT SIZE=4>
+<B>irproc (Mar05)</B></FONT></TD>
+</TR></TABLE><P>
+<TITLE>irproc</TITLE>
+<UL>
+</UL>
+<H2><A NAME="s_name">NAME</A></H2>
+<! BeginSection: 'NAME'>
+<UL>
+irproc -- Process IR images
+</UL>
+<! EndSection:   'NAME'>
+<H2><A NAME="s_synopsis">SYNOPSIS</A></H2>
+<! BeginSection: 'SYNOPSIS'>
+<UL>
+<B>IRPROC</B> corrects and calibrates images with emphasis on data from
+infra-red detectors.  A key aspect of this task is efficient background
+subtraction using sequences of dithered or offset exposures.  The task may
+be used as a processing server for telescope applications and as a
+stand-alone task for interactive or pipeline applications.
+</UL>
+<! EndSection:   'SYNOPSIS'>
+<H2><A NAME="s_highlights">HIGHLIGHTS</A></H2>
+<! BeginSection: 'HIGHLIGHTS'>
+<UL>
+This summary highlights some of the novel features, particularly in
+contrast to the classic <B>ccdproc</B> task.  One of the key features
+of <I>irproc</I> is performing an efficient moving median sky subtraction.
+The order of the processing steps may be specified to allow greater
+flexibility and the potential to use this with both IR array and CCD data.
+A fairly general non-linearity correction may be applied either with the
+same function for all pixels or with different coefficients for each pixel.
+There are features to allow the task to be triggered by a socket message
+so that it can be used as a processing server and for parameters to be
+specified by header keywords so processing can be header driven.
+<P>
+This task make extensive use of expressions using keywords and pixel values
+for various purposes.  This allows providing explicit values, the values of
+keywords, functions of the values of keywords and pixels, and combinations
+of keywords.  It also allows keywords to be different for different
+applications.  The <I>badpixel</I> expression is a more general version
+of the saturation detection functionality.
+<P>
+Some philosophical difference with <B>ccdproc</B> are that "<TT>in-place</TT>"
+calibration or automatic processing of calibrations images are not
+allowed.  Also support for doing all processing and producing output
+data using only short integers is not provided.  A consequence of this
+is that flat fields are normalized rather than carrying along and applying
+a scale factor when a flat field is applied.
+</UL>
+<! EndSection:   'HIGHLIGHTS'>
+<H2><A NAME="s_usage_">USAGE	</A></H2>
+<! BeginSection: 'USAGE	'>
+<UL>
+irproc input output
+</UL>
+<! EndSection:   'USAGE	'>
+<H2><A NAME="s_parameters">PARAMETERS</A></H2>
+<! BeginSection: 'PARAMETERS'>
+<UL>
+All of the following parameters, except the input image list, may be
+redirected to header keywords in the input image by preceeding the keyword
+with !.  If a keyword is specified and it is not found, either a warning is
+given with processing proceeding to the next input image or the task quits
+processing with either an error abort or a message as selected by the
+<I>erraction</I> parameter.  (If <I>erraction</I> is referenced to a
+non-existant the keyword will abort.)
+<P>
+<DL>
+<DT><B><A NAME="l_input">input</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='input' Line='input'>
+<DD>List of input images to process.  A special "<TT>socket list</TT>" may be specified
+to run this task as a processing server as described in the section
+<B>socket input</B>.  This task supports multi-extension files where each
+image extension is processed.  Note the output will then be a
+multi-extension file but only contain the processed image extension with
+any other extensions excluded.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_output">output</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='output' Line='output'>
+<DD>List of output processed images or a pattern based on the input basename.
+If a list is specified it must match the input list.  If a pattern is
+specified the substring $I will be substituted with the input image
+basename.  For instance "<TT>$Ip</TT>" would produce obj321p from the input image
+obj321.  The output image must be different than the input image though
+the basenames may be the same if they are in different directories.
+Note that one could also use the general pattern replacement syntax of
+image lists (see example 2 of <B>imrename</B>).
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_outmasks">outmasks = "<TT></TT>"</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='outmasks' Line='outmasks = ""'>
+<DD>List of output bad pixel masks or a pattern based on the input basename.
+If a list is specified it must match the input list.  If a pattern is
+specified the substring $I will be substituted with the input image
+basename.  For instance "<TT>$Ip_bpm</TT>" would produce obj321p_bpm from the input
+image obj321.  Note that one could also use the general pattern replacement
+syntax of image lists (see example 2 of <B>imrename</B>).  The output mask
+will be a combination of pixels in the input image bad pixel mask, as
+specified by the <I>maskkey</I> parameter, whether or not the <I>fixpix</I>
+processing switch is enabled, and those identified during processing as
+saturated.  The mask values will be those from the input mask and the
+<I>smaskval</I> parameter value for the saturated pixels.
+<P>
+If a keyword is specified by the <I>maskkey</I> parameter the output mask
+name will be recorded in the header of the output image under this
+keyword.  If no output mask is created the keyword is not changed from that
+in the input image.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_logfile">logfile = "<TT>STDOUT</TT>"</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='logfile' Line='logfile = "STDOUT"'>
+<DD>List of output logfiles for processing information.  The special value
+"<TT>STDOUT</TT>" may be use to write to the terminal and multiple files may be
+specified to tee the output to more than one file or network connection.
+The output is appended to any existing output.  [Compared to CCDRED/MSCRED
+this merges the "<TT>verbose</TT>" and "<TT>logfile</TT>" parameters into one parameter.]
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_override">override = no</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='override' Line='override = no'>
+<DD>Override previous processing?  If set to yes then the selected processing
+will be performed on images which have header keywords indicating the
+operations have been peformed previously.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_erraction">erraction = "<TT>warn</TT>" [warn|abort|quit]</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='erraction' Line='erraction = "warn" [warn|abort|quit]'>
+<DD>Action to take if an ignorable error is encountered.  If "<TT>warn</TT>" is set
+then a warning is issued and the task will continue, either skipping the
+operation or skipping the input image depending on the type of error.
+If "<TT>abort</TT>" is set then the task will abort.  The "<TT>quit</TT>" mode prints
+a error to the standard output and the task exits normally.  The purpose
+of this is allow a calling script to read the error without causing the
+script to abort because <I>Birproc</I> aborted.
+</DD>
+</DL>
+<P>
+<CENTER>SELECTION AND GROUPING
+
+</CENTER><BR>
+<P>
+Processing depends on the type of exposure, the part of the detector
+recorded in the image, the photon energies being detected, and other
+characteristics of the instrument.  To make it easy to process mixtures of
+images, and to check for proper types of calibrations, and to allow
+configuration for instruments with different characteristics and keywords
+the following parameters are used to interpret the data.  These make
+use of expressions which use keyword names as operands and evaluate
+to boolean (yes or no), string, or numeric values.  The expression
+syntax is described by <B><A HREF="irprocexpr.html">irprocexpr</A></B>.
+<P>
+[The use of expressions is a different and more flexible approach than
+use in <B>ccdproc</B> based on the instrument translation file.]
+<P>
+<DL>
+<DT><B><A NAME="l_intype">intype = "<TT></TT>"</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='intype' Line='intype = ""'>
+<DD>Boolean expression used to select images from the input image list, such as
+by their observation type keywords.  The null string may be used to select
+all images from the input list.  Note that to select dark or flat field
+images using the expressions specified with the <I>dtype</I> or
+<I>ftype</I> parameters one can redirect this parameter with the
+value "<TT>)dtype</TT>" or "<TT>)ftype</TT>".  The "<TT>)</TT>" is a feature of the parameter
+system to refer to a value from a different parameter.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_stype">stype = "<TT></TT>"</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='stype' Line='stype = ""'>
+<DD>Boolean expression used to select sky images from the list of potential
+images in the <I>input</I> or <I>sky\R list.  The null string may be used to
+select all images from the sky list if one is specified or the input list
+if a sky list is not specified.  Note that the sky selection is not
+necessarily to identify a specific sky "type" but a way to select exposures
+to be used to compute the sky.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_dtype">dtype = "obstype?='{dark}'|obstype?='{zero}'"</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='dtype' Line='dtype = "obstype?='{dark}'|obstype?='{zero}'"'>
+<DD>Boolean expression used to identify dark exposures.  The default
+expression matches the words dark or zero anywhere in the keyword
+OBSTYPE and ignores case.  The processing steps applied to exposures
+matching this expression are specified by the fIdorder</I> parameter.
+It is an error if both the type and <I>ftype</I> expressions evaluate
+to true for an input image.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_ftype">ftype = "<TT>obstype?='{flat}'</TT>"</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='ftype' Line='ftype = "obstype?='{flat}'"'>
+<DD>Boolean expression used to identify flat field exposures.  The default
+expression matches the word flat anywhere in the keyword OBSTYPE and
+ignores case.  The processing steps applied to exposures matching
+this expression are specified by the <I>forder</I> parameter.
+It is an error if both the type and <I>ftype</I> expressions evaluate
+to true for an input image.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_imageid">imageid = "<TT>imageid</TT>"</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='imageid' Line='imageid = "imageid"'>
+<DD>String valued expression that groups images from instruments that produce
+multiple image elements from multiple readout streams.  Examples of this
+are multiple CCD amplifiers, multiple section readouts, multiple arrays in
+a mosaic detector.  The simplest expression is a keyword name that
+evaluates to the value of the keyword.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_filter">filter = "<TT>filter</TT>"</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='filter' Line='filter = "filter"'>
+<DD>String valued expression that groups images where the characteristics of
+the calibration depend on the detected photon energies.  Examples of this
+are different filters and different grating settings.  The simplest
+expression is a keyword name that evaluates to the value of the keyword.
+However, an expression can combine the values of several keywords if there
+are multiple filters or gratings.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_sortkey">sortkey = "<TT>mjd-obs</TT>"</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='sortkey' Line='sortkey = "mjd-obs"'>
+<DD>Numeric valued expression used to sort images into a sequence.  In the
+absence of an expression, the null string "<TT></TT>", the order in the list
+is used.  Beware of keywords that have periodic boundaries such as time of
+day.  The "<TT>epoch</TT>" or "<TT>julday</TT>" functions may be used to convert a date and
+time to a running value.  The parameter is only required when doing sky
+subtraction.  It is a fatal error if a sort expression does not evaluate to
+a numeric value.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_exptime">exptime = "<TT>exptime</TT>"</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='exptime' Line='exptime = "exptime"'>
+<DD>Numeric valued expression producing the exposure time.  The units of the
+exposure time are not significant provided it is consistent for the
+dataset and the relative times are linearly related.
+</DD>
+</DL>
+<P>
+<CENTER>PROCESSING SWITCHES
+
+</CENTER><BR>
+<P>
+The following parameters select the corrections and calibration operations
+to be performed.  The allowed operations and the order in which they are
+performed is controled by the <I>order</I>, <I>dorder</I>, and <I>forder</I>
+parameters.  The single letter processing code is used to identify the
+operation in the order parameters and in record keeping.  In order for an
+operation to be performed the processing switch must be enabled AND the
+operation must be listed in the order of operations.  Normally the order of
+operations is rarely changed and the operations are controled through the
+processing switches.  But by setting all the switches to yes the processing
+steps may be controled by the order parameters.  Because the order
+parameter may be set by an input keyword it is possible to control the
+operations though a header keyword as might be desired in a pipeline
+situation.
+<P>
+<DL>
+<DT><B><A NAME="l_xtalkcor">xtalkcor = no [processing code: X]</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='xtalkcor' Line='xtalkcor = no [processing code: X]'>
+<DD>Subtract a crosstalk correction?  This requires specification of a crosstalk
+coefficient file with the <I>xtalkfile</I> parameter.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_biascor">biascor = no [processing code: B]</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='biascor' Line='biascor = no [processing code: B]'>
+<DD>Subtract bias using bias pixels?  This requires specification of the
+location of the bias pixels with the <I>biassec</I> parameter, the
+type of bias to estimate with the <I>biastype</I> parameter, and
+for the types that fit a function to the average bias vector,
+the parameters specified by the <I>biasfit</I> parameter set.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_darkcor">darkcor = yes [processing code: D]</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='darkcor' Line='darkcor = yes [processing code: D]'>
+<DD>Apply dark exposure correction?  This requires specification of a dark
+image with the ark parameter.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_lincor">lincor = yes [processing code: L]</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='lincor' Line='lincor = yes [processing code: L]'>
+<DD>Apply a linearity correction?  This requires specification of a
+linearity expression with the <I>linexpr</I> parameter and parameters
+related to it.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_flatcor">flatcor = yes [processing code: F]</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='flatcor' Line='flatcor = yes [processing code: F]'>
+<DD>Apply flat field correction?  This requires specification of a flat
+field image list with the <I>flat</I> parameter.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_skysub">skysub = yes [processing code: S]</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='skysub' Line='skysub = yes [processing code: S]'>
+<DD>Subtract a sky image?  This requires specification of sky images
+with the <I>sky</I> parameter and the parameters related to it.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_fixpix">fixpix = no [processing code: P]</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='fixpix' Line='fixpix = no [processing code: P]'>
+<DD>Fix bad pixels using linear interpolation from neighboring pixels?
+Bad pixels are those identified by the input image mask
+(see <I>maskkey</I>) and by the saturation parameters.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_trim">trim = yes [processing code: T]</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='trim' Line='trim = yes [processing code: T]'>
+<DD>Trim the image by removing edge lines and columns?  This requires
+specification of teh region to be retained with the <I>trimsec\R
+parameter.
+</DD>
+</DL>
+<P>
+<CENTER>PROCESSING ORDER
+
+</CENTER><BR>
+<P>
+<DL>
+<DT><B><A NAME="l_dorder">dorder = "XBPT", forder = "XBDLPT", order = "XBDLFSPT"</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='dorder' Line='dorder = "XBPT", forder = "XBDLPT", order = "XBDLFSPT"'>
+<DD>Allowed operations and the order, specified from left to right, in which
+the selected processing steps are to be performed for dark images
+(fIdorder</I>), flat images (<I>forder</I>), and all other images
+(<I>order</I>).  The image types are identified by the selection expressions
+specified in the parameters <I>dtype</I> and <I>ftype</I>.  Each processing
+step has a processing code letter as shown in the processing switch
+section.  For a step to be performed it must both be present in the order
+specification and the processing switch must be enabled.  Note that the
+position of the trim code is irrelevant since the trimming is always the
+final output step.
+</DD>
+</DL>
+<P>
+<CENTER>PROCESSING PARAMETERS
+
+</CENTER><BR>
+<P>
+The processing parameters provide data for the various operations selected
+by the processing switches.
+<P>
+<DL>
+<DT><B><A NAME="l_xtalkfile">xtalkfile = "<TT></TT>"</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='xtalkfile' Line='xtalkfile = ""'>
+<DD>List of crosstalk coefficient files.  The list must either be a single file
+to apply to all data to be processed  or a list of of files which match the
+input list.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_linexpr">linexpr = "<TT></TT>"</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='linexpr' Line='linexpr = ""'>
+<DD>Linearity expression computing the corrected pixel value given the
+uncorrected pixel value represented by the operand "<TT>I</TT>".  The expression
+may use any of the standard mathematical operators and functions described
+for <B>imexpr</B>.  The expression may be read from a file by using
+"<TT>@&lt;file&gt;</TT>".  If no expression is specified but a linearity correction
+is requested the task will either abort or skip the linearity correction
+depending on the setting of the <I>erraction</I> parameter.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_linimage">linimage = "<TT></TT>"</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='linimage' Line='linimage = ""'>
+<DD>Optional image providing per pixel coefficients for the linearity
+expression.  The image must match the input size in the first two
+dimensions.  A third dimnension may be used for expressions with multiple
+coefficients.  The values are referenced with C&lt;index&gt;, i.e. C1, C2, etc.,
+where &lt;index&gt; is the index of the third dimension.  If no image is
+specified then there must be no reference to it in the linearity
+expression.  If the file is required by the linearity expression and an
+error occurs accessing it then the task will abort.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_biassec">biassec</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='biassec' Line='biassec'>
+<DD>Bias pixel strip image section.  Only the column selection from the section
+matters.  If one wants to limit the region of the overscan used in the fit
+to be less than that of the trim section then the sample region parameter,
+<I>sample</I>, should be used.  It is an error if no section or the whole
+image is specified.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_biastype">biastype = "<TT>fit</TT>"</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='biastype' Line='biastype = "fit"'>
+<DD>Type of bias estimation.  The choices are:
+<P>
+<PRE>
+	  fit - fit a function to the bias vector (non-interactive)
+	 ifit - fit a function to the bias vector (interactive)
+         mean - the mean of the biassec columns at each line
+       median - the median of the biassec columns at each line
+       minmax - the mean at each line with the min and max excluded
+</PRE>
+<P>
+The "<TT>fit</TT>" and "<TT>ifit</TT>" options use the <B>icfit</B> routines to fit a function
+to the average bias vector either non-interactively or interactively
+respectively.  The fit is then evaluated and subtracted at each line.  The
+fitting parameters are set with the <I>biaspars</A></I> parameters.  The other
+options statistically estimate the bias at each line using only the bias
+pixels for that line.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_biaspars">biaspars = "<TT></TT>" (pset)</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='biaspars' Line='biaspars = "" (pset)'>
+<DD>Parameter set for the bias fitting parameters.  A null value uses the
+<B><A HREF="biaspars.html">biaspars</A></B> parameters.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_sky">sky = "<TT></TT>"</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='sky' Line='sky = ""'>
+<DD>List of sky images to be used for estimating and subtracting sky background
+when the <I>skysub</I> processing switch is enabled.  If a null list is
+specified the input list is used.  The way the sky images are used is
+defined by the <I>skymode</I> parameter.  In all cases the input image being
+processed is never included as a sky image.  It is reasonable to include
+all images in the list and then use the fact that the image being processed
+is always excluded from a sky estimation.  The <I>stype</I> parameter may
+be used to further restrict the set of images.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_skymode">skymode = "<TT>median 10</TT>" (nearest|median &lt;N&gt; [bpmkey])</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='skymode' Line='skymode = "median 10" (nearest|median &lt;N&gt; [bpmkey])'>
+<DD>The type of sky background estimation used with the <I>skysub</I>
+processing switch is enabled.  The choices are "<TT>nearest</TT>" to select the
+nearest image in the <I>sky</I> list with the same filter keyword and
+"<TT>median</TT>" to form a median from the images in the <I>sky</I> selected before
+and/or after the image being processed.  The number of before and after
+images for the median is specified by a sign and number following the word
+"<TT>median</TT>".  An optional bad pixel mask may be used to exclude pixels from
+the calculation.  For more details on the sky estimation methods see the
+SKY SUBTRACTION section.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_dark">dark = "<TT></TT>"</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='dark' Line='dark = ""'>
+<DD>List of dark calibration images.  The list will
+be searched for the image with the closest exposure time (see
+<I>exptime</I>) to the input image.  Note that this allows bias or zero
+exposures (those with a zero or very small exposure time) may be used in
+the absence of a dark image obtained with a similar exposure time.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_flat">flat = "<TT></TT>"</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='flat' Line='flat = ""'>
+<DD>List of flat field calibration images.  The list will be searched
+for the first image with a matching filter expression value (see
+<I>filter</I>).
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_maskkey">maskkey = "<TT>BPM</TT>"</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='maskkey' Line='maskkey = "BPM"'>
+<DD>Keyword identifying the bad pixel masks in the input and output images.
+This applies to all images used by the tasks whether input, output, or
+calibration.  If no mask keyword is specified then all pixels in the image
+are assumed to be good on input and any bad pixel mask created (see
+<I>outmasks</I>) will not be recorded in the output header.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_badpixels">badpixels = "<TT></TT>"</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='badpixels' Line='badpixels = ""'>
+<DD>Integer valued keyword expression identifying bad pixels.  This is
+typically used to identify values above some threshold as saturated though
+any criteria can be used.  The input pixel value is referenced in the
+expression with the operand $I.  Resultant expression values of zero define
+good pixels and non-zero positive values are considered bad pixels.  The
+bad pixel expression result will be written to an output pixel mask if
+defined.  Bad pixels will also be replaced by interpolation when the
+<I>fixpix</I> option is selected.  If no expression is specified then this
+check for bad pixels will be skipped.  This is more efficient than using an
+expression like "<TT>0</TT>".
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_bpgrow">bpgrow = 0</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='bpgrow' Line='bpgrow = 0'>
+<DD>Number of neighboring pixels along rows and columns from a bad pixel
+identified by the <I>badpixel</I> expression which are also identified
+as bad pixels.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_trimsec">trimsec</A></B></DT>
+<! Sec='PARAMETERS' Level=0 Label='trimsec' Line='trimsec'>
+<DD>Image section for trimming.
+</DD>
+</DL>
+<P>
+</UL>
+<! EndSection:   'PARAMETERS'>
+<H2><A NAME="s_description">DESCRIPTION</A></H2>
+<! BeginSection: 'DESCRIPTION'>
+<UL>
+<P>
+<B>IRPROC</B> processes detector array data, recorded as images, to correct
+or calibrate array defects, electronic and detector bias, signal dependent
+linearity and crosstalk, flat field response, and sky background.  The
+output images may also be trimmed to specified regions to exclude bad edges
+and non-imaging pixels.  In addition to the processed detector images it
+may also produce pixel masks consisting of bad pixels identified by an input
+mask and by a bad pixel expression computed during processing.
+<P>
+While this task is general, it was developed with infra-red array detectors
+in mind.  It is designed to be efficient and relatively easy to use for the
+typical operations performed on images from such detectors.  Processing
+observational data also requires identifying different types of exposures
+and matching calibrations, so this task also handles this bookkeeping based
+on information from the image headers.
+<P>
+In addition to allow image header keywords to identify the type of
+exposure, including how to match calibrations by filter or grating, there
+is a feature that allows any <B>irproc</B> parameter except the input
+list to be specified by header keywords.  This is done by prefixing the
+keyword with !.  This feature can be particularly useful for pipelines
+and for integration with data acquisition systems.
+<P>
+While this task is most useful when header information is provided
+it can still be used without requiring any keywords.  This is done by
+setting the various keyword expressions to select all data and not
+use keyword.  The user must then group and process the data
+using image lists that explicitly contain only the appropriate data.
+The parameters must also be set with explict values.
+<P>
+The first step is to select the images to be processed.  The initial
+candidate list is specified by the <I>input</I> parameter.  The input names
+may be single images or multi-extension format (MEF) files.  MEF data are
+expanded into a list of image extensions (with non-image extensions
+ignored) and then processed as independent images.  However, on output
+images from the same MEF file will be written to another MEF file with the
+same extension names.
+<P>
+After a candidate list is defined the list may be winnowed using the
+<I>intype</I> selection parameter.  So one may process a subset of files
+either by explicitly specifying the desired files in the input list with
+the selection parameter set to accept all images or by specifying a more
+generic template list, such as "<TT>*.fits</TT>", and using the selection parameter
+to extract a subset which have a common characteristic.
+<P>
+The most common type of input selection is to process dark, bias and flat
+field exposures before combining them into master calibrations to be
+applied to the program exposures.  Because this is so common the
+<I>dtype</I> and <I>ftype</I> parameters are provided for the selection
+expressions so they can be set once.  Then the <I>intype</I> parameter is
+set to point to these expressions using the syntax "<TT>)dtype</TT>" or "<TT>)ftype</TT>".
+Note that this syntax is a less known feature of the IRAF parameter system
+which can be used with any task and parameter.
+<P>
+Another aspect of selecting calibration images using the <I>dtype</I> and
+<I>ftype</I> expressions is that the task can then be configured to do
+different operations without requiring changing the processing switches.
+This is done using the <I>dorder</I> and order parameters.  These
+parameters set the order and operations appropriate for these types of
+calibration images.  If an operation is not referenced in these parameters
+it will not be performed even if the processing switches are set for
+the steps for program exposures.
+<P>
+Another winnowing of the input list is the exclusion of images that have
+been previously processed by <I>Birproc</I>.  This task adds keywords to
+document the processing that has been applied to the image.  These keywords
+are checked to determine what has been done previously.  Therefore, if all
+the steps have already been done an image will be skipped based on this
+processing history information.  Note that if just some of the operations
+have been performed then the image will be processed but only the
+operations which have not been previously done and which are requested
+by the task parameters will be applied.
+<P>
+The <I>override</I> parameter may be used to override this prohibition
+against repeating operations that have been previously performed.  Note
+that a valid alternative is to delete the header keywords.  There are some
+operations that do make sense to repeat, albeit with different parameters
+of calibrations.  These include corrections to the flat field, detecting
+and fixing additional bad pixels, and using additional data for sky
+subtraction.
+<P>
+The processing operations to be performed on the selected input data are
+set by boolean (yes/no) parameters.  The allowed steps and their order are
+specified by the <I>order</I> parameter.  The <I>dorder</I> and <I>forder</I>
+parameters will be used instead if the image is identified as a dark or
+flat field by the <I>dtype</I> or <I>ftype</I> parameters.  It is important
+to realize that in order for an operation to be performed it must appear in
+the order parameter and have the appropriate processing switch set.  This
+allows two modes of operation.  One may enable all the switches and select
+the steps with the order parameter or one may set the order parameter to
+enable all the steps and switch operations on or off with the switches.
+One method may be better for interactive work and the other better for
+pipelines.
+<P>
+In addition to providing alternate ways to adjust parameters,
+the order parameters are important for defining the order of processing.
+Different types of detector array data, such as CCD vs IR arrays, require
+similar instrumental calibrations but are performed in a different order.
+Each processing operation has a switch parameter which has a single
+letter code.  This is indicated in the PARAMETER section.  The order
+parameter is a string of these codes which are applied from left to
+right.  If there is a malformed order string an error will result and
+the task will abort.  One type of error which may not be obvious is
+that if an operation may not appear more than once.
+<P>
+The processing steps have related parameters which must be set.  These are
+things like image sections defining the bias pixels and trim region and
+calibration image lists.  These parameters and how the various operations
+are performed will be described below in subsections.
+<P>
+</UL>
+<! EndSection:   'DESCRIPTION'>
+<H2><A NAME="s_output">OUTPUT</A></H2>
+<! BeginSection: 'OUTPUT'>
+<UL>
+<P>
+<DL>
+<DT><B><A NAME="l_Processed">Processed images</A></B></DT>
+<! Sec='OUTPUT' Level=0 Label='Processed' Line='Processed images'>
+<DD>The output of <B>irproc</B> are calibrated images, bad pixel masks, and log
+text.  The primary output is, of course, the calibrated images.  If you are
+familiar with <I>ccdproc</I> you may expect that by not specifying an output
+image or using the same name as the processed image the result of
+processsing  will automatically replace the input image.  But because sky
+subtraction is an important feature of this task this task does not allow
+the output processed images to replace the input images.  Of course, you
+may do this outside of the task but you should be careful of how this
+affects current or potential future sky subtraction.
+<P>
+The output image names are specified by the <I>outputfIR parameter.  One
+can provide a list which gives a name for each image in the input list.
+However, when processing large input lists or automatically processing data
+with a pipeline or in a data acquisition environment it is useful to
+generate output names from the input names.  This can be done with
+pattern substitutions.  The fIoutputfIR parameter provides a simple
+form of pattern substitution with the $I special string.  Note that
+there is another form of template substitution which is a feature of
+the template lists which is described in the </I><B>Ifiles</B> help topic.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_Bad">Bad pixel masks</A></B></DT>
+<! Sec='OUTPUT' Level=0 Label='Bad' Line='Bad pixel masks'>
+<DD>Another useful output are bad pixel masks.  This identifies pixels flagged
+as bad in input masks as well as those identified by a bad pixel expression
+(see <I>badpixel</I>).  The output mask filenames are specified with the
+<I>outmasks</I> parameter.  The same substitution features as in
+<I>output</I> are available.  Note that output bad pixel masks are
+optional.  The output masks can be linked to the input images through a
+header keyword specified by the <I>maskkey</I> parameter.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_Log">Log information</A></B></DT>
+<! Sec='OUTPUT' Level=0 Label='Log' Line='Log information'>
+<DD>Text log information produced by the task may be output to a list of files
+specified by the <I>logfile</I> parameter.  In this context the terminal,
+specifically the standard output, is specified by the special file name
+"<TT>STDOUT</TT>".  So to write log information to the terminal and to a disk file a
+list such as "<TT>STDOUT,myproc.log</TT>" may be used.  It is possible to have
+no log output as well as more than just the terminal and one log file.
+</DD>
+</DL>
+<P>
+</UL>
+<! EndSection:   'OUTPUT'>
+<H2><A NAME="s_socket_input">SOCKET INPUT</A></H2>
+<! BeginSection: 'SOCKET INPUT'>
+<UL>
+<P>
+If the input parameter has the form "<TT>@inet:&lt;number&gt;[:&lt;host&gt;]</TT>" then the task
+will accept connections on the port given by &lt;number&gt; and, optionally, on
+the host specified by &lt;host&gt;.  In this way the task may be used as a
+processing server.  Logically this is simply a infinite input list which
+<I>irproc</I> reads through sequentially.
+<P>
+When a connection is made the task polls for image names and when one is
+received it processes that image.  When processing is completed it returns
+to the polling step for additional images.  The connection may be transient
+without error so that clients may connect, pass an image name, and
+disconnect.
+<P>
+The main reason to use this task in this way is to maintain an efficient
+running sky median for background subtraction.  To do this the <I>skysub</I>
+parameter should be enabled, the <I>sky</I> parameter should be null to use
+the input list as the sky list, and the <I>skymode</I> parameter should be
+set to the median of some number of preceding images.  The "<TT>nearest</TT>" option
+might also be useful in quick reduction applications so that every input
+image is subtracted by the preceding image.  Note that in this mode the
+first image will not be sky subtracted.
+<P>
+</UL>
+<! EndSection:   'SOCKET INPUT'>
+<H2><A NAME="s_bad_pixel_expression">BAD PIXEL EXPRESSION</A></H2>
+<! BeginSection: 'BAD PIXEL EXPRESSION'>
+<UL>
+<P>
+Bad pixels may be identified during processing by an integer valued
+expression, specified by the <I>badpixel</I> parameter, evaluated on
+the input pixel values.  Typically the expression would identify pixel
+values above some saturation threshold given by a header keyword.
+An example of this is
+<P>
+<PRE>
+    $I &gt; saturate ? 4 : 0
+</PRE>
+<P>
+This says if the input pixel value is greater than the value of the
+saturate keyword the result is the value 4 otherwise it is zero.  The
+value 4 is used as the value in the output bad pixel mask if one is
+created.  However, more complex expressions may be defined which may
+evaluate to different integer flag values.
+<P>
+The neighbors of a bad pixel may be flagged as bad with the same
+value by using the <I>bpgrow</I> parameter.
+<P>
+Note that the expression is evaluated on the input image pixels before any
+corrections are made.  If the image has been partially processed earlier
+then the criteria may not be equivalent to identifying the saturated
+pixels in the completely unprocessed image.
+<P>
+</UL>
+<! EndSection:   'BAD PIXEL EXPRESSION'>
+<H2><A NAME="s_erraction">ERRACTION</A></H2>
+<! BeginSection: 'ERRACTION'>
+<UL>
+<P>
+The <I>erraction</I> parameter is provided to control whether an error will
+abort the task, and so any calling scripts that don't catch the abort, or
+if only a warning or error message is printed to the standard error
+output.  The distinction is most useful when processing a list of images.
+In some cases one would like the processing to stop immediately, including
+a parent script, to fix the source of the error.  But in more automated
+situations one may want to continue on to other images in the list and deal
+with the warning messages later.  The "<TT>quit</TT>" mode is intermediate between
+an abort and a warning in that it lets the task exit immediately but
+without aborting a parent script.  The script can monitor the standard
+error output to detect the exit.
+<P>
+</UL>
+<! EndSection:   'ERRACTION'>
+<H2><A NAME="s_crosstalk__x_">CROSSTALK (X)</A></H2>
+<! BeginSection: 'CROSSTALK (X)'>
+<UL>
+<P>
+The crosstalk correction consists of subtracting some small fraction, called
+the crosstalk coefficient, of the signal in one pixel from another pixel.
+The relationship between the pixels and the crosstalk coefficients are
+specified by a crosstalk calibration file specified by the <I>xtalkfile</I>
+parameter.  Details of the algorithm are TBD.
+<P>
+</UL>
+<! EndSection:   'CROSSTALK (X)'>
+<H2><A NAME="s_biascor__b_">BIASCOR (B)</A></H2>
+<! BeginSection: 'BIASCOR (B)'>
+<UL>
+<P>
+The bias pixel correction consists of estimating a bias value for an
+image line, from either the bias pixels from that line or from all the
+bias pixels, and subtracting that value from all the pixel in the line.
+There are three types of  parameters defining this correction.
+<P>
+The first is specifying the bias pixels with the <I>biassec</I> parameter.
+This requires the bias pixels to be recorded in the image data as a
+contiguous strip.
+<P>
+The second is specifying the algorithm with the <I>biastype</I> parameter.
+There two types of algorithms.  One is where only the bias pixels for
+an image line are used for that line.  The other is were all the bias
+pixels are used.
+<P>
+The line-only algorithms are "<TT>mean</TT>", "<TT>median</TT>", and "<TT>minmax</TT>".  The mean
+algorithm uses the mean of all the bias pixels on the line for the bias
+value.  Because there may be bad bias pixels the "<TT>median</TT>" option uses the
+median for the bias value.  But the median is not a very statistically
+efficient estimate (meaning for a given sample size it has larger
+uncertainty than the mean if bad data is not present).  So the last
+algorithm is to assume that bad pixels are rare so that by excluding the
+highest and lowest values from the mean the statistical estimate is not
+affected by bad data.  This estimate for the bias value has the option name
+"<TT>minmax</TT>".
+<P>
+The algorithm that combines all the bias pixels collapses the bias pixels
+at each line to a value using a simple mean.  The collection of bias values
+as a function of the line is the "<TT>bias vector</TT>".  Because the individual
+bias values at each line are noisy due to small number sampling the bias
+vector is smoothed by fitting a function.  This assumes that the
+line-by-line trends in the bias are smooth.  Note that one type of function
+is a constant which is equivalent to averaging all the bias pixels into a
+single value for the image.  The bias types for this algorithm are "<TT>fit</TT>"
+and "<TT>ifit</TT>" for an interactive and non-interactive fit respectively.
+<P>
+The fit uses the standard IRAF curve fitting package <B>icfit</B>.  The
+parameters are organized in a parameter set (pset) and are described by the
+help topic <B><A HREF="biaspars.html">biaspars</A></B>.  Psets are just a way to organize paraemters
+and help topics.  However, the task sees a single set of parameters and any
+parameter may be set explicitly on the command line.
+<P>
+</UL>
+<! EndSection:   'BIASCOR (B)'>
+<H2><A NAME="s_linearity_correction__l_">LINEARITY CORRECTION (L)</A></H2>
+<! BeginSection: 'LINEARITY CORRECTION (L)'>
+<UL>
+<P>
+The linearity correction replaces pixel values by a new value which is a
+function of the orginal pixel value.  The correction is specified by a
+replacement expression given by the paraemeter <I>linexpr</I>.  The
+replacement expression is in terms of the uncorrected pixel value,
+represented in the expression by the operand $I, and the result is the
+corrected pixel value.
+<P>
+The expression is typically monotonicly increasing polynomial.  The
+coefficients of the polynomial are constants, keywords pointing to
+constants, or pixel values from a coefficient image.  In the first two
+cases all pixels use the same coefficients and so the non-linearity
+correction is the same.  In the last case linearity correction can be
+different for each pixel.
+<P>
+The expression is implemented with a general expression evaluator described
+under the topic <B><A HREF="irprocexpr.html">irprocexpr</A></B>.  The expressions can use any
+of the standard arithmetic operators and mathematical functions, the
+conditional evaluation operator, and numerical constants.  The operand $I
+is used to reference the input pixel value.  The operands $C1, $C2, ... are
+used to reference values in an optional linearity coefficient image given by
+the parameter <I>linimage</I>.  The column and line are matched with the
+input pixel being corrected so the linearity image must be the same size in
+the first two dimensions.  A third dimension may be used for coefficients
+C2 and higher, where the index is the value of the third dimension.  Note
+that it is not required to use a linearity image if the expression does not
+depend on pixel position.
+<P>
+A typical expression with and without positional dependence might be a
+polynomial such as
+<P>
+<PRE>
+    "$I + (1 + $C1 * $I)"	# With linearity image
+    "$I * (1 + 0.01 * $I)"	# Without linearity image
+    "$I * (1 + LINCOEFF * $I)"	# With coefficient in header
+</PRE>
+<P>
+Fairly complex expressions can be built up, particularly using the
+conditional evaluation operator:
+<P>
+<PRE>
+    "$I*(1+$I*($I&lt;100?$C1:($I&lt;25000?$C1+$C2*($I-100) : 2.5)))"
+    "$I*(1+$I*($I&lt;100?0.01 : ($I&lt;25000?0.01+0.0001*($I-100) : 2.5)))"
+</PRE>
+<P>
+</UL>
+<! EndSection:   'LINEARITY CORRECTION (L)'>
+<H2><A NAME="s_sky_subtraction__s_">SKY SUBTRACTION (S)</A></H2>
+<! BeginSection: 'SKY SUBTRACTION (S)'>
+<UL>
+<P>
+Sky subtraction is one of the key uses of <B>irproc</B>.  Sky subtraction
+consists of subtracting an estimate of the sky background at each pixel.
+There are a number of ways that the sky background may be estimated.
+<P>
+Most of the methods are based on using other images.  This requires an
+ordered list of images.  The list is specified by the <I>sky</I> parameter
+or, when a separate sky list is not defined, the list of input images is
+used.  The list is broken down into filter lists as defined by the
+<I>filter</I> parameter.  The ordering (within each filter list) is set either
+by the <I>sortkey</I> parameter or by the position in the list when no
+sort key is specified.  The ordered list for the filter matching the
+image being processed is called the "<TT>ordered filter list</TT>".
+<P>
+To use the position in the list, the images being processed must appear in
+the list.  However, the image being processed obviously should not be used
+in estimating the sky for that image and the task will automatically
+enforce this.  For dithered observations of relatively sparse fields all
+images are typically used to contribute to the sky estimation of other
+images.
+<P>
+For observations of extended sources, or for chopping type of observations,
+it is desirable to select the images to be used.  This may be done using
+the <I>skykey</I> parameter.  This is any keyword which has a specific value
+for those to be used as sky images.  Note that the <I>sortkey</I> and
+<I>skymode</I> parameters still apply to compute a sky using only data
+within a window of the image to be corrected.
+<P>
+The sky estimation method to be used is specified by the <I>skymode</I>
+parameter.  The choices are:
+<P>
+<DL>
+<DT><B><A NAME="l_">"<TT>nearest</TT>" - use nearest sky image</A></B></DT>
+<! Sec='SKY SUBTRACTION (S)' Level=0 Label='' Line='"nearest" - use nearest sky image'>
+<DD>The nearest image from the ordered filter list is subtracted.  If more
+than one image is equidistant in the sort value the preceding one is used.
+</DD>
+</DL>
+<DL>
+<DT><B><A NAME="l_">"<TT>median &lt;N&gt;</TT>" - median of up to &lt;N&gt; images</A></B></DT>
+<! Sec='SKY SUBTRACTION (S)' Level=0 Label='' Line='"median &lt;N&gt;" - median of up to &lt;N&gt; images'>
+<DD>The median of the sky images in the ordered filter list, with the input
+image excluded if it is in the list, is computed and subtracted from the
+input image.  The number following the "<TT>median</TT>" designation selects the
+images nearest the target image to be medianed.  A value with a negative
+sign selects up to that many before the target image, with a positive sign
+selects up to that many after the target image, and without a sign it
+selects the N/2 before (rounded up) and N/2 after (rounded down) the target
+image.  There may be fewer image included in the median than specified
+because of finite lists.
+</DD>
+</DL>
+<P>
+If the <I>maskkey</I> parameter points to a keyword whose value is a
+bad pixel mask then the non-zero values in the mask will exclude pixels
+from the sky estimate.  If all images exclude the same pixel then no
+pixels will be excluded.  Note that for "<TT>nearest</TT>" sky this means that
+a bad pixel mask has no effect.
+<P>
+</UL>
+<! EndSection:   'SKY SUBTRACTION (S)'>
+<H2><A NAME="s_dark_and_flat_field_calibrations__d__f_">DARK AND FLAT FIELD CALIBRATIONS (D, F)</A></H2>
+<! BeginSection: 'DARK AND FLAT FIELD CALIBRATIONS (D, F)'>
+<UL>
+<P>
+Dark and flat field calibration images are specified by list of image
+names.  A list is allowed because each input image may require different
+calibration images or there may be several choices from which <I>irproc</I>
+can choose.  The most appropriate image is chosen based on exposure time
+(<I>exptime</I> parameter) for dark images or filter and grating setting
+(<I>filter</I> parameter) for flat field images.  If more than one
+calibration is equally good then the one closest based on the
+<I>sorkey</I> parameter is used.  If there is no sorting criterion then
+the first one in the list order is applied.
+<P>
+Unlike <B>ccdproc</B> there is no scaling applied to the flat field.
+Therefore, if the flat field is not normalized the flat fielded output will
+have a significantly different mean level. For efficiency there is no check
+made for division by zero.  Therefore, one should make sure that there are
+no bad values in the master flat fields when they are created.  One way to
+do this is to apply the <I>fixpix</I> correction to the flat fields to
+replace bad pixels specified in a mask with interpolated values.
+<P>
+Note that there is no check made that the images specified in the list are
+actually of the appropriate type and that they have been processed.  It is
+up to the user to insure the calibration images are properly prepared.  As
+noted previously, it is possible to define calibration images by header
+keywords.  In this case the value will not be a list but the single
+calibration designated by some other mechanism through the header keyword.
+<P>
+</UL>
+<! EndSection:   'DARK AND FLAT FIELD CALIBRATIONS (D, F)'>
+<H2><A NAME="s_fixpix__p_">FIXPIX (P)</A></H2>
+<! BeginSection: 'FIXPIX (P)'>
+<UL>
+<P>
+Bad pixels are replaced by linear interpolation from neighboring lines and
+columns when the parameter <I>fixpix</I> is set.  The algorithm is the same
+as used in the task <B>fixpix</B>.  There are two sources of bad pixels
+which are interpolated.  One is the bad pixel mask from the input image as
+specified by the header keyword defined by the <I>maskkey</I> parameter.
+The other are bad pixels identifed by the bad pixel expression given by
+the <I>badpixel</I> parameter.
+<P>
+</UL>
+<! EndSection:   'FIXPIX (P)'>
+<H2><A NAME="s_trim__t_">TRIM (T)</A></H2>
+<! BeginSection: 'TRIM (T)'>
+<UL>
+<P>
+When the parameter <I>trim</I> is set the input image will be trimmed to
+the image section given by the parameter <I>trimsec</I>.  This trim
+should, of course, be the same as that used for the calibration images.
+<P>
+</UL>
+<! EndSection:   'TRIM (T)'>
+<H2><A NAME="s_see_also">SEE ALSO</A></H2>
+<! BeginSection: 'SEE ALSO'>
+<UL>
+<PRE>
+<A HREF="irprocexpr.html">irprocexpr</A>, <A HREF="biaspars.html">biaspars</A>, ccdproc, fixpix, icfit
+</PRE>
+</UL>
+<! EndSection:    'SEE ALSO'>
+
+<! Contents: 'NAME' 'SYNOPSIS' 'HIGHLIGHTS' 'USAGE	' 'PARAMETERS' 'DESCRIPTION' 'OUTPUT' 'SOCKET INPUT' 'BAD PIXEL EXPRESSION' 'ERRACTION' 'CROSSTALK (X)' 'BIASCOR (B)' 'LINEARITY CORRECTION (L)' 'SKY SUBTRACTION (S)' 'DARK AND FLAT FIELD CALIBRATIONS (D, F)' 'FIXPIX (P)' 'TRIM (T)' 'SEE ALSO'  >
+
+</BODY>
+</HTML>

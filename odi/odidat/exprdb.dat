@@ -1,0 +1,57 @@
+# Database of expression evaluation functions for ODI.
+#
+# V100908: Initial version
+
+# TASK IMAGE KEYWORDS ----------------------------------------------------------
+
+# This database is intended for use with the tasks imexpr, mskexpr, and odiproc.
+# This is the only task dependent portion.  It defines the image operand for
+# keywords.  The three below are for imexpr, mskexpr, and odiproc respectively. 
+
+im=	I
+
+# USAGE ------------------------------------------------------------------------
+#
+
+# GLOSSARY ---------------------------------------------------------------------
+# 
+
+# CONSTANTS --------------------------------------------------------------------
+#
+
+# EXPOSURE KEYWORD PARAMETERS --------------------------------------------------
+#
+
+# MACROS -----------------------------------------------------------------------
+#
+
+# FUNCTIONS --------------------------------------------------------------------
+#
+
+# The functions here are called by expression evaluator tasks that support
+# expression databases.  The arguments are replaced by task operands.  The
+# operands may be constants, keywords, or images.
+
+# PROCTOOL ---------------------------------------------------------------------
+
+# Proctool expressions.  This uses additional substitution features
+# in proctool (e.q. odiproc).  In particular, \I is replaced by the
+# value of the "imageid" parameter and {} are evaluated as expressions
+# that return a string which is then further macro expanded.  For
+# ODI the imageid parameter maps to the (fppos//extname) keyword.
+# PROCTOOL sets the keyword PROCDONE with certain flags which is what
+# is used to conditionally modify the macro selected.
+
+
+# Functions
+
+#cindex(EN)	(int(substr(EN,3,3))*8+int(substr(EN,4,4))+1)
+cindex(EN)	(int(substr(EN,4,4))*8+int(substr(EN,3,3))+1)
+cmode(EN)	(substr(cellmode,cindex(EN),cindex(EN)))
+
+# Aliases
+
+zero=		(obstype?='{BIAS}'&&cmode(extname)=='S')
+dark=           (obstype?='{DARK}'&&cmode(extname)=='S')
+flat=		(obstype?='{DFLAT}'&&cmode(extname)=='S')
+object=		(obstype?='{OBJECT}'&&cmode(extname)=='S')

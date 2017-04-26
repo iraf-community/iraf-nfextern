@@ -1,0 +1,14 @@
+# ACEFOCUS -- Focus task using ACE catalogs.
+
+input,s,a,,,,"List of images or catalogs"
+catdef,s,h,"!FWHM",,,"Catalog keyword or definition file"
+focus,s,h,"!focus",,,"Focus values"
+filter,s,h,"",,,"Filter expression"
+match,r,h,-10,,,"Matching distance (arcsec|-pix)"
+rsig,r,h,2.2,,,"Size sigma clipping factor"
+fsig,r,h,2.5,,,"Focus sigma clipping factor"
+logfiles,s,h,"STDOUT,logfile",,,"Logfiles"
+interactive,b,h,yes,,,"Interactive graphics?"
+graphcur,*gcur,h,"",,,"Graphics cursor input"
+bestfocus,r,h,INDEF,,,"Best focus"
+bestsize,r,h,INDEF,,,"Best size"

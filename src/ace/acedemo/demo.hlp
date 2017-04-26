@@ -1,0 +1,271 @@
+.help demo Sep07
+.ih
+NAME
+demo -- interpret CL commands for a demonstration
+.ih
+SYNOPSIS
+.ih
+USAGE	
+demo
+.ih
+PARAMETERS
+.ls fname = "home$demo.dat"		{prompt="Demo file"}
+Demo file name.
+.le
+.ls dmprompt = "cl>"
+Prompt to be prepended to echoed commands in the demo file.  The demo file
+may override this default.
+.le
+.ls dmpause = yes			{prompt="Demo pause?"}
+Pause for an input key before executing commands in the demo file?
+The demo file may override this parameter for individual commands or
+for all commands.
+.le
+.ls dmexecute = yes			{prompt="Demo execute?"}
+Execute commands in the demo file?  If no then the commands will only
+be printed.
+.le
+.ls dmdelay = 0
+Delay after echoing commands before executing them.  The delay is in
+integer seconds.  The delay only applies when key pause is turned off.
+.ih
+DESCRIPTION
+This task interprets a simple text file containing commands,
+comments and demo parameters.  This demo file allows simple commands
+to be echoed to the terminal and/or executed.  The interpreter
+may pause after a printing a command and wait for a key to be typed,
+execute after a specified delay, or execute immediately.
+
+The purpose of this task is to allow execution of tasks with comments,
+pauses, and delays for a demonstration or test.  When pausing, an
+echoed command or comment waits for key to be typed with the terminal
+cursor at the end of a line.  This is the only cue that a key must be entered.  Any key except
+the ones noted below may be used to interpret the line with the current
+execute setting.  A good key to use is <return> or <enter>.  The special
+key 'q' quits the demo immediately.  The key 'n' does not execute the
+command regardless of the current execution setting.
+
+When a pause is not the current setting, or temporarily set as indicated
+below, and the current mode is to execute the command the command is
+executed after a delay given by the current delay value.  A value of zero
+will execute immediately.  A delay in a command leaves the cursor at the
+beginning of the line after the echoed command before starting the delay.
+Note how this differs from the cursor position for key pauses.  Also note
+that delays may only be integer seconds.
+
+The format of the file is designed to allow interpreting the demo file
+directly by the CL or by the demo interpreter.  For this purpose all
+control commands or commands to only be executed by the demo interpreter
+begin with the # comment character.
+
+There are limitations for a demo.  Unlike the stty playback mechanism
+which supplies all input, this task only echos lines and executes each
+command separately.  One a task is run the user must still supply
+all input such as responding to query parameters, standard input,
+cursor keystrokes or eparam input.  Also the commands in the demo
+file may not use CL control flow statements.The only special commands
+are package loading and help commands which need to explicitly set
+the current package to appear like interactive input.
+
+The following commands may be included in the demo file.  Note that there
+are separate set parameters for task commands, comments, and for blank
+lines.  The table shows the initial values, where those shown with
+"demo." are initially set by the task parameters described in the
+PARAMETER section.
+
+.nf
+## set prompt = demo.dmprompt
+## set pause = demo.dmpause
+## set delay = demo.delay
+## set execute = demo.execute
+## set echo = yes
+## set comment_echo = yes
+## set comment_pause = no
+## set comment_delay = 0
+## set blank_echo = yes
+## package <package>
+## help
+.fi
+
+The package command  loads the package, prints the package tasks, and
+changes the package prompt.  The help command prints the current package
+help.  and printing the help menu for the last loaded package.  These
+commands are needed because the way the demo interpreter, or any CL script,
+executes package loading and package help menu commands do not work as if
+they were executed interactively.
+
+The following describes the way a demo file is intepreted.  This illustrates
+the how blank lines and comments are handled by the demo interpreter.
+
+1. Any non-blank line not beginning with a # comment character is treated as
+a command to echo and execute after a key pause or delay.
+
+2. Any blank line may be echoed or not as controled by the blank_echo
+boolean parameter.
+
+3. Any line beginning with a single # is a comment which may be echoed
+and followed by a pause or delay.
+
+4. Any line beginning with a double ## begins either a set command
+for the demo or a command to be executed only by the demo interpreter.
+
+5. Any liine beginning with ##+ or ##- and followed by a command to
+be executed with pause or not pause, respectively, regardless of the
+current setting the pause option.
+
+6. Any line beginning with a three or more #'s are comments in the file
+but are not echoed or interpreted.
+
+.ih
+EXAMPLES
+.nf
+### ADASS playback script
+
+## set pause = no
+cd ADASS
+del comb*,diff*
+unlearn ace newfirm
+
+## clear
+# --- The NFEXTERN Package ---
+# 
+# This is an external package with the three major new packages.
+# The name is an arbitrary container package and its contents may be
+# released in one or more different containers.  Eventually they will
+# also be part of a new core or NOAO package distribution.
+
+## package nfextern
+
+## help
+
+##+ clear
+# --- The MSCTOOLS Package ---
+# 
+# This is a collection of general tools extracted and augmented from
+# the MSCRED package.  In general these tools are generic for both
+# single image and multi-extension format (MEF) files.
+
+## package msctools
+
+##+ clear
+# --- The NEWFIRM Package ---
+# 
+# This package supports the NEWFIRM IR Mosaic but it is the basis of
+# new reduction tools for IR (and CCD) instruments.  A significant change
+# from previous instrument reduction packages is doing away with translation
+# files and using expression parameters.
+
+## package newfirm
+
+## help
+
+##+ epar nfproc
+##+ epar combine
+
+## clear
+# --- The ACE package ---
+# 
+# This package is a general and modern source detection and cataloging
+# environment.  It is integrated with IRAF and common formats (pixel masks,
+# MEF files, binary and text tables), though it can also be binary installed
+# for stand-alone use (no IRAF required).  It features useful functionality
+# for segmentation (such as sky maps and object masks) and cataloging.  It
+# supports single and aggregate catalogs and difference image cataloging.  It
+# is very flexible in its catalog formats.
+
+## package ace
+
+##+ clear
+## help
+
+##+ clear
+# Make demo data.
+#
+# This consists of three MEF files with two extensions.  
+# This demo uses MEF files to illustrated the ease of used ad support for
+# mosaics or collections of images.  Of course, ACE also works on single
+# images.
+
+del comb*,BVI*,mos???_*
+mkacedata
+## dir
+
+## set pause=yes
+##+ clear
+# Combine the three extensions.  This is to illustrate a common used case
+# of detection on a deeper reference image and then cataloging on
+# multiple images with the same segmentation.
+
+combine mos???.fits comb combine=median group="" exten=extname
+
+# Display the image data.
+#
+# ACEDISPLAY is a version of MSCDISPLAY configured for ACE segmentation
+# map overlays.
+
+acedisp comb 1
+
+# Create a catalog.
+#
+# The simplest application is to catalog sources in images.
+
+## epar acecat
+acecat comb.fits
+
+## dir comb*
+
+# Now when we display we can see the object isophotes.
+## epar acedisp
+acedisp comb 2
+
+## clear
+# Catalog definition file.
+#
+# The catalog output is very flexible with many parameters and any
+# expression or function of parameters.  This also sets the output
+# field names.
+
+## page acelib$catdef.dat
+## page acedemo$BVI.def
+
+# Make catalog from common segmentation.
+#
+# This is a common use case that uses a previous segmentation and
+# outputs a catalog with joined fields.
+
+aceeval mos???.fits comb_cat catalog=BVI_cat catdef=acedemo$BVI.def
+
+# A lot of catalog functionality is provided by the existing TABLES package.
+
+tlcol BVI_cat.fits[im1]
+## tedit BVI_cat.fits[im1]
+sgraph "BVI_cat.fits[im1] B-V V-I" point+
+
+# A related type of display is using filtering and marks.
+
+acetvmark mos001 frame=1 catfilt="abs(@'B-V')>1"
+acetvmark mos002 frame=2 catfilt="abs(@'B-V')>1"
+
+# The last example is difference image detection.  This supports integer
+# offset registration and independent handling of sky and sky sigma.
+# Currently the actual differencing is simple subtraction with now
+# PSF matching.
+
+## epar acediff
+acediff mos???.fits rimage=comb rfrac=0.2
+acetvmark mos001 frame=1
+mscarith mos001 - comb diff
+acetvmark diff frame=2
+
+# As a final demonstration we show ACE running without IRAF.
+
+imcopy comb[im1] comb1
+!acecatalog comb1.fits catalogs=comb1.cat objmasks='""'
+!less comb1.cat
+
+# --- DONE ---
+
+.ih
+SEE ALSO
+stty
+.endhelp

@@ -1,0 +1,19 @@
+# Make SYSHOST.
+
+$omake	t_test.x
+$omake	xttxtopen.x
+$omake	test.x
+$link	t_test.o xttxtopen.o test.o
+$exit
+
+syshost:
+	$omake	syshost.x
+	$omake	xttxtfio.x
+	$omake	foo.x
+	$link	syshost.o xttxtfio.o foo.o
+	;
+
+txtcompile:
+	$omake	t_txtcompile.x
+	$link	t_txtcompile.o
+	;

@@ -1,0 +1,18 @@
+#
+rm test
+xx_examples.e example1 output="test" <<EOF
+
+EOF
+head -n 5 test
+
+rm test1
+xx_examples.e example1 output="test1" <<EOF
+myra mydec mymag
+EOF
+head -n 5 test1
+
+rm test2
+xx_examples.e example1 output="test2" <<EOF
+@example1.def
+EOF
+head -n 5 test2

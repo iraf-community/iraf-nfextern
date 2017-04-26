@@ -1,0 +1,29 @@
+# Help directory for DIMSUM tools.
+
+guide		hlp = guide.hlp
+
+badpixupdate	hlp = badpixupdate.hlp,		src = ../badpixupdate.cl
+demos		hlp = demos.hlp,		src = ../demos/demos.cl
+iterstat	hlp = iterstat.hlp,		src = ../iterstat.cl
+miterstat	hlp = miterstat.hlp,		src = ../miterstat.cl
+makemask	hlp = makemask.hlp,		src = ../makemask.cl
+maskdereg	hlp = maskdereg.hlp,		src = ../maskdereg.cl
+maskfix		hlp = maskfix.hlp,		src = ../maskfix.cl
+maskstat	hlp = maskstat.hlp,		src = ../maskstat.cl
+mkmask		hlp = mkmask.hlp,		src = ../mkmask.cl
+orient		hlp = orient.hlp,		src = ../orient.cl
+xmosaic		hlp = xmosaic.hlp,		src = ../xmosaic.cl
+sigmanorm	hlp = sigmanorm.hlp,		src = ../sigmanorm.cl
+xdshifts	hlp = xdshifts.hlp,		src = ../xdshifts.cl
+xfirstpass	hlp = xfirstpass.hlp,		src = ../xfirstpass.cl
+xfshifts	hlp = xfshifts.hlp,		src = ../xfshifts.cl
+xlist		hlp = xlist.hlp,		src = ../xlist.cl
+xmaskpass	hlp = xmaskpass.hlp,		src = ../xmaskpass.cl
+xmshifts	hlp = xmshifts.hlp,		src = ../xmshifts.cl
+xmskcombine	hlp = xmskcombine.hlp,		src = ../xmskcombine.cl
+xnregistar	hlp = xnregistar.hlp,		src = ../xnregistar.cl
+xnslm		hlp = xnslm.hlp,		src = ../xnslm.cl
+xnzap		hlp = xnzap.hlp,		src = ../xnzap.cl
+xrshifts	hlp = xrshifts.hlp,		src = ../xrshifts.cl
+xslm		hlp = xslm.hlp,			src = ../xslm.cl
+xzap		hlp = xzap.hlp,			src = ../xzap.cl

@@ -1,0 +1,77 @@
+.help newfirm Mar07 "User Guide"
+
+.ce
+\fBNEWFIRM Package User Guide\fR
+
+The \fBnewfirm\fR package is a collection of tasks that are useful for
+examining, processing, and analyzing NEWFIRM data.  Raw and most processed
+NEWFIRM data is in multi-extension FITS (MEF) files.  These files have
+a global header followed by extensions for each of the four arrays.
+Bad pixel masks applied and created during processing may also be
+MEF files.  So many of the tasks are designed to handle MEF files.
+Generally this means that the operation the task performs on images are
+applied to all the extensions in the MEF files.
+
+Note that most of the tasks in the package will work on single images,
+in one of the IRAF primary image formats or an MEF with one extension,
+as well as mosaics in MEF format.
+
+.sh
+Examining NEWFIRM Data
+
+.in +4
+.ce
+Table 1: NEWFIRM Package Examination and Display Tasks
+.nf
+mimpars         mscdisplay      mscexamine      mscheader
+mscselect       mscstat         msctvmark       msczero
+.fi
+
+This section describes tasks to examine the image headers and pixel
+statistics and display view and interact with the full NEWFIRM mosaic.
+Probably the first thing you will want to do is display a NEWFIRM mosaic
+exposure.  MSCDISPLAY, MSCEXAMINE, and MSCZERO all display a NEWFIRM
+exposure as a tiling of the display frame where the arrays are shown in
+their approximate position and orientation on the sky.  It is
+approximate because the array images are not resampled or rotated.
+MSCEXAMINE and MSCZERO call MSCDISPLAY to do the display if the
+requested image is not already displayed.
+
+MSCDISPLAY is an extension of the basic DISPLAY task and has many of
+the same parameters.  The positioning of the array images is
+controlled by DETSEC header keywords or, if absent, by the world
+coordinate system.  MIMPARS is a parameter set (a task that only
+sets parameters) for MSCDISPLAY.  It allows control of size of
+gaps (when using DETSEC) and "on-the-fly" processing.  The flat
+fields processing requires special files but quick bias and sky
+subtraction may be useful.  Trimming is always done if the keyword
+TRIMSEC is present as is the case with raw data to exclude display
+of the NEWFIRM reference bias pixels.
+
+A special feature of this task is the way automatic intensity
+windowing (zscaling) is done.  The \fIzcombine\fR parameter controls
+how scaling between the arrays is done.  The default "auto" does the
+most common modes for raw (independent scaline) and flat fielded
+(a common scaling) data.
+
+
+.sh
+Processing NEWFIRM Data
+
+instrumental calibration
+    irskysub, nfproc, mscwcsfit, mscsetwcs, mscpixarea, mscskysub, irobjmasks
+    irsetsky, msccmatch, mscimatch, mscwcs
+calibration combining
+    combine, dcombine, fcombine, mscstack, mscimage
+examination and display
+    mscdisplay, mscexamine, msczero, mimpars, mscstat, mscselect, mscheader,
+    msctvmark
+analysis
+    ircatalog, mscqphot, nffocus
+miscellaneous
+    mscarith, mscblkavg, mscctran, mscedit, mscextensions, mscgetcatalog,
+    mscjoin, mscmedian, mscrfits, mscsplit, mscwfits
+
+  
+
+.endhelp
