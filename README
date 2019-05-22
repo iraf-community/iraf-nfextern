@@ -112,7 +112,7 @@ instructions contact Frank Valdes (valdes@noao.edu).
     the source code).  Note that  pathnames  must  end  with  '/'.   For
     example:
     
-        % setenv nfextern /local/nfextern/
+        % export nfextern=/local/nfextern/
     
     In your login.cl or loginuser.cl file make the following definitions
     somewhere before the "keep" statement.
@@ -129,9 +129,9 @@ instructions contact Frank Valdes (valdes@noao.edu).
     supported environment.
     
         # Example
-        % setenv iraf /iraf/iraf/             # Path to IRAF root (example)
-        % source $iraf/unix/hlib/irafuser.csh # Define rest of environment
-        % setenv IRAFARCH redhat              # IRAF architecture
+        % export iraf=/iraf/iraf/             # Path to IRAF root (example)
+        % source $iraf/unix/hlib/irafuser.sh  # Define rest of environment
+        % export IRAFARCH=linux               # IRAF architecture
     
     where   you  need  to  supply  the  appropriate  path  to  the  IRAF 
     installation root in  the  first  step  and  the  IRAF  architecture

@@ -147,9 +147,9 @@ The following is for Unix/csh which is the main supported environment.
 
 .nf
     # Example
-    % setenv iraf /iraf/iraf/             # Path to IRAF root (example)
-    % source $iraf/unix/hlib/irafuser.csh # Define rest of environment
-    % setenv IRAFARCH redhat              # IRAF architecture
+    % export iraf=/iraf/iraf/             # Path to IRAF root (example)
+    % source $iraf/unix/hlib/irafuser.sh  # Define rest of environment
+    % export IRAFARCH=linux               # IRAF architecture
 .fi
 
 where you need to supply the appropriate path to the IRAF installation root
